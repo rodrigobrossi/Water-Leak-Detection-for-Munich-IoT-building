@@ -1,4 +1,3 @@
-
 //Written by: John D Vasquez, IBM
 //Date: 24/10/18
 //Water detection Monitor Munich IoT Center
@@ -11,6 +10,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include "DHT.h"
+#include <PubSubClient.h>
 
 //Includes for blynk connection
 #include <ESP8266WiFi.h>
@@ -39,33 +39,37 @@ char pass[] = "dem04IoT";
 #define DHTPIN D4
 #define DHTTYPE DHT22  
 DHT dht(DHTPIN, DHTTYPE);
+#define ORG "h9eyui"
+#define DEVICE_TYPE "waterLeakDetector"
+#define DEVICE_ID "20WestSensor1"
+#define TOKEN "watsoniot"
+
+char server[] = ORG ".messaging.internetofthings.ibmcloud.com";
+char topic[] = "iot-2/evt/status/fmt/json";
+char authMethod[] = "use-token-auth";
+char token[] = TOKEN;
+char clientId[] = "d:" ORG ":" DEVICE_TYPE ":" DEVICE_ID;
+
+WiFiClient wifiClient;
+PubSubClient client(server, 1883, NULL, wifiClient);
+
+
 
  
 void setup()   
 {
   Serial.begin(9600);
   
-  // Connect to WiFi using WiFiManager
- // wifiManager.resetSettings();       // Reset WiFiManager settings, uncomment if needed
-  //wifiManager.setTimeout(AP_TIMEOUT); // Timeout until config portal is turned off
-  //if (!wifiManager.autoConnect(AP_NAME, AP_PASS))
-  //{
-  //  Serial.println("Failed to connect and hit timeout");
-   // delay(3000);
-    //reset and try again
-   // ESP.reset();
-    //delay(5000);
-  //}
-
   Blynk.begin(auth, ssid, pass);
-  //Blynk.begin(auth, AP_NAME, AP_PASS);
   dht.begin();
   // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 64x48)
   display.display();
+
+  
 }
  
- 
+int counter = 0;
 void loop() 
 {
   Blynk.run();
@@ -73,7 +77,17 @@ void loop()
   display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(WHITE);
-  
+
+  if (!!!client.connected()) {
+   Serial.print("Reconnecting client to ");
+   Serial.println(server);
+   while (!!!client.connect(clientId, authMethod, token)) {
+      Serial.print(".");
+      delay(500);
+   }
+   Serial.println();
+ }
+
   // Reading temperature or humidity takes about 250 milliseconds!
   // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
   float h = dht.readHumidity();
@@ -86,6 +100,21 @@ void loop()
     return;
   }
   //temp in f
+
+ String payload = "{";
+  payload += "\"temperature\":"; payload += t; payload += ",";
+  payload += "\"humidity\":"; payload += h;
+  payload += "}";
+ 
+ Serial.print("Sending payload: ");
+ Serial.println(payload);
+ 
+ if (client.publish(topic, (char*) payload.c_str())) {
+   Serial.println("Publish ok");
+ } else {
+   Serial.println("Publish failed");
+ }
+
   
   Blynk.virtualWrite(V5, h);
   Blynk.virtualWrite(V6, f);
