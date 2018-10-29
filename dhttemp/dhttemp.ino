@@ -10,6 +10,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include "DHT.h"
+
 #include <PubSubClient.h>
 
 //Includes for blynk connection
@@ -99,11 +100,13 @@ void loop()
     Serial.println("Failed to read from DHT sensor!");
     return;
   }
-  //temp in f
+  
+  float c  = ((f -32) /1.800);
 
  String payload = "{";
   payload += "\"temperature\":"; payload += t; payload += ",";
-  payload += "\"humidity\":"; payload += h;
+  payload += "\"humidity\":"; payload += h;payload += ",";
+  payload += "\"celsius\":"; payload += c;
   payload += "}";
  
  Serial.print("Sending payload: ");
@@ -115,13 +118,17 @@ void loop()
    Serial.println("Publish failed");
  }
 
-  
+ 
   Blynk.virtualWrite(V5, h);
   Blynk.virtualWrite(V6, f);
+  Blynk.virtualWrite(V7, c);
   display.setCursor(32,8);
-  display.println(f);
+  display.println(String(h)+" %");
   display.setCursor(32,16);
-  display.println(h);
+  display.println(String(f)+" 'F");
+  display.setCursor(32,24);
+  display.println(String(c)+" 'C");
+  
      
   display.display();
  
