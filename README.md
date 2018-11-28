@@ -4,7 +4,7 @@ Threshold set to: 50%
 Once Threshold is met an email is sent 
 
 
-#Raspberry Pi setup
+# Raspberry Pi setup
 
 ### Install dependencies :
 1) DHT Library
@@ -24,7 +24,16 @@ pip install ibmiotf
 pip install blynk-library-python
 ```
 ### Circuit Connection :
+![alt diag](https://raw.github.ibm.com/Watson-IoT/Water-Leak-Detection-for-Munich-IoT-building/master/pi/connection.png?token=AAA7dqBb2AgPHmazQfMl0czwWfqgH8gSks5cB_IRwA%3D%3D)
 
+### Run
+
+```
+cd pi
+
+python humidity.py
+
+```
 ### To utilize the systemd service
 
 First copy the service file to /etc/systemd/system/humidity.service then:
