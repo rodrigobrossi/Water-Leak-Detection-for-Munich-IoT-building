@@ -5,7 +5,10 @@ Once Threshold is met an email is sent
 
 
 # Raspberry Pi setup
-
+### Clone the Repo :
+```
+git clone git@github.ibm.com:Watson-IoT/Water-Leak-Detection-for-Munich-IoT-building.git
+```
 ### Install dependencies :
 1) DHT Library
 ```
