@@ -24,3 +24,13 @@ pip install ibmiotf
 pip install blynk-library-python
 ```
 ### Circuit Connection :
+
+### To utilize the systemd service
+
+First copy the service file to /etc/systemd/system/humidity.service then:
+```
+sudo systemctl enable humidity.service
+```
+```
+sudo systemctl daemon-reload
+```
