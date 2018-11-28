@@ -1,0 +1,16 @@
+## humidity.service
+
+[Unit]
+Description=Humidity and Temperature Monitor
+After=network.target
+
+[Service]
+Type=forking
+User=root
+WorkingDirectory=/home/pi/Desktop/IOT-WATER
+ExecStart=/usr/bin/python /home/pi/Desktop/IOT-WATER/humidity.py &
+Restart=on-failure
+StartLimitIntervalSec=60
+
+[Install]
+WantedBy=multi-user.target
