@@ -27,6 +27,7 @@ pip install ibmiotf
 pip install blynk-library-python
 ```
 ### Circuit Connection :
+(recommended 4.7k or 10k ohm resistor)
 ![alt diag](https://raw.github.ibm.com/Watson-IoT/Water-Leak-Detection-for-Munich-IoT-building/master/pi/connection.png?token=AAA7dqBb2AgPHmazQfMl0czwWfqgH8gSks5cB_IRwA%3D%3D)
 
 ### Run
