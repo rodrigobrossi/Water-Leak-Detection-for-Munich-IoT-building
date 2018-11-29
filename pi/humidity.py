@@ -27,7 +27,8 @@ def getData():
     data = { 
         'fahrenheit' : round(fahrenheit,1),
         'humidity' : round(humidity,1),
-        'celsius' : round(celsius,1)
+	 'celsius' : round(celsius,1),
+        'temperature' : round(celsius,1)
     }
 
     return data
