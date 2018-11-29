@@ -76,7 +76,7 @@ def V7_read_handler():
 
 deviceCli.connect()
 publish()
-set_interval(publish,60*5)
+set_interval(publish,60*1)
 Blynk.run()
     
     
