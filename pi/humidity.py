@@ -46,7 +46,7 @@ def myOnPublishCallback():
 		print("Confirmed event received by IoTF\n" )
 
 def publish():
-    deviceCli.publishEvent("WaterData", "json", getData(), qos=0, on_publish=myOnPublishCallback)
+    deviceCli.publishEvent("status", "json", getData(), qos=0, on_publish=myOnPublishCallback)
 
 # Connect to Blynk and WIOTP
 try:
