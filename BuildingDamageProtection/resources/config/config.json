@@ -1,5 +1,8 @@
 {
    "server_port":"8080",
+   "db_dbname":"dbadmin",
+   "db_dbhost":"dummyhost",
+   "db_dbport":"50000",
    "db_admin_user":"dbadmin",
    "db_admin_password":"dbpassword",
    "gateway_user":"admin",

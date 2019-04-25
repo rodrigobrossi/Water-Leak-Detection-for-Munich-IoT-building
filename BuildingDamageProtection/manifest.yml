@@ -1,0 +1,4 @@
+applications:
+- name: BuildingDamageProtection
+  random-route: true
+  memory: 128M
