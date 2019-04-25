@@ -1,0 +1,11 @@
+{
+   "server_port":"8443",
+   "db_admin_user":"dbadmin",
+   "db_admin_password":"dbpassword",
+   "gateway_user":"admin",
+   "gateway_password":"password",
+   "server_type":"wsgi",
+   "debug_mode":"true",
+   "https_cert":"resources/https/cert.pem",
+   "https_key":"resources/https/key.pem"
+}
