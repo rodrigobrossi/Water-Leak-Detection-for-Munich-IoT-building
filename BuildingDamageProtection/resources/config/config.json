@@ -1,10 +1,11 @@
 {
-   "server_port":"8443",
+   "server_port":"8080",
    "db_admin_user":"dbadmin",
    "db_admin_password":"dbpassword",
    "gateway_user":"admin",
    "gateway_password":"password",
-   "server_type":"wsgi",
+   "server_type_backup":"wsgi",
+   "server_type":"flask",
    "debug_mode":"true",
    "https_cert":"resources/https/cert.pem",
    "https_key":"resources/https/key.pem"

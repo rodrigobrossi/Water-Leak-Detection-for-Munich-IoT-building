@@ -15,9 +15,8 @@ import sys
 import gevent
 import gevent.monkey
 from gevent.pywsgi import WSGIServer
-from importlib import reload
 gevent.monkey.patch_all()
-reload(sys)
+
 #sys.setdefaultencoding('utf8')
 sys.dont_write_bytecode = True
 
@@ -25,7 +24,6 @@ sys.dont_write_bytecode = True
 from bdp_auth import BDPAuth
 #from ai_sysinit import AISysInit
 #import psycopg2
-from threading import Thread
 from time import sleep
 
 from flask import Flask
@@ -65,7 +63,8 @@ api.add_resource(BDPIncidentRespond, '/respond')
 #app.run(threaded=True, ssl_context=(AIProperty.getInstance().getValue('https_cert'), AIProperty.getInstance().getValue('https_key')), host='0.0.0.0', port=int(AIProperty.getInstance().getValue('server_port')))
 
 if 'flask' == BDPProperty.getInstance().getValue('server_type'):
-    app.run(ssl_context=(BDPProperty.getInstance().getValue('https_cert'), BDPProperty.getInstance().getValue('https_key')), host='0.0.0.0', port=int(BDPProperty.getInstance().getValue('server_port')))
+    app.run(host='0.0.0.0', port=int(BDPProperty.getInstance().getValue('server_port')))
+#    app.run(ssl_context=(BDPProperty.getInstance().getValue('https_cert'), BDPProperty.getInstance().getValue('https_key')), host='0.0.0.0', port=int(BDPProperty.getInstance().getValue('server_port')))
 else:
     http_server = WSGIServer(('0.0.0.0', int(BDPProperty.getInstance().getValue('server_port'))), app, keyfile=BDPProperty.getInstance().getValue('https_key'), certfile=BDPProperty.getInstance().getValue('https_cert'))
     http_server.serve_forever()
