@@ -22,7 +22,7 @@ sys.dont_write_bytecode = True
 
 
 from bdp_auth import BDPAuth
-#from ai_sysinit import AISysInit
+from bdp_sysinit import BDPSysInit
 #import psycopg2
 from time import sleep
 
@@ -42,8 +42,8 @@ class BDPGateway(Resource):
     def get(self):
         return {'Building Damage Protection': 'alive'}
 
-#sysInit = AISysInit()
-#sysInit.init()
+sysInit = BDPSysInit()
+sysInit.init()
 
 '''def startScheduler():
     periodic_scheduler = AIServiceInit()  
