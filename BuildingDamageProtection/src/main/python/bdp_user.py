@@ -1,0 +1,58 @@
+#############################################################
+# IBM Confidential
+# OCO Source Materials
+#
+#  (C) Copyright IBM Corp. 2018
+#
+# The source code for this program is not published or otherwise
+# divested of its trade secrets, irrespective of what has
+# been deposited with the U.S. Copyright Office.
+#############################################################
+import os 
+import sys
+import pprint
+import time
+import datetime
+from flask import Response
+from flask import Flask
+from flask_restful import Resource, Api
+from flask_httpauth import HTTPBasicAuth
+from flask import request
+from flask import json
+import ibm_db
+from bdp_dbutil import *
+
+from bdp_auth import BDPAuth
+auth = HTTPBasicAuth()
+
+authF = BDPAuth()
+
+
+class BDPUser(Resource):
+
+    @auth.login_required
+    def post(self):
+        try:
+            conn = get_db_connection()
+            jsonbody = request.get_json(force=True)
+            print(jsonbody)
+            sql_string = "INSERT INTO " + BDPProperty.getInstance().getValue('db_admin_user') + ".BDP_USER (USER_NAME, USER_CONTACT_1, TENANT_ID) SELECT '" + jsonbody['USER_NAME'] + "', '" + jsonbody['USER_CONTACT_1'] + "', TENANT_ID FROM LKR34911.BDP_TENANT WHERE TENANT = '"+ jsonbody['TENANT'] + "'"
+            stmt = ibm_db.exec_immediate(conn, sql_string)
+            content = {'user':'created'}
+            if ibm_db.num_rows(stmt) == 0:
+                content = {'result':'failed to create user'}
+
+            return content
+        except Exception as e:
+            print(e)
+            return {"result":"failed to create user", "msg": str(e)}, 400
+
+
+    @auth.verify_password
+    def verify(username, password):
+        print("BDPIncident called")
+        return authF.auth(username, password)
+    
+    def postValidation(self, jsonbody):
+        print(jsonbody)
+        return True
