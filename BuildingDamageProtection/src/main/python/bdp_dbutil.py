@@ -12,7 +12,6 @@ import ibm_db
 from bdp_property import BDPProperty
 
 def get_db_connection():
-#DATABASE=name;HOSTNAME=host;PORT=60000;PROTOCOL=TCPIP;UID=username;PWD=password;
     conn_string = "DATABASE=" + BDPProperty.getInstance().getValue('db_dbname')
     conn_string = conn_string + ";HOSTNAME=" + BDPProperty.getInstance().getValue('db_dbhost')
     conn_string = conn_string + ";PORT=" + BDPProperty.getInstance().getValue('db_dbport')

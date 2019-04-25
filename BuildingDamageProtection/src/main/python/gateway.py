@@ -31,6 +31,8 @@ from flask_restful import Resource, Api
 from flask_httpauth import HTTPBasicAuth
 from bdp_property import BDPProperty
 from bdp_incident import BDPIncident
+from bdp_tenant import BDPTenant
+from bdp_user import BDPUser
 from bdp_respond import BDPIncidentRespond
 
 app = Flask(__name__)
@@ -57,6 +59,8 @@ thread1.start()
 api.add_resource(BDPGateway, '/')
 api.add_resource(BDPIncident, '/incident')
 api.add_resource(BDPIncidentRespond, '/respond')
+api.add_resource(BDPTenant, '/tenant')
+api.add_resource(BDPUser, '/user')
 
 #app.run(ssl_context='adhoc', host='0.0.0.0', port=int(AIProperty.getInstance().getValue('server_port')))
 #app.run(host='0.0.0.0', port=int(AIProperty.getInstance().getValue('server_port')))

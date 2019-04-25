@@ -19,7 +19,9 @@ from flask_restful import Resource, Api
 from flask_httpauth import HTTPBasicAuth
 from flask import request
 from flask import json
-
+from bdp_property import BDPProperty
+import ibm_db
+from bdp_dbutil import *
 
 from bdp_auth import BDPAuth
 auth = HTTPBasicAuth()
@@ -27,20 +29,23 @@ auth = HTTPBasicAuth()
 authF = BDPAuth()
 
 
-class BDPIncident(Resource):
+class BDPTenant(Resource):
 
     @auth.login_required
     def post(self):
         try:
+            conn = get_db_connection()
             jsonbody = request.get_json(force=True)
             print(jsonbody)
-            content = {'incident':'created'}
-
-    
+            sql_string = "insert into " + BDPProperty.getInstance().getValue('db_admin_user') + ".BDP_TENANT (TENANT, TENANT_NAME) values ('" + jsonbody['TENANT'] + "', '" + jsonbody['TENANT_NAME'] + "')";
+            stmt = ibm_db.exec_immediate(conn, sql_string)
+            content = {'tenant':'created'}
+            if ibm_db.num_rows(stmt) == 0:
+                content = {'result':'failed to create tenant'}
             return content
         except Exception as e:
             print(e)
-            return {"result":"fail", "msg": str(e)}, 400
+            return {"result":"fail to create tenant", "msg": str(e)}, 400
 
 
     @auth.verify_password
