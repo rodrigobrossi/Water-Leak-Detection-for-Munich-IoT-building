@@ -22,7 +22,7 @@ reload(sys)
 sys.dont_write_bytecode = True
 
 
-from bdp_auth import AIAuth
+from bdp_auth import BDPAuth
 #from ai_sysinit import AISysInit
 #import psycopg2
 from threading import Thread
@@ -31,14 +31,14 @@ from time import sleep
 from flask import Flask
 from flask_restful import Resource, Api
 from flask_httpauth import HTTPBasicAuth
-from bdp_property import AIProperty
+from bdp_property import BDPProperty
 
 app = Flask(__name__)
 api = Api(app)
 #auth = HTTPBasicAuth()
 #authF = AIAuth()
 
-class AIEngineGateway(Resource):
+class BDPGateway(Resource):
     def get(self):
         return {'Building Damage Protection': 'alive'}
 
@@ -54,15 +54,15 @@ thread1 = Thread(target = startScheduler, args = ())
 thread1.start()
 '''
     
-api.add_resource(AIEngineGateway, '/')
+api.add_resource(BDPGateway, '/')
 
 #app.run(ssl_context='adhoc', host='0.0.0.0', port=int(AIProperty.getInstance().getValue('server_port')))
 #app.run(host='0.0.0.0', port=int(AIProperty.getInstance().getValue('server_port')))
 #app.run(threaded=True, ssl_context=(AIProperty.getInstance().getValue('https_cert'), AIProperty.getInstance().getValue('https_key')), host='0.0.0.0', port=int(AIProperty.getInstance().getValue('server_port')))
 
-if 'flask' == AIProperty.getInstance().getValue('server_type'):
-    app.run(ssl_context=(AIProperty.getInstance().getValue('https_cert'), AIProperty.getInstance().getValue('https_key')), host='0.0.0.0', port=int(AIProperty.getInstance().getValue('server_port')))
+if 'flask' == BDPProperty.getInstance().getValue('server_type'):
+    app.run(ssl_context=(BDPProperty.getInstance().getValue('https_cert'), BDPProperty.getInstance().getValue('https_key')), host='0.0.0.0', port=int(BDPProperty.getInstance().getValue('server_port')))
 else:
-    http_server = WSGIServer(('0.0.0.0', int(AIProperty.getInstance().getValue('server_port'))), app, keyfile=AIProperty.getInstance().getValue('https_key'), certfile=AIProperty.getInstance().getValue('https_cert'))
+    http_server = WSGIServer(('0.0.0.0', int(BDPProperty.getInstance().getValue('server_port'))), app, keyfile=BDPProperty.getInstance().getValue('https_key'), certfile=BDPProperty.getInstance().getValue('https_cert'))
     http_server.serve_forever()
 
