@@ -35,10 +35,14 @@ class BDPSysInit():
         if rownum == 0:
             f = open("resources/db/db2/init.sql", "r")
             flines = f.readlines()
+            command = ''
             for line in flines:
                 line = line.replace("DBUSER", BDPProperty.getInstance().getValue('db_admin_user'))
-                print(line)
-                ibm_db.exec_immediate(conn, line)
+                command = command + " " + line.strip()
+                if command.endswith(';'):
+                    print(command)
+                    ibm_db.exec_immediate(conn, command)
+                    command = ''
         
         xmldoc = minidom.parse('resources/db/db2/db.changelog.xml')
         itemlist = xmldoc.getElementsByTagName('include')
@@ -61,10 +65,14 @@ class BDPSysInit():
             if idnum == 0:
                 f = open(filename, "r")
                 flines = f.readlines()
+                command = ''
                 for line in flines:
                     line = line.replace("DBUSER", BDPProperty.getInstance().getValue('db_admin_user'))
-                    print(line)
-                    ibm_db.exec_immediate(conn, line)
+                    command = command + " " + line.strip()
+                    if command.endswith(';'):
+                        print(command)
+                        ibm_db.exec_immediate(conn, command)
+                        command = ''
                     
                 sql_string = "insert into " + BDPProperty.getInstance().getValue('db_admin_user') + ".BDP_DBCHANGELOG (changeid, changeset) values ('" + id + "', '" + filename + "')";
                 print(sql_string)
