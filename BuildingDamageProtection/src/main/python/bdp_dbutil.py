@@ -14,11 +14,11 @@ from bdp_property import BDPProperty
 def get_db_connection():
 #DATABASE=name;HOSTNAME=host;PORT=60000;PROTOCOL=TCPIP;UID=username;PWD=password;
     conn_string = "DATABASE=" + BDPProperty.getInstance().getValue('db_dbname')
-    conn_string = conn_string + ";HOSTNAME=" + BDPProperty.getInstance().getValue('db_host')
-    conn_string = conn_string + ";PORT=" + BDPProperty.getInstance().getValue('db_port')
+    conn_string = conn_string + ";HOSTNAME=" + BDPProperty.getInstance().getValue('db_dbhost')
+    conn_string = conn_string + ";PORT=" + BDPProperty.getInstance().getValue('db_dbport')
     conn_string = conn_string + ";PROTOCOL=TCPIP;UID=" + BDPProperty.getInstance().getValue('db_admin_user')
-    conn_string = conn_string + ";PWD=" + BDPProperty.getInstance().getValue('db_password')
+    conn_string = conn_string + ";PWD=" + BDPProperty.getInstance().getValue('db_admin_password')
     print(conn_string)
-    conn = ibm_db.connect(BDPProperty.getInstance().getValue('db_dbname'), BDPProperty.getInstance().getValue('db_admin_user'), AIProperty.getInstance().getValue('db_admin_password'))
+    conn = ibm_db.connect(conn_string, "", "")
     '''conn.autocommit = True'''
     return conn
