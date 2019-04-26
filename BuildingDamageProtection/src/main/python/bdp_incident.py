@@ -34,7 +34,7 @@ class BDPIncident(Resource):
     @auth.login_required
     def post(self):
         try:
-            conn = get_db_connection()
+            conn = getDBConnection()
             jsonbody = request.get_json(force=True)
             print(jsonbody)
             tenantjson = get_tenantid_by_name(conn, jsonbody['TENANT'])
@@ -42,18 +42,18 @@ class BDPIncident(Resource):
                 content = {'result':'failed to create incident'}
             else:
                 tenantid = tenantjson['TENANT_ID']
-                sql_string = "SELECT * FROM " + get_table_name("BDP_INCIDENT") + " WHERE INCIDENT_ID_ORIGINAL IS NULL AND TENANT_ID = " + str(tenantid) + " AND INCIDENT_STATUS_CODE != 1 ORDER BY INCIDENT_TIME DESC FETCH FIRST 1 ROWS ONLY"
+                sql_string = "SELECT * FROM " + getTableName("BDP_INCIDENT") + " WHERE INCIDENT_ID_ORIGINAL IS NULL AND TENANT_ID = " + str(tenantid) + " AND INCIDENT_STATUS_CODE != 1 ORDER BY INCIDENT_TIME DESC FETCH FIRST 1 ROWS ONLY"
                 stmt = ibm_db.exec_immediate(conn, sql_string)
-                dictionary = ibm_db.fetch_both(stmt)
+                incidentjson = ibm_db.fetch_both(stmt)
                 incidentid = None
-                if dictionary != False:
-                    print(dictionary["INCIDENT_ID"])
-                    incidentid = str(dictionary["INCIDENT_ID"])
+                if incidentjson != False:
+                    print(incidentjson["INCIDENT_ID"])
+                    incidentid = str(incidentjson["INCIDENT_ID"])
                 
                 if incidentid is None:  #new incident
-                    sql_string = "INSERT INTO " + get_table_name("BDP_INCIDENT") + " (INCIDENT_DETAIL, INCIDENT_TIME, INCIDENT_STATUS_CODE, TENANT_ID) VALUES( '" + json.dumps(jsonbody['INCIDENT_DETAIL']) + "', '" + jsonbody['INCIDENT_TIME'] + "', 2, '" + str(tenantid) + "')"
+                    sql_string = "INSERT INTO " + getTableName("BDP_INCIDENT") + " (INCIDENT_DETAIL, INCIDENT_TIME, INCIDENT_STATUS_CODE, TENANT_ID) VALUES( '" + json.dumps(jsonbody['INCIDENT_DETAIL']) + "', '" + jsonbody['INCIDENT_TIME'] + "', 2, '" + str(tenantid) + "')"
                 else: #existing incident
-                    sql_string = "INSERT INTO " + get_table_name("BDP_INCIDENT") + " (INCIDENT_DETAIL, INCIDENT_TIME, INCIDENT_STATUS_CODE, TENANT_ID, INCIDENT_ID_ORIGINAL) VALUES( '" + json.dumps(jsonbody['INCIDENT_DETAIL']) + "', '" + jsonbody['INCIDENT_TIME'] + "', 2, '" + str(tenantid) + "', " + incidentid + ")"
+                    sql_string = "INSERT INTO " + getTableName("BDP_INCIDENT") + " (INCIDENT_DETAIL, INCIDENT_TIME, INCIDENT_STATUS_CODE, TENANT_ID, INCIDENT_ID_ORIGINAL) VALUES( '" + json.dumps(jsonbody['INCIDENT_DETAIL']) + "', '" + jsonbody['INCIDENT_TIME'] + "', 2, '" + str(tenantid) + "', " + incidentid + ")"
                 print(sql_string)
                 stmt = ibm_db.exec_immediate(conn, sql_string)
                 if ibm_db.num_rows(stmt) == 0:
@@ -61,8 +61,9 @@ class BDPIncident(Resource):
                 else:
                     content = {'incident':'created'}
                     print("new incident added, need to determine if notification is needed: ")
-                    print(dictionary)
+                    print(incidentjson)
                     print(tenantjson)
+                    timeToNotify(incidentjson, tenantjson)
 
             return content
         except Exception as e:

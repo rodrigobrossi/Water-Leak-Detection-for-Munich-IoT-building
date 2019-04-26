@@ -11,7 +11,7 @@
 import ibm_db
 from bdp_property import BDPProperty
 
-def get_db_connection():
+def getDBConnection():
     conn_string = "DATABASE=" + BDPProperty.getInstance().getValue('db_dbname')
     conn_string = conn_string + ";HOSTNAME=" + BDPProperty.getInstance().getValue('db_dbhost')
     conn_string = conn_string + ";PORT=" + BDPProperty.getInstance().getValue('db_dbport')
@@ -23,7 +23,7 @@ def get_db_connection():
     return conn
 
 def get_tenantid_by_name(conn, tenant):
-    sql_string = "SELECT * FROM " + get_table_name("BDP_TENANT") + " WHERE TENANT = '" + tenant + "'"
+    sql_string = "SELECT * FROM " + getTableName("BDP_TENANT") + " WHERE TENANT = '" + tenant + "'"
     stmt = ibm_db.exec_immediate(conn, sql_string)
     dictionary = ibm_db.fetch_both(stmt)
     if dictionary != False:
@@ -31,6 +31,6 @@ def get_tenantid_by_name(conn, tenant):
     else:
         return None
     
-def get_table_name(tablename):
+def getTableName(tablename):
     return BDPProperty.getInstance().getValue('db_admin_user') + "." + tablename
     
