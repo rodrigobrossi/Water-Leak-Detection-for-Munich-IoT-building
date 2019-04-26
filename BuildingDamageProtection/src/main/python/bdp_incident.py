@@ -61,7 +61,8 @@ class BDPIncident(Resource):
                 else:
                     content = {'incident':'created'}
                     print("new incident added, need to determine if notification is needed: ")
-                    self.timeToNotify(incidentjson, tenantjson, conn)
+                    usersgroup = self.timeToNotify(incidentjson, tenantjson, conn)
+                    print(usersgroup)
 
             return content
         except Exception as e:
@@ -79,6 +80,7 @@ class BDPIncident(Resource):
         return True
     
     def timeToNotify(self, incident_record, tenant_record, conn):
+        usergroups = []
         send = False
         if incident_record == False: #no previous incident, send immediately
             print("no previous incident, send immediately")
@@ -117,6 +119,5 @@ class BDPIncident(Resource):
                     snoozeFlip(conn, incident_record, False)
 
         if send is True:
-            print(tenant_record)
-            getAllUsers(conn, tenant_record["TENANT_ID"])
-        return False
+            usergroups = getAllUsers(conn, tenant_record["TENANT_ID"])
+        return usergroups

@@ -10,6 +10,7 @@
 #############################################################
 import ibm_db
 from bdp_property import BDPProperty
+from bdp_util import *
 
 def getDBConnection():
     conn_string = "DATABASE=" + BDPProperty.getInstance().getValue('db_dbname')
@@ -35,19 +36,20 @@ def getTableName(tablename):
     return BDPProperty.getInstance().getValue('db_admin_user') + "." + tablename
 
 def getAllUsers(conn, tenant_id):
+    usergroups = []
     print("getting all users for tenant: " + str(tenant_id))
     if tenant_id < 0:
         sql_string = "SELECT * FROM " + getTableName("BDP_USER")
     else:
         sql_string = "SELECT * FROM " + getTableName("BDP_USER") + " WHERE TENANT_ID = " + str(tenant_id)
-    print(sql_string)
     stmt = ibm_db.exec_immediate(conn, sql_string)
-    dictionary = ibm_db.fetch_both(stmt)
-    if dictionary != False:
-        print(dictionary)
-        return dictionary
-    else:
-        return None
+    dictionary = ibm_db.fetch_assoc(stmt)
+    while dictionary != False:
+        dictionary["linkid"] = randomString()
+        usergroups.append(dictionary)
+        dictionary = ibm_db.fetch_assoc(stmt)
+
+    return usergroups
     
 def snoozeFlip(conn, incident_record, state):
     if state is True:
@@ -56,6 +58,5 @@ def snoozeFlip(conn, incident_record, state):
     else:
         #turn of snooze
         sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET SNOOZE_TIME = null WHERE INCIDENT_ID = " + str(incident_record["INCIDENT_ID"])
-    print(sql_string)
     stmt = ibm_db.exec_immediate(conn, sql_string)
-    
+
