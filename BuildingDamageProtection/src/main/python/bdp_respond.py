@@ -24,6 +24,10 @@ class BDPIncidentRespond(Resource):
     def get(self):
         try:
             content = {'user action':'received'}
+            action = request.args.get('action')
+            print(action)
+            nid = request.args.get('nid')
+            print(nid)
 
             return content
         except Exception as e:
