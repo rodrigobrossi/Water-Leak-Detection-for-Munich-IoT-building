@@ -93,6 +93,7 @@ class BDPIncident(Resource):
                 lastsent = incident_record["NOTIFY_TIME"]
                 if lastsent is None:
                     print("#never sent before, now")
+                    send = True
                 else:
                     interval = tenant_record["ALARM_INTERVAL_HR"] * 60
                     now = datetime.datetime.now()
@@ -102,10 +103,20 @@ class BDPIncident(Resource):
                     print("diff: " + str(diff) + "/interval: " + str(interval))
                     if diff > interval:
                         send = True
+            else:
+                print("# snooze in session")
+                lastsnooze = incident_record["SNOOZE_TIME"]
+                interval = tenant_record["SNOOZE_HR"] * 60
+                now = datetime.datetime.now()
+                print(lastsnooze)
+                print(now)
+                diff = (now - lastsnooze).seconds/60
+                print("diff: " + str(diff) + "/interval: " + str(interval))
+                if diff > interval:
+                    send = True
+                    snoozeFlip(conn, incident_record, False)
+
         if send is True:
-            print("strange true")
             print(tenant_record)
             getAllUsers(conn, tenant_record["TENANT_ID"])
-        else:
-            print("strange")
         return False

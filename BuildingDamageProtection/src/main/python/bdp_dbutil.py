@@ -49,3 +49,13 @@ def getAllUsers(conn, tenant_id):
     else:
         return None
     
+def snoozeFlip(conn, incident_record, state):
+    if state is True:
+        #set snooze
+        sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SNOOZE_TIME = " + datetime.datetime.now() + " WHERE INCIDENT_ID = " + str(incident_record["INCIDENT_ID"])
+    else:
+        #turn of snooze
+        sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET SNOOZE_TIME = null WHERE INCIDENT_ID = " + str(incident_record["INCIDENT_ID"])
+    print(sql_string)
+    stmt = ibm_db.exec_immediate(conn, sql_string)
+    
