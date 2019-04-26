@@ -17,7 +17,7 @@ from xml.dom import minidom
 class BDPSysInit():
     def init(self):
         # Define our connection string
-        conn = getDBConnection()
+        conn = BDPDBConnection.getInstance().getDBConnection()
         
         sql = "SELECT  * FROM  SYSIBM.SYSTABLES WHERE  type = 'T' AND NAME LIKE 'BDP_%'"
         stmt = ibm_db.exec_immediate(conn, sql)

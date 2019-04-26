@@ -34,7 +34,7 @@ class BDPIncident(Resource):
     @auth.login_required
     def post(self):
         try:
-            conn = getDBConnection()
+            conn = BDPDBConnection.getInstance().getDBConnection()
             jsonbody = request.get_json(force=True)
             print(jsonbody)
             tenantjson = getTenantByName(conn, jsonbody['TENANT'])

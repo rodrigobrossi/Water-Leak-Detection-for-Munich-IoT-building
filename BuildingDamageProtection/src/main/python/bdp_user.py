@@ -33,7 +33,7 @@ class BDPUser(Resource):
     @auth.login_required
     def post(self):
         try:
-            conn = getDBConnection()
+            conn = BDPDBConnection.getInstance().getDBConnection()
             jsonbody = request.get_json(force=True)
             print(jsonbody)
             sql_string = "INSERT INTO " + BDPProperty.getInstance().getValue('db_admin_user') + ".BDP_USER (USER_NAME, USER_CONTACT_1, TENANT_ID) SELECT '" + jsonbody['USER_NAME'] + "', '" + jsonbody['USER_CONTACT_1'] + "', TENANT_ID FROM LKR34911.BDP_TENANT WHERE TENANT = '"+ jsonbody['TENANT'] + "'"

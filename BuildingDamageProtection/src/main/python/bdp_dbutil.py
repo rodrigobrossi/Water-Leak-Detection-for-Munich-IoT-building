@@ -12,7 +12,34 @@ import ibm_db
 from bdp_property import BDPProperty
 from bdp_util import *
 
-def getDBConnection():
+
+
+class BDPDBConnection():
+    __instance = None
+
+    @staticmethod
+    def getInstance():
+        if BDPDBConnection.__instance == None:
+            BDPDBConnection()
+        return BDPDBConnection.__instance 
+
+    def __init__(self):
+        if BDPDBConnection.__instance != None:
+            raise Exception("This class is a singleton!")
+        else:
+            BDPDBConnection.__instance = self
+            conn_string = "DATABASE=" + BDPProperty.getInstance().getValue('db_dbname')
+            conn_string = conn_string + ";HOSTNAME=" + BDPProperty.getInstance().getValue('db_dbhost')
+            conn_string = conn_string + ";PORT=" + BDPProperty.getInstance().getValue('db_dbport')
+            conn_string = conn_string + ";PROTOCOL=TCPIP;UID=" + BDPProperty.getInstance().getValue('db_admin_user')
+            conn_string = conn_string + ";PWD=" + BDPProperty.getInstance().getValue('db_admin_password')
+            print(conn_string)
+            self.conn = ibm_db.pconnect(conn_string, "", "")            
+            
+    def getDBConnection(self):
+        return self.conn
+
+'''def getDBConnection():
     conn_string = "DATABASE=" + BDPProperty.getInstance().getValue('db_dbname')
     conn_string = conn_string + ";HOSTNAME=" + BDPProperty.getInstance().getValue('db_dbhost')
     conn_string = conn_string + ";PORT=" + BDPProperty.getInstance().getValue('db_dbport')
@@ -20,8 +47,8 @@ def getDBConnection():
     conn_string = conn_string + ";PWD=" + BDPProperty.getInstance().getValue('db_admin_password')
     print(conn_string)
     conn = ibm_db.connect(conn_string, "", "")
-    '''conn.autocommit = True'''
-    return conn
+    #conn.autocommit = True
+    return conn'''
 
 def getTenantByName(conn, tenant):
     sql_string = "SELECT * FROM " + getTableName("BDP_TENANT") + " WHERE TENANT = '" + tenant + "'"
