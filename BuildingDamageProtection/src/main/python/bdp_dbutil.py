@@ -11,7 +11,7 @@
 import ibm_db
 from bdp_property import BDPProperty
 from bdp_util import *
-
+import datetime
 
 
 class BDPDBConnection():
@@ -34,7 +34,7 @@ class BDPDBConnection():
             conn_string = conn_string + ";PROTOCOL=TCPIP;UID=" + BDPProperty.getInstance().getValue('db_admin_user')
             conn_string = conn_string + ";PWD=" + BDPProperty.getInstance().getValue('db_admin_password')
             print(conn_string)
-            self.conn = ibm_db.pconnect(conn_string, "", "")            
+            self.conn = ibm_db.pconnect(conn_string, "", "") 
             
     def getDBConnection(self):
         return self.conn
@@ -72,18 +72,31 @@ def getAllUsers(conn, tenant_id):
     stmt = ibm_db.exec_immediate(conn, sql_string)
     dictionary = ibm_db.fetch_assoc(stmt)
     while dictionary != False:
-        dictionary["linkid"] = randomString()
+        dictionary["NOTIFICATION_ID"] = randomString()
         usergroups.append(dictionary)
         dictionary = ibm_db.fetch_assoc(stmt)
-
     return usergroups
     
 def snoozeFlip(conn, incident_record, state):
     if state is True:
         #set snooze
-        sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SNOOZE_TIME = " + datetime.datetime.now() + " WHERE INCIDENT_ID = " + str(incident_record["INCIDENT_ID"])
+        sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET SNOOZE_TIME = '" + str(datetime.datetime.now()) + "' WHERE INCIDENT_ID = " + str(incident_record["INCIDENT_ID"])
     else:
         #turn of snooze
         sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET SNOOZE_TIME = null WHERE INCIDENT_ID = " + str(incident_record["INCIDENT_ID"])
     stmt = ibm_db.exec_immediate(conn, sql_string)
+
+def updateIncidentNotifyTime(conn, incidentid):
+    sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET NOTIFY_TIME = '" + str(datetime.datetime.now()) + "' WHERE INCIDENT_ID = " + str(incidentid)
+    print(sql_string)
+    stmt = ibm_db.exec_immediate(conn, sql_string)
+    
+def createNotificationRecord(conn, incidentid, usergroups):
+    now = str(datetime.datetime.now())
+    for user in usergroups:
+        notificationid = user["NOTIFICATION_ID"]
+        userid = str(user["USER_ID"])
+        sql_string = "INSERT INTO " + getTableName("BDP_NOTIFICATION") + " (NOTIFICATION_ID, INCIDENT_ID, NOTIFICATION_TYPE, NOTIFICATION_TIME, USER_ID) VALUES( '" + notificationid + "', '" + str(incidentid) + "', 1, '" + now + "', " + userid + ")"
+        print(sql_string)
+        stmt = ibm_db.exec_immediate(conn, sql_string)
 

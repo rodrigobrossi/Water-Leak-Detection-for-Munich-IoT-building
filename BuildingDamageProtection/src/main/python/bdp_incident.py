@@ -47,7 +47,6 @@ class BDPIncident(Resource):
                 incidentjson = ibm_db.fetch_both(stmt)
                 incidentid = None
                 if incidentjson != False:
-                    print(incidentjson["INCIDENT_ID"])
                     incidentid = str(incidentjson["INCIDENT_ID"])
                 
                 if incidentid is None:  #new incident
@@ -59,10 +58,20 @@ class BDPIncident(Resource):
                 if ibm_db.num_rows(stmt) == 0:
                     content = {'result':'failed to create incident'}
                 else:
-                    content = {'incident':'created'}
+                    if incidentid is None:
+                        sql_string = "SELECT * FROM " + getTableName("BDP_INCIDENT") + " WHERE INCIDENT_DETAIL = '" + json.dumps(jsonbody['INCIDENT_DETAIL']) + "' AND INCIDENT_TIME = '" + jsonbody['INCIDENT_TIME'] + "' AND INCIDENT_STATUS_CODE = 2 AND TENANT_ID = '" + str(tenantid) + "' ORDER BY INCIDENT_ID DESC"
+                        print(sql_string)
+                        stmt = ibm_db.exec_immediate(conn, sql_string)
+                        tempjson = ibm_db.fetch_both(stmt)
+                        incidentid = tempjson["INCIDENT_ID"]
+                        print("new incidentid: " + str(incidentid))
+                    content = {'result':'incident created', 'snooze':'/respond?action=snooze&nid=', 'fix':'/respond?action=fix&nid='}
                     print("new incident added, need to determine if notification is needed: ")
                     usersgroup = self.timeToNotify(incidentjson, tenantjson, conn)
                     print(usersgroup)
+                    content["notification"] = usersgroup
+                    updateIncidentNotifyTime(conn, incidentid)
+                    createNotificationRecord(conn, incidentid, usersgroup)
 
             return content
         except Exception as e:
