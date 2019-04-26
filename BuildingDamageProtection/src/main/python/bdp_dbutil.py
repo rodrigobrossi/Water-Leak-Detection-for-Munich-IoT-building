@@ -21,3 +21,16 @@ def get_db_connection():
     conn = ibm_db.connect(conn_string, "", "")
     '''conn.autocommit = True'''
     return conn
+
+def get_tenantid_by_name(conn, tenant):
+    sql_string = "SELECT * FROM " + get_table_name("BDP_TENANT") + " WHERE TENANT = '" + tenant + "'"
+    stmt = ibm_db.exec_immediate(conn, sql_string)
+    dictionary = ibm_db.fetch_both(stmt)
+    if dictionary != False:
+        return dictionary
+    else:
+        return None
+    
+def get_table_name(tablename):
+    return BDPProperty.getInstance().getValue('db_admin_user') + "." + tablename
+    
