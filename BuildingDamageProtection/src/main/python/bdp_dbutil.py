@@ -22,7 +22,7 @@ def getDBConnection():
     '''conn.autocommit = True'''
     return conn
 
-def get_tenantid_by_name(conn, tenant):
+def getTenantByName(conn, tenant):
     sql_string = "SELECT * FROM " + getTableName("BDP_TENANT") + " WHERE TENANT = '" + tenant + "'"
     stmt = ibm_db.exec_immediate(conn, sql_string)
     dictionary = ibm_db.fetch_both(stmt)
@@ -33,4 +33,19 @@ def get_tenantid_by_name(conn, tenant):
     
 def getTableName(tablename):
     return BDPProperty.getInstance().getValue('db_admin_user') + "." + tablename
+
+def getAllUsers(conn, tenant_id):
+    print("getting all users for tenant: " + str(tenant_id))
+    if tenant_id < 0:
+        sql_string = "SELECT * FROM " + getTableName("BDP_USER")
+    else:
+        sql_string = "SELECT * FROM " + getTableName("BDP_USER") + " WHERE TENANT_ID = " + str(tenant_id)
+    print(sql_string)
+    stmt = ibm_db.exec_immediate(conn, sql_string)
+    dictionary = ibm_db.fetch_both(stmt)
+    if dictionary != False:
+        print(dictionary)
+        return dictionary
+    else:
+        return None
     

@@ -37,7 +37,7 @@ class BDPIncident(Resource):
             conn = getDBConnection()
             jsonbody = request.get_json(force=True)
             print(jsonbody)
-            tenantjson = get_tenantid_by_name(conn, jsonbody['TENANT'])
+            tenantjson = getTenantByName(conn, jsonbody['TENANT'])
             if tenantjson is None:
                 content = {'result':'failed to create incident'}
             else:
@@ -61,9 +61,7 @@ class BDPIncident(Resource):
                 else:
                     content = {'incident':'created'}
                     print("new incident added, need to determine if notification is needed: ")
-                    print(incidentjson)
-                    print(tenantjson)
-                    timeToNotify(incidentjson, tenantjson)
+                    self.timeToNotify(incidentjson, tenantjson, conn)
 
             return content
         except Exception as e:
@@ -80,9 +78,34 @@ class BDPIncident(Resource):
         print(jsonbody)
         return True
     
-    def timeToNotify(self, incident_record, tenant_record):
-        if incident_record == False:
-            getAllUsers()
+    def timeToNotify(self, incident_record, tenant_record, conn):
+        send = False
+        if incident_record == False: #no previous incident, send immediately
+            print("no previous incident, send immediately")
+            send = True
+        else:#needs to check all intervals
+            print(incident_record)
+            print("#needs to check all intervals")
+            #is it snoozed? if so, past the znoozed period yet? if past, needs to reset and send. otherwise, hibernate. 
+            #if not snoozed, what was the last time sent out? past period yet?
+            if incident_record["SNOOZE_TIME"] is None:
+                print("#no snooze, needs to check last sent and period")
+                lastsent = incident_record["NOTIFY_TIME"]
+                if lastsent is None:
+                    print("#never sent before, now")
+                else:
+                    interval = tenant_record["ALARM_INTERVAL_HR"] * 60
+                    now = datetime.datetime.now()
+                    print(lastsent)
+                    print(now)
+                    diff = (now - lastsent).seconds/60
+                    print("diff: " + str(diff) + "/interval: " + str(interval))
+                    if diff > interval:
+                        send = True
+        if send is True:
+            print("strange true")
+            print(tenant_record)
+            getAllUsers(conn, tenant_record["TENANT_ID"])
         else:
-            getAllUsers()
+            print("strange")
         return False
