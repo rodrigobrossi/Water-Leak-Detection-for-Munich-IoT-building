@@ -19,6 +19,8 @@ from flask_restful import Resource, Api
 from flask_httpauth import HTTPBasicAuth
 from flask import request
 from flask import json
+import ibm_db
+from bdp_dbutil import *
 
 
 from bdp_auth import BDPAuth
@@ -32,15 +34,20 @@ class BDPIncident(Resource):
     @auth.login_required
     def post(self):
         try:
+            conn = get_db_connection()
             jsonbody = request.get_json(force=True)
             print(jsonbody)
+            sql_string = "INSERT INTO " + BDPProperty.getInstance().getValue('db_admin_user') + ".BDP_INCIDENT (INCIDENT_DETAIL, INCIDENT_TIME, INCIDENT_STATUS_CODE, TENANT_ID) SELECT '" + json.dumps(jsonbody['INCIDENT_DETAIL']) + "', '" + jsonbody['INCIDENT_TIME'] + "', 2, TENANT_ID FROM LKR34911.BDP_TENANT WHERE TENANT = '"+ jsonbody['TENANT'] + "'"
+            print(sql_string)
+            stmt = ibm_db.exec_immediate(conn, sql_string)
             content = {'incident':'created'}
+            if ibm_db.num_rows(stmt) == 0:
+                content = {'result':'failed to create incident'}
 
-    
             return content
         except Exception as e:
             print(e)
-            return {"result":"fail", "msg": str(e)}, 400
+            return {"result":"failed to create incident", "msg": str(e)}, 400
 
 
     @auth.verify_password
