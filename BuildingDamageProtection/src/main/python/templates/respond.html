@@ -1,11 +1,19 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>Building Damage Protection</title>
-  </head>
-  <body>
-    <h1> Response received </h1>
-    <p> Snooze or Fix </p>
-  </body>
+<head>
+<meta charset="utf-8">
+<title>Building Damage Protection</title>
+</head>
+<body>
+	<h1>Response System</h1>
+	<p>Snooze or Fix</p>
+
+	<form  action="/respond2" method="post">
+		<input type="radio" name="action" value="snooze" checked> snooze<br>
+		<input type="radio" name="action" value="fix"> fix<br>
+		Contact (email):<br> <input type="text" name="contact"><br>
+		<input type="submit" value="submit">
+	</form>
+
+</body>
 </html>

@@ -29,7 +29,6 @@ class BDPIncidentRespond2(Resource):
 
     def get(self):
         try:
-            #return render_template("respond.html")
             resp = make_response(render_template('respond.html'))
             resp.headers['Content-type'] = 'text/html; charset=utf-8'
             return resp
@@ -37,3 +36,11 @@ class BDPIncidentRespond2(Resource):
             print(e)
             return {"result":"fail", "msg": str(e)}, 400
 
+    def post(self):
+        try:
+            resp = make_response(render_template('respond_ok.html'))
+            resp.headers['Content-type'] = 'text/html; charset=utf-8'
+            return resp
+        except Exception as e:
+            print(e)
+            return {"result":"fail", "msg": str(e)}, 400
