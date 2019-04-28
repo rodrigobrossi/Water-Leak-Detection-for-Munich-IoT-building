@@ -69,7 +69,10 @@ class BDPIncident(Resource):
                     print("new incident added, need to determine if notification is needed: ")
                     usersgroup = self.timeToNotify(incidentjson, tenantjson, conn)
                     print(usersgroup)
-                    content["notification"] = usersgroup
+                    notification = {}
+                    notification["group"] = usersgroup
+                    notification["action"] = "ALARM"
+                    content["notification"] = notification
                     updateIncidentNotifyTime(conn, incidentid)
                     createNotificationRecord(conn, incidentid, usersgroup)
 
