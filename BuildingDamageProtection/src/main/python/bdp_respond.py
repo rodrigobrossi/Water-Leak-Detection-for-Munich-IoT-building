@@ -35,6 +35,12 @@ class BDPIncidentRespond(Resource):
             print(action)
             nid = request.args.get('nid')
             print(nid)
+#todo
+#1. using nid to find the notification record
+#2. using notification field to find incident record
+#3. update the record using with response field
+#needs to update the response field in the notification record. response field is a json format ["action(snooze/fix)":timestamp]
+#4. update incident record
 
             return content
         except Exception as e:
