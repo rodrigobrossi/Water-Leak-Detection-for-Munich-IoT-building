@@ -99,4 +99,15 @@ def createNotificationRecord(conn, incidentid, usergroups):
         sql_string = "INSERT INTO " + getTableName("BDP_NOTIFICATION") + " (NOTIFICATION_ID, INCIDENT_ID, NOTIFICATION_TYPE, NOTIFICATION_TIME, USER_ID) VALUES( '" + notificationid + "', '" + str(incidentid) + "', 1, '" + now + "', " + userid + ")"
         print(sql_string)
         stmt = ibm_db.exec_immediate(conn, sql_string)
+        
+def getNotificationsByIncidentID(conn, incidentid): #not tested yet
+    notificationgroups = []
+    sql_string = "SELECT * FROM " + getTableName("BDP_NOTIFICATION") + " WHERE INCIDENT_ID = '"  + str(incidentid) + "'"
+    print(sql_string)
+    stmt = ibm_db.exec_immediate(conn, sql_string)
+    dictionary = ibm_db.fetch_assoc(stmt)
+    while dictionary != False:
+        notificationgroups.append(dictionary)
+        dictionary = ibm_db.fetch_assoc(stmt)
+    return notificationgroups
 
