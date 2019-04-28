@@ -18,9 +18,16 @@ from flask import Flask
 from flask_restful import Resource, Api
 from flask import request
 from flask import json
+from flask_httpauth import HTTPBasicAuth
+
+from bdp_auth import BDPAuth
+auth = HTTPBasicAuth()
+
+authF = BDPAuth()
 
 class BDPIncidentRespond(Resource):
 
+    @auth.login_required
     def get(self):
         try:
             content = {'user action':'received'}
@@ -34,3 +41,7 @@ class BDPIncidentRespond(Resource):
             print(e)
             return {"result":"fail", "msg": str(e)}, 400
 
+    @auth.verify_password
+    def verify(username, password):
+        print("BDPIncidentRespond called")
+        return authF.auth(username, password)
