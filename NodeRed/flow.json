@@ -1,0 +1,1380 @@
+[
+	{
+		"id": "5fadb76d.41fea8",
+		"type": "tab",
+		"label": "Humidity Sensor View Flow",
+		"disabled": false,
+		"info": ""
+	},
+	{
+		"id": "62474709.222638",
+		"type": "tab",
+		"label": "Humidity Sensor Notification Flow",
+		"disabled": false,
+		"info": ""
+	},
+	{
+		"id": "48484c88.668724",
+		"type": "tab",
+		"label": "Humidity Sensor Simulation Flow",
+		"disabled": false,
+		"info": ""
+	},
+	{
+		"id": "bffb2f34.580fc",
+		"type": "tab",
+		"label": "Humidity Heat Map",
+		"disabled": false,
+		"info": ""
+	},
+	{
+		"id": "f6b78c52.71a04",
+		"type": "tab",
+		"label": "Test Flow",
+		"disabled": false,
+		"info": ""
+	},
+	{
+		"id": "ebd31a45.5071f8",
+		"type": "ibmiot",
+		"z": null,
+		"name": "WIoTP Munich UK (h9eyui) Dashboard",
+		"keepalive": "60",
+		"serverName": "h9eyui.messaging.internetofthings.ibmcloud.com",
+		"cleansession": true,
+		"appId": "nodered-waterleakdetector-dashboard",
+		"shared": false
+	},
+	{
+		"id": "6cbbafdd.d05de",
+		"type": "ui_group",
+		"z": "5fadb76d.41fea8",
+		"name": "Humidity",
+		"tab": "58b8363d.29aac8",
+		"disp": true,
+		"width": "6",
+		"collapse": false
+	},
+	{
+		"id": "7baa7eaa.456fd",
+		"type": "ui_group",
+		"z": "5fadb76d.41fea8",
+		"name": "Temperature",
+		"tab": "58b8363d.29aac8",
+		"disp": true,
+		"width": "6",
+		"collapse": false
+	},
+	{
+		"id": "72b77b38.0da3c4",
+		"type": "ui_tab",
+		"z": "5fadb76d.41fea8",
+		"name": "Home",
+		"icon": "dashboard",
+		"order": 1
+	},
+	{
+		"id": "55106289.0e00ec",
+		"type": "ui_base",
+		"theme": {
+			"name": "theme-custom",
+			"lightTheme": {
+				"default": "#0094CE",
+				"baseColor": "#0094CE",
+				"baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+				"edited": true,
+				"reset": false
+			},
+			"darkTheme": {
+				"default": "#097479",
+				"baseColor": "#097479",
+				"baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+				"edited": true,
+				"reset": false
+			},
+			"customTheme": {
+				"name": "Untitled Theme 1",
+				"default": "#4B7930",
+				"baseColor": "#172936",
+				"baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+				"reset": false
+			},
+			"themeState": {
+				"base-color": {
+					"default": "#4B7930",
+					"value": "#172936",
+					"edited": true
+				},
+				"page-titlebar-backgroundColor": {
+					"value": "#172936",
+					"edited": true
+				},
+				"page-backgroundColor": {
+					"value": "#172936",
+					"edited": true
+				},
+				"page-sidebar-backgroundColor": {
+					"value": "#000000",
+					"edited": false
+				},
+				"group-textColor": {
+					"value": "#eeeeee",
+					"edited": true
+				},
+				"group-borderColor": {
+					"value": "#172936",
+					"edited": true
+				},
+				"group-backgroundColor": {
+					"value": "#172936",
+					"edited": true
+				},
+				"widget-textColor": {
+					"value": "#eeeeee",
+					"edited": false
+				},
+				"widget-backgroundColor": {
+					"value": "#172936",
+					"edited": true
+				},
+				"widget-borderColor": {
+					"value": "#172936",
+					"edited": true
+				},
+				"base-font": {
+					"value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+				}
+			},
+			"angularTheme": {
+				"primary": "indigo",
+				"accents": "blue",
+				"warn": "red",
+				"background": "grey"
+			}
+		},
+		"site": {
+			"name": "Node-RED Dashboard",
+			"hideToolbar": "false",
+			"allowSwipe": "false",
+			"allowTempTheme": "false",
+			"dateFormat": "DD/MM/YYYY",
+			"sizes": {
+				"sx": 48,
+				"sy": 48,
+				"gx": 6,
+				"gy": 6,
+				"cx": 6,
+				"cy": 6,
+				"px": 0,
+				"py": 0
+			}
+		}
+	},
+	{
+		"id": "8882fdc8.5c083",
+		"type": "ui_group",
+		"z": "",
+		"name": "Humidity",
+		"tab": "72b77b38.0da3c4",
+		"order": 1,
+		"disp": true,
+		"width": "6",
+		"collapse": false
+	},
+	{
+		"id": "ca212415.751b88",
+		"type": "ui_group",
+		"z": "",
+		"name": "Temperature",
+		"tab": "72b77b38.0da3c4",
+		"order": 2,
+		"disp": true,
+		"width": "6",
+		"collapse": false
+	},
+	{
+		"id": "f105f5ef.49b348",
+		"type": "ibmiot",
+		"z": "",
+		"name": "WIoTP Munich UK (h9eyui) Notification",
+		"keepalive": "60",
+		"serverName": "h9eyui.messaging.internetofthings.ibmcloud.com",
+		"cleansession": true,
+		"appId": "nodered-waterleakdetectory-notify",
+		"shared": false
+	},
+	{
+		"id": "f2f7f0d9.b39de",
+		"type": "ui_tab",
+		"z": "",
+		"name": "Water Sensors Heatmap",
+		"icon": "dashboard",
+		"order": 2
+	},
+	{
+		"id": "b331238c.1fb78",
+		"type": "wiotp",
+		"z": "",
+		"name": "WIoTP Munich UK (h9eyui) Simulation"
+	},
+	{
+		"id": "e22567b5.b81fe8",
+		"type": "ibmiot",
+		"z": "",
+		"name": "WIoTP Munich UK (h9eyui) Simulation Out",
+		"keepalive": "60",
+		"serverName": "h9eyui.messaging.internetofthings.ibmcloud.com",
+		"cleansession": true,
+		"appId": "nodered-waterleakdetector-simout",
+		"shared": false
+	},
+	{
+		"id": "14e1edc2.c9ba22",
+		"type": "ibmiot",
+		"z": "",
+		"name": "WIoTP Munich UK (h9eyui) Simulation In",
+		"keepalive": "60",
+		"serverName": "h9eyui.messaging.internetofthings.ibmcloud.com",
+		"cleansession": true,
+		"appId": "nodered-waterleakdetector-simin",
+		"shared": false
+	},
+	{
+		"id": "11bdc182.43e46e",
+		"type": "ibmiot",
+		"z": "",
+		"name": "Water Sensor Connect",
+		"keepalive": "60",
+		"serverName": "",
+		"cleansession": true,
+		"appId": "",
+		"shared": false
+	},
+	{
+		"id": "e0307f66.72f29",
+		"type": "ui_group",
+		"z": "",
+		"name": "20th Floor",
+		"tab": "f2f7f0d9.b39de",
+		"order": 2,
+		"disp": true,
+		"width": "12",
+		"collapse": false
+	},
+	{
+		"id": "a19f2634.5257d",
+		"type": "ui_group",
+		"z": "",
+		"name": "21st Floor",
+		"tab": "f2f7f0d9.b39de",
+		"order": 2,
+		"disp": true,
+		"width": "10",
+		"collapse": false
+	},
+	{
+		"id": "d6cb05d8.6bea1",
+		"type": "ui_group",
+		"z": "",
+		"name": "26th Floor",
+		"tab": "f2f7f0d9.b39de",
+		"order": 3,
+		"disp": true,
+		"width": "10",
+		"collapse": false
+	},
+	{
+		"id": "542eeeb7.26ce78",
+		"type": "twilio-api",
+		"z": "",
+		"sid": "ACf7b0c22f484efb58bd2d94b216d75016",
+		"from": "+4917661271654",
+		"name": "watersensors"
+	},
+	{
+		"id": "3ae4612c.af4426",
+		"type": "twilio-api",
+		"z": "",
+		"sid": "ACf7b0c22f484efb58bd2d94b216d75016",
+		"from": "4917661271654",
+		"name": "watersensornotification"
+	},
+	{
+		"id": "43c30496.f6e51c",
+		"type": "ibmiot in",
+		"z": "5fadb76d.41fea8",
+		"authentication": "apiKey",
+		"apiKey": "11bdc182.43e46e",
+		"inputType": "evt",
+		"logicalInterface": "",
+		"ruleId": "",
+		"deviceId": "20WestSensor4",
+		"applicationId": "",
+		"deviceType": "waterLeakDetector",
+		"eventType": "",
+		"commandType": "",
+		"format": "json",
+		"name": "Water Leak Sensor Subscriber",
+		"service": "registered",
+		"allDevices": false,
+		"allApplications": "",
+		"allDeviceTypes": "",
+		"allLogicalInterfaces": "",
+		"allEvents": true,
+		"allCommands": "",
+		"allFormats": "",
+		"qos": 0,
+		"x": 180,
+		"y": 280,
+		"wires": [
+			[
+				"d51ad6be.984488",
+				"17c66b79.9e9815",
+				"284b98c4.a62618"
+			]
+		]
+	},
+	{
+		"id": "d51ad6be.984488",
+		"type": "function",
+		"z": "5fadb76d.41fea8",
+		"name": "Extract humidity from payload",
+		"func": "msg.payload = msg.payload.humidity\nreturn msg",
+		"outputs": 1,
+		"noerr": 0,
+		"x": 510,
+		"y": 280,
+		"wires": [
+			[
+				"524a69f2.384fc8",
+				"baeb979.9b53268"
+			]
+		]
+	},
+	{
+		"id": "17c66b79.9e9815",
+		"type": "function",
+		"z": "5fadb76d.41fea8",
+		"name": "Extract temperature from payload",
+		"func": "msg.payload = msg.payload.temperature\nreturn msg",
+		"outputs": 1,
+		"noerr": 0,
+		"x": 520,
+		"y": 360,
+		"wires": [
+			[
+				"46d7a891.577c98",
+				"90b322ba.4faa4"
+			]
+		]
+	},
+	{
+		"id": "524a69f2.384fc8",
+		"type": "ui_chart",
+		"z": "5fadb76d.41fea8",
+		"name": "Humidity chart",
+		"group": "8882fdc8.5c083",
+		"order": 0,
+		"width": 0,
+		"height": 0,
+		"label": "Humidity History",
+		"chartType": "line",
+		"legend": "false",
+		"xformat": "HH:mm:ss",
+		"interpolate": "linear",
+		"nodata": "",
+		"dot": false,
+		"ymin": "0",
+		"ymax": "100",
+		"removeOlder": 1,
+		"removeOlderPoints": "",
+		"removeOlderUnit": "3600",
+		"cutout": 0,
+		"useOneColor": false,
+		"colors": [
+			"#1f77b4",
+			"#aec7e8",
+			"#ff7f0e",
+			"#2ca02c",
+			"#98df8a",
+			"#d62728",
+			"#ff9896",
+			"#9467bd",
+			"#c5b0d5"
+		],
+		"useOldStyle": false,
+		"x": 800,
+		"y": 280,
+		"wires": [
+			[],
+			[]
+		]
+	},
+	{
+		"id": "46d7a891.577c98",
+		"type": "ui_chart",
+		"z": "5fadb76d.41fea8",
+		"name": "Temperature chart",
+		"group": "ca212415.751b88",
+		"order": 1,
+		"width": 0,
+		"height": 0,
+		"label": "Temperature History",
+		"chartType": "line",
+		"legend": "false",
+		"xformat": "HH:mm:ss",
+		"interpolate": "linear",
+		"nodata": "",
+		"dot": false,
+		"ymin": "",
+		"ymax": "",
+		"removeOlder": 1,
+		"removeOlderPoints": "",
+		"removeOlderUnit": "3600",
+		"cutout": 0,
+		"useOneColor": false,
+		"colors": [
+			"#1f77b4",
+			"#aec7e8",
+			"#ff7f0e",
+			"#2ca02c",
+			"#98df8a",
+			"#d62728",
+			"#ff9896",
+			"#9467bd",
+			"#c5b0d5"
+		],
+		"useOldStyle": false,
+		"x": 810,
+		"y": 400,
+		"wires": [
+			[],
+			[]
+		]
+	},
+	{
+		"id": "90b322ba.4faa4",
+		"type": "ui_text",
+		"z": "5fadb76d.41fea8",
+		"group": "ca212415.751b88",
+		"order": 2,
+		"width": 0,
+		"height": 0,
+		"name": "Temperature text",
+		"label": "Current Temperature (C)",
+		"format": "{{msg.payload}}",
+		"layout": "row-spread",
+		"x": 810,
+		"y": 360,
+		"wires": []
+	},
+	{
+		"id": "baeb979.9b53268",
+		"type": "ui_gauge",
+		"z": "5fadb76d.41fea8",
+		"name": "Humidity gauge",
+		"group": "8882fdc8.5c083",
+		"order": 0,
+		"width": 0,
+		"height": 0,
+		"gtype": "gage",
+		"title": "Current Humidity",
+		"label": "units",
+		"format": "{{value}}",
+		"min": 0,
+		"max": "100",
+		"colors": [
+			"#00b500",
+			"#c33131",
+			"#ca3838"
+		],
+		"seg1": "",
+		"seg2": "",
+		"x": 800,
+		"y": 320,
+		"wires": []
+	},
+	{
+		"id": "cf74695e.3bbb38",
+		"type": "e-mail",
+		"z": "62474709.222638",
+		"server": "smtp.mailgun.org",
+		"port": "465",
+		"secure": true,
+		"name": "john.d.vasquez@ibm.com, alona.sakhnenko@ibm.com, Babett.Haering@de.ibm.com, SPARRER@de.ibm.com",
+		"dname": "Send Email",
+		"x": 1190,
+		"y": 280,
+		"wires": []
+	},
+	{
+		"id": "7d846b45.fb8cc4",
+		"type": "function",
+		"z": "62474709.222638",
+		"name": "Generate message",
+		"func": "msg.to = msg.payload.email\n\nhumidity = msg.payload.humidity\nlocation = msg.payload.location\ndevice = msg.deviceId\n\n\nmsg.from = \"munich-iot-hq@mg.hkurtz.com\";\nmsg.topic = \"Water Intrusion Warning\";\nmsg.payload = \"Water has been detected! \\n \\n\";\nmsg.payload += \"Sensor ID: \" + String(device) + \"\\n\";\nmsg.payload += \"Location: \" + location + \"\\n\";\nmsg.payload += \"Humidity level: \" + String(humidity) + \"% \\n \\n\";\nmsg.payload += \"See the link for more information: https://waterleakdetector.eu-de.mybluemix.net/ui/#/1\";\n\nreturn msg;",
+		"outputs": 1,
+		"noerr": 0,
+		"x": 750,
+		"y": 280,
+		"wires": [
+			[
+				"a12fe73.8857318",
+				"6ac32456.e214ac"
+			]
+		]
+	},
+	{
+		"id": "b1650fed.9d44b",
+		"type": "switch",
+		"z": "62474709.222638",
+		"name": "Threshold",
+		"property": "payload.humidity",
+		"propertyType": "msg",
+		"rules": [
+			{
+				"t": "gte",
+				"v": "50",
+				"vt": "num"
+			}
+		],
+		"checkall": "true",
+		"repair": false,
+		"outputs": 1,
+		"x": 340,
+		"y": 280,
+		"wires": [
+			[
+				"71c6f8f5.4c1288"
+			]
+		]
+	},
+	{
+		"id": "a12fe73.8857318",
+		"type": "delay",
+		"z": "62474709.222638",
+		"name": "Rate limit humidity emails",
+		"pauseType": "rate",
+		"timeout": "5",
+		"timeoutUnits": "seconds",
+		"rate": "1",
+		"nbRateUnits": "20",
+		"rateUnits": "minute",
+		"randomFirst": "1",
+		"randomLast": "5",
+		"randomUnits": "seconds",
+		"drop": true,
+		"x": 990,
+		"y": 280,
+		"wires": [
+			[
+				"cf74695e.3bbb38"
+			]
+		]
+	},
+	{
+		"id": "2b3deb31.920c84",
+		"type": "ibmiot in",
+		"z": "62474709.222638",
+		"authentication": "apiKey",
+		"apiKey": "f105f5ef.49b348",
+		"inputType": "evt",
+		"logicalInterface": "",
+		"ruleId": "",
+		"deviceId": "",
+		"applicationId": "",
+		"deviceType": "waterLeakDetector",
+		"eventType": "status",
+		"commandType": "",
+		"format": "json",
+		"name": "Water Leak Sensor Subscriber",
+		"service": "registered",
+		"allDevices": true,
+		"allApplications": "",
+		"allDeviceTypes": "",
+		"allLogicalInterfaces": "",
+		"allEvents": "",
+		"allCommands": "",
+		"allFormats": "",
+		"qos": 0,
+		"x": 120,
+		"y": 300,
+		"wires": [
+			[
+				"b1650fed.9d44b"
+			]
+		]
+	},
+	{
+		"id": "a34169ef.1dc2a8",
+		"type": "comment",
+		"z": "62474709.222638",
+		"name": "README",
+		"info": "# Humidity Sensor Notification\n\n## Summary\n\nThis flow will send an email notificaton if any `waterLeakDetector` devices in a WIoTP organization report a relative humidity value over the configured max threshold.\n\n## Setup\n\n1. Configure an API Key for the `ibm iot in` node:\n\n- Add API Key\n- Add API Token\n- Set the server messaging address (`{orgId}.messaging.internetofthings.ibmcloud.com`)\n- Set a unique application ID\n\n2. Configure smtp authentication for the `mail out` node:\n\n- Set smtp server\n- Set smtp port\n- Set smtp user ID\n- Set smtp password\n- \n\n3. Set the humidity threshold in the `switch` node\n\n## Input\n\nThe `ibm iot in` node will subscribe to `status` events for a `waterLeakDetector` device in a Watson IoT Platform organization. \n\nThe flow expects the `status` event payload to contain `temperature` and `humidity` fields:\n\n```\n{\n    \"temperature\": 24.24,\n    \"humidity\": 2.01\n}\n```\n\nThe temperature value unit is degrees celcius. The humidity value unit is relative humidity. Both values are float types.\n\n",
+		"x": 180,
+		"y": 220,
+		"wires": []
+	},
+	{
+		"id": "8baddcef.4eaae",
+		"type": "ui_template",
+		"z": "5fadb76d.41fea8",
+		"group": "",
+		"name": "CSS injection",
+		"order": 0,
+		"width": 0,
+		"height": 0,
+		"format": "<style>\n    #Home_Temperature_cards md-card:last-of-type {\n        flex-direction: column;\n        -webkit-flex-direction: column;\n        height: auto !important;\n    }\n    #Home_Temperature_cards md-card:last-of-type p:last-of-type {\n        font-size: xx-large;\n    }\n    .nr-dashboard-theme .nr-dashboard-chart-titlel {\n        font-size: initial;\n    }\n    .nr-dashboard-theme .nr-dashboard-gauge-titlel {\n        font-size: initial;\n    }\n</style>",
+		"storeOutMessages": true,
+		"fwdInMessages": true,
+		"templateScope": "local",
+		"x": 1040,
+		"y": 360,
+		"wires": [
+			[]
+		]
+	},
+	{
+		"id": "ba24abb7.fbb788",
+		"type": "ui_template",
+		"z": "5fadb76d.41fea8",
+		"group": "",
+		"name": "IBM plex font CSS",
+		"order": 2,
+		"width": 0,
+		"height": 0,
+		"format": "<link href=\"https://fonts.googleapis.com/css?family=IBM+Plex+Sans\" rel=\"stylesheet\"/>\n<style>\n    body.nr-dashboard-theme {\n        font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif !important;\n    }\n</style>\n\n",
+		"storeOutMessages": true,
+		"fwdInMessages": true,
+		"templateScope": "global",
+		"x": 1050,
+		"y": 400,
+		"wires": [
+			[]
+		]
+	},
+	{
+		"id": "6e15c85e.1c4c28",
+		"type": "comment",
+		"z": "5fadb76d.41fea8",
+		"name": "README",
+		"info": "# Humidity Sensor View\n\n## Summary\n\nThis flow will generate a visualization with historical and real-time dashboards of an environmental sensor.\n\nThe visualization can be viewed at `{urlOfNodeRedInstance}/ui`.\n\n## Setup\n\n1. Configure an API Key for the `ibm iot in` node:\n\n- Add API Key\n- Add API Token\n- Set the server messaging address (`{orgId}.messaging.internetofthings.ibmcloud.com`)\n- Set a unique application ID\n\n## Input\n\nThe `ibm iot in` node will subscribe to `status` events for a `waterLeakDetector` device in a Watson IoT Platform organization. \n\nThe flow expects the `status` event payload to contain `temperature` and `humidity` fields:\n\n```\n{\n    \"temperature\": 24.24,\n    \"humidity\": 2.01\n}\n```\n\nThe temperature value unit is degrees celcius. The humidity value unit is relative humidity. Both values are float types.\n\n",
+		"x": 140,
+		"y": 200,
+		"wires": []
+	},
+	{
+		"id": "d84e4167.dedd7",
+		"type": "inject",
+		"z": "48484c88.668724",
+		"name": "Simulate sensor devices",
+		"topic": "",
+		"payload": "",
+		"payloadType": "date",
+		"repeat": "10",
+		"crontab": "",
+		"once": false,
+		"onceDelay": "1",
+		"x": 170,
+		"y": 440,
+		"wires": [
+			[
+				"c17086c4.5ff178"
+			]
+		]
+	},
+	{
+		"id": "d4a0af57.1073f",
+		"type": "function",
+		"z": "48484c88.668724",
+		"name": "Simulate sensor payload",
+		"func": "function getRandomFloat(min, max) {\n  return parseFloat((Math.random() * (max - min) + min).toFixed(2));\n}\n\nmsg.deviceType = flow.get(\"deviceTypeId\");\nmsg.deviceId = msg.payload;\nmsg.eventOrCommandType = flow.get(\"eventId\");\n\nmsg.payload = {\n    \"temperature\": getRandomFloat(24, 26),\n    \"humidity\": getRandomFloat(1, 15)\n};\n\nreturn msg;",
+		"outputs": 1,
+		"noerr": 0,
+		"x": 770,
+		"y": 500,
+		"wires": [
+			[]
+		]
+	},
+	{
+		"id": "14386926.700cb7",
+		"type": "split",
+		"z": "48484c88.668724",
+		"name": "Create device ID stream from CSV",
+		"splt": ",",
+		"spltType": "str",
+		"arraySplt": 1,
+		"arraySpltType": "len",
+		"stream": false,
+		"addname": "",
+		"x": 480,
+		"y": 500,
+		"wires": [
+			[
+				"d4a0af57.1073f"
+			]
+		]
+	},
+	{
+		"id": "c17086c4.5ff178",
+		"type": "function",
+		"z": "48484c88.668724",
+		"name": "Create device ID CSV",
+		"func": "// This function expects a target number of devices to simulate as an input, \n// and generates a CSV output consisting of the device IDs to be used for\n// the simulation\n\n// ex. prefix == 20West, suffix == 1, deviceId == 20West001\nfunction formatDeviceId(prefix, suffix) {\n    return prefix + (\"00\" + suffix).slice(-3);\n}\n\nvar numOfDevices = flow.get(\"numOfDevices\");\nvar deviceIdPrefix = flow.get(\"deviceIdPrefix\");\n\nvar deviceIdCsv = \"\";\nfor (deviceIdSuffix = 1; deviceIdSuffix < numOfDevices + 1; deviceIdSuffix++) {\n    deviceIdCsv += formatDeviceId(deviceIdPrefix, deviceIdSuffix) + \",\";\n}\n// Chop off trailing comma\ndeviceIdCsv = deviceIdCsv.slice(0, -1);\n\nmsg.payload = deviceIdCsv;\nreturn msg;",
+		"outputs": 1,
+		"noerr": 0,
+		"x": 440,
+		"y": 440,
+		"wires": [
+			[
+				"14386926.700cb7"
+			]
+		]
+	},
+	{
+		"id": "c76b00ab.2ad74",
+		"type": "inject",
+		"z": "48484c88.668724",
+		"name": "Provision devices",
+		"topic": "",
+		"payload": "",
+		"payloadType": "date",
+		"repeat": "",
+		"crontab": "",
+		"once": false,
+		"onceDelay": 0.1,
+		"x": 140,
+		"y": 300,
+		"wires": [
+			[
+				"f2dc4d41.beae3"
+			]
+		]
+	},
+	{
+		"id": "3ecc827f.c401ae",
+		"type": "change",
+		"z": "48484c88.668724",
+		"name": "Persist config",
+		"rules": [
+			{
+				"t": "set",
+				"p": "numOfDevices",
+				"pt": "flow",
+				"to": "15",
+				"tot": "num"
+			},
+			{
+				"t": "set",
+				"p": "deviceTypeId",
+				"pt": "flow",
+				"to": "waterLeakDetector",
+				"tot": "str"
+			},
+			{
+				"t": "set",
+				"p": "deviceIdPrefix",
+				"pt": "flow",
+				"to": "20West",
+				"tot": "str"
+			},
+			{
+				"t": "set",
+				"p": "eventId",
+				"pt": "flow",
+				"to": "status",
+				"tot": "str"
+			}
+		],
+		"action": "",
+		"property": "",
+		"from": "",
+		"to": "",
+		"reg": false,
+		"x": 360,
+		"y": 220,
+		"wires": [
+			[]
+		]
+	},
+	{
+		"id": "7d47fde7.0d8eb4",
+		"type": "inject",
+		"z": "48484c88.668724",
+		"name": "Set config",
+		"topic": "",
+		"payload": "",
+		"payloadType": "date",
+		"repeat": "",
+		"crontab": "",
+		"once": true,
+		"onceDelay": 0.1,
+		"x": 130,
+		"y": 220,
+		"wires": [
+			[
+				"3ecc827f.c401ae"
+			]
+		]
+	},
+	{
+		"id": "73da2594.67ea6c",
+		"type": "device-manager",
+		"z": "48484c88.668724",
+		"auth": "api",
+		"name": "Create devices",
+		"apiKey": "b331238c.1fb78",
+		"deviceType": "",
+		"method": "Create",
+		"deviceId": "",
+		"password": "",
+		"ignore": true,
+		"x": 820,
+		"y": 360,
+		"wires": [
+			[
+				"9b479443.de1198"
+			]
+		]
+	},
+	{
+		"id": "6c54e18.953092",
+		"type": "device-type-manager",
+		"z": "48484c88.668724",
+		"auth": "api",
+		"name": "Create device type",
+		"apiKey": "b331238c.1fb78",
+		"deviceType": "",
+		"classId": "Device",
+		"method": "Create",
+		"deviceTypeId": "",
+		"serialNumber": "",
+		"manufacturer": "",
+		"model": "",
+		"deviceClass": "",
+		"infoDescription": "",
+		"firmwareVersion": "",
+		"hardwareVersion": "",
+		"descriptiveLocation": "",
+		"metadata": "",
+		"password": "",
+		"properties": [],
+		"ignore": true,
+		"x": 370,
+		"y": 360,
+		"wires": [
+			[
+				"2d7ea723.4dc418"
+			]
+		]
+	},
+	{
+		"id": "f2dc4d41.beae3",
+		"type": "function",
+		"z": "48484c88.668724",
+		"name": "Generate device type input",
+		"func": "msg.payload = {\n    deviceType: flow.get(\"deviceTypeId\")\n};\nreturn msg;",
+		"outputs": 1,
+		"noerr": 0,
+		"x": 400,
+		"y": 300,
+		"wires": [
+			[
+				"6c54e18.953092",
+				"74503da1.cc20a4"
+			]
+		]
+	},
+	{
+		"id": "95fc74b0.981ed8",
+		"type": "function",
+		"z": "48484c88.668724",
+		"name": "Generate device input",
+		"func": "// ex. prefix == 20West, suffix == 1, deviceId == 20West001\nfunction formatDeviceId(prefix, suffix) {\n    return prefix + (\"00\" + suffix).slice(-3);\n}\n\nvar numOfDevices = flow.get(\"numOfDevices\");\nvar deviceTypeId = flow.get(\"deviceTypeId\");\nvar deviceIdPrefix = flow.get(\"deviceIdPrefix\");\n\nvar bulkDeviceCreateReq = []\nfor (deviceIdSuffix = 1; deviceIdSuffix < numOfDevices + 1; deviceIdSuffix++) {\n    deviceId = formatDeviceId(deviceIdPrefix, deviceIdSuffix);\n    bulkDeviceCreateReq.push({\n        typeId: deviceTypeId,\n        deviceId: deviceId,\n        authToken: deviceId\n    });\n}\n\nmsg.payload = bulkDeviceCreateReq;\nreturn msg;",
+		"outputs": 1,
+		"noerr": 0,
+		"x": 840,
+		"y": 300,
+		"wires": [
+			[
+				"73da2594.67ea6c"
+			]
+		]
+	},
+	{
+		"id": "74503da1.cc20a4",
+		"type": "delay",
+		"z": "48484c88.668724",
+		"name": "",
+		"pauseType": "delay",
+		"timeout": "5",
+		"timeoutUnits": "seconds",
+		"rate": "1",
+		"nbRateUnits": "1",
+		"rateUnits": "second",
+		"randomFirst": "1",
+		"randomLast": "5",
+		"randomUnits": "seconds",
+		"drop": false,
+		"x": 640,
+		"y": 300,
+		"wires": [
+			[
+				"95fc74b0.981ed8"
+			]
+		]
+	},
+	{
+		"id": "2d7ea723.4dc418",
+		"type": "debug",
+		"z": "48484c88.668724",
+		"name": "Provision output",
+		"active": true,
+		"tosidebar": true,
+		"console": false,
+		"tostatus": false,
+		"complete": "payload",
+		"x": 580,
+		"y": 360,
+		"wires": []
+	},
+	{
+		"id": "9b479443.de1198",
+		"type": "debug",
+		"z": "48484c88.668724",
+		"name": "Provision output",
+		"active": true,
+		"tosidebar": true,
+		"console": false,
+		"tostatus": false,
+		"complete": "payload",
+		"x": 1020,
+		"y": 360,
+		"wires": []
+	},
+	{
+		"id": "a54642af.8bb29",
+		"type": "ibmiot out",
+		"z": "48484c88.668724",
+		"authentication": "apiKey",
+		"apiKey": "e22567b5.b81fe8",
+		"outputType": "evt",
+		"deviceId": "",
+		"deviceType": "",
+		"eventCommandType": "status",
+		"format": "json",
+		"data": "",
+		"qos": 0,
+		"name": "Water Leak Detector Sim Out",
+		"service": "registered",
+		"x": 720,
+		"y": 580,
+		"wires": []
+	},
+	{
+		"id": "6974b4b7.bcfe9c",
+		"type": "ibmiot in",
+		"z": "48484c88.668724",
+		"authentication": "apiKey",
+		"apiKey": "14e1edc2.c9ba22",
+		"inputType": "evt",
+		"logicalInterface": "",
+		"ruleId": "",
+		"deviceId": "20EastSensor4",
+		"applicationId": "",
+		"deviceType": "waterLeakDetector",
+		"eventType": "status",
+		"commandType": "",
+		"format": "json",
+		"name": "Water Leak Connection",
+		"service": "registered",
+		"allDevices": false,
+		"allApplications": "",
+		"allDeviceTypes": false,
+		"allLogicalInterfaces": "",
+		"allEvents": false,
+		"allCommands": "",
+		"allFormats": "",
+		"qos": 0,
+		"x": 140,
+		"y": 580,
+		"wires": [
+			[
+				"5371961c.e1ac38"
+			]
+		]
+	},
+	{
+		"id": "b2f73892.efee88",
+		"type": "comment",
+		"z": "48484c88.668724",
+		"name": "README",
+		"info": "# Humidity Sensor Simulation\n\n## Summary\n\nThis flow will provision and simulate a configurable amount of devices outputting environmental sensor data to WIoTP.\n\n## Setup\n\n1. Configure an API Key for the `device-type-manager` node:\n\n- Add API Key\n- Add API Token\n\n2. Configure an API Key for the `device-manager` node:\n\n- Add API Key\n- Add API Token\n\n3. Configure an API Key for the `ibm iot out` node:\n\n- Add API Key\n- Add API Token\n- Set the server messaging address (`{orgId}.messaging.internetofthings.ibmcloud.com`)\n- Set a unique application ID\n\n4. Trigger the `Provision` injection node to provision the device type and devices.\n\n5. Enable and a repeat interval time in the `Simulate sensor devices` node to simulate environmental sensor data.\n\n## Configuration\n\nThe `Persist config` change node sets a few properties that can be retrieved from the flow's context:\n\n`numOfDevices` sets the number of devices to provision and simulate. Default is `10`.\n\n`deviceTypeId` is the device type ID to use for the simulated devices. Default is `waterLeakDetector`.\n\n`deviceIdPrefix` is the prefix of the device ID for the simulated devices. Default is `20West` (for the 20th IoT HQ floor).\n\n`eventId` is the event ID the simulated devices will be publishing to. Default is `status`.\n\n## Output\n\nThe `ibm iot out` node will publish `status` events for the `waterLeakDetector` devices to a WIoTP organization. \n\nThe `status` event payload will contain `temperature` and `humidity` fields:\n\n```\n{\n    \"temperature\": 24.24,\n    \"humidity\": 2.01\n}\n```\n\nThe temperature value unit is degrees celcius. The humidity value unit is relative humidity. Both values are float types.\n\n",
+		"x": 100,
+		"y": 160,
+		"wires": []
+	},
+	{
+		"id": "6687cdfe.78e9ac",
+		"type": "ibmiot in",
+		"z": "bffb2f34.580fc",
+		"authentication": "apiKey",
+		"apiKey": "11bdc182.43e46e",
+		"inputType": "evt",
+		"logicalInterface": "",
+		"ruleId": "",
+		"deviceId": "20WestSensor1",
+		"applicationId": "",
+		"deviceType": "waterLeakDetector",
+		"eventType": "",
+		"commandType": "",
+		"format": "json",
+		"name": "Water Leak Sensor Subscriber",
+		"service": "registered",
+		"allDevices": true,
+		"allApplications": "",
+		"allDeviceTypes": "",
+		"allLogicalInterfaces": "",
+		"allEvents": true,
+		"allCommands": "",
+		"allFormats": "",
+		"qos": 0,
+		"x": 200,
+		"y": 240,
+		"wires": [
+			[
+				"94fe080c.f7382",
+				"690e153.ee64aec"
+			]
+		]
+	},
+	{
+		"id": "94fe080c.f7382",
+		"type": "function",
+		"z": "bffb2f34.580fc",
+		"name": "Get color code",
+		"func": "rgb_color = ''\n\nif(msg.payload.humidity <= 33){\n    // Green\n    rgb_color = \"0, 255, 0\"; \n}\nelse if(msg.payload.humidity <= 66){\n    // Yellow\n    rgb_color = \"255, 255, 0\"; \n}\nelse {\n    // Red\n    rgb_color = \"255, 0, 0\"\n}\n\nmsg.payload = {color: rgb_color, humidity: Math.floor(msg.payload.humidity)}\n\nreturn msg;",
+		"outputs": 1,
+		"noerr": 0,
+		"x": 440,
+		"y": 240,
+		"wires": [
+			[
+				"c6efb2c5.97dae"
+			]
+		]
+	},
+	{
+		"id": "86ce0e26.d0d4f8",
+		"type": "ui_template",
+		"z": "bffb2f34.580fc",
+		"group": "e0307f66.72f29",
+		"name": "Template HeatMap 20th",
+		"order": 1,
+		"width": "0",
+		"height": "0",
+		"format": "<div class=\"map\">\n    <div class=\"sensor animated\" id=\"s20WestSensor1\">\n        <div class=\"popup\"></div>\n        <div class=\"sensorId\">20WestSensor1</div>\n    </div>\n    <div class=\"sensor animated\" id=\"s20WestSensor2\">\n        <div class=\"popup\"></div>\n        <div class=\"sensorId\">20WestSensor2</div>\n    </div>\n    <div class=\"sensor animated\" id=\"s20WestSensor3\">\n        <div class=\"popup\"></div>\n        <div class=\"sensorId\">20WestSensor3</div>\n    </div>\n    <div class=\"sensor animated\" id=\"s20WestSensor4\">\n        <div class=\"popup\"></div>\n        <div class=\"sensorId\">20WestSensor4</div>\n    </div>\n    <div class=\"sensor animated\" id=\"s20WestSensor5\">\n        <div class=\"popup\"></div>\n        <div class=\"sensorId\">20WestSensor5</div>\n    </div>\n    <div class=\"sensor animated\" id=\"s20EastSensor1\">\n        <div class=\"popup\"></div>\n        <div class=\"sensorId\">20EastSensor1</div>\n    </div>\n    <div class=\"sensor animated\" id=\"s20EastSensor2\">\n        <div class=\"popup\"></div>\n        <div class=\"sensorId\">20EastSensor2</div>\n    </div>\n    <div class=\"sensor animated\" id=\"s20EastSensor3\">\n        <div class=\"popup\"></div>\n        <div class=\"sensorId\">20EastSensor3</div>\n    </div>\n    <div class=\"sensor animated\" id=\"s20EastSensor4\">\n        <div class=\"popup\"></div>\n    <div class=\"sensorId\">20EastSensor4</div>\n    </div>\n</div>\n\n<script>\n(function(scope)\n{\n    scope.$watch('msg',function(msg)\n    {\n        var sensor = document.getElementById(msg.deviceId);\n        if(sensor)\n        {\n            sensor.style.visibility=\"visible\";\n\n            popup = sensor.children[0]\n            popup.innerText = msg.payload.humidity + ' %';\n            \n            var prevColor = getComputedStyle(sensor).getPropertyValue('--color');\n            sensor.style.setProperty('--prevColor',prevColor);\n            sensor.style.setProperty('--color',msg.payload.color);\n            \n            // --- reload stylesheet ---\n            sensor.classList.remove(\"animated\");\n            sensor.innerText;\n            sensor.classList.add(\"animated\");\n        }\n    });\n})(scope);\n</script>",
+		"storeOutMessages": true,
+		"fwdInMessages": true,
+		"templateScope": "local",
+		"x": 870,
+		"y": 240,
+		"wires": [
+			[]
+		]
+	},
+	{
+		"id": "125c112a.841df7",
+		"type": "ui_template",
+		"z": "bffb2f34.580fc",
+		"group": "e0307f66.72f29",
+		"name": "CSS Style Sheet",
+		"order": 0,
+		"width": 0,
+		"height": 0,
+		"format": "<link href=\"https://fonts.googleapis.com/css?family=IBM+Plex+Sans\" rel=\"stylesheet\"/>\n\n<style>\n    :root{\n        --color: 0, 255, 0;\n        --prevColor: 0, 255, 0;\n    }\n    body.nr-dashboard-theme {\n        font-family: 'IBM Plex Sans Condensed', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif !important;\n        font-weight:bold;\n    }\n    .map{\n        background-image: url('http://ricoh-data-visualization.eu-de.mybluemix.net/img/watersensor-floorplan-20.png');\n        background-size: contain;\n        background-repeat: no-repeat;\n        width: 100%;\n        height: 300px;\n    }\n    .sensor{\n        height: 10px;\n        width: 10px;\n        position: absolute;\n        border-radius: 50%;\n        background-size: cover;\n        color:rgba(var(--color), 1);\n        background-color: rgba(var(--color), 1);\n        visibility: hidden;\n    }\n    .popup{\n        height: 15px;\n        width: 30px;\n        top:-20px;\n        right:-20px;\n        position: relative;\n        border-radius: 20%;\n        background-size: cover;\n        background-color: rgba(var(--color), 0.5);\n        text-align: center;\n        font-size: 10px;\n        color: rgba(255, 255, 255, 0.75);\n        z-index:10;\n    }\n    .sensorId{\n        left:-40px;\n        bottom:-10px;\n        position: relative;\n        width: 80px;\n        color: rgba(154, 162, 172, 0.5);\n        font-size: 10px;\n        text-align: center;\n        z-index: 2;\n        visibility: visible;\n    }\n    #s20WestSensor1{\n        top: 14%;\n        left: 25%;\n    }\n    #s20WestSensor2{\n        top: 8%;\n        left: 34%;\n    }\n    #s20WestSensor3{\n        top: 6%;\n        left: 50%;\n    }\n    #s20WestSensor4{\n        top: 8%;\n        left: 74%;\n    }\n    #s20WestSensor5{\n        top: 14%;\n        left: 84.5%;\n    }\n    #s20EastSensor1{\n        bottom: 15%;\n        left: 9%;\n    }\n    #s20EastSensor2{\n        bottom: 10%;\n        left: 20%;\n    }\n    #s20EastSensor3{\n        bottom: 10%;\n        left: 58%;\n    }\n    #s20EastSensor4{\n        bottom: 17.5%;\n        left: 67%;\n    }\n    .pinging{\n        animation: pingingEffect 4s infinite;\n    }\n    .animated{\n        animation: pingingEffect 5s, changeEffect 5s;\n    }\n    @keyframes changeEffect {\n        0%  {background-color:rgba(var(--prevColor), 1);}\n        100%{background-color:rgba(var(--color), 1);}\n    }\n    @keyframes pingingEffect{\n        0%  {color:rgba(var(--color), 0.5); box-shadow:0 0 0 0;}\n        100%{color:rgba(var(--color), 0); box-shadow:0 0 5px 25px;}\n    }\n</style>",
+		"storeOutMessages": true,
+		"fwdInMessages": true,
+		"templateScope": "local",
+		"x": 840,
+		"y": 280,
+		"wires": [
+			[]
+		]
+	},
+	{
+		"id": "284b98c4.a62618",
+		"type": "debug",
+		"z": "5fadb76d.41fea8",
+		"name": "",
+		"active": true,
+		"tosidebar": true,
+		"console": false,
+		"tostatus": false,
+		"complete": "true",
+		"x": 430,
+		"y": 200,
+		"wires": []
+	},
+	{
+		"id": "c6efb2c5.97dae",
+		"type": "function",
+		"z": "bffb2f34.580fc",
+		"name": "Fix deviceId",
+		"func": "//CSS ID start with a letter\nmsg.deviceId = 's' + msg.deviceId;\nreturn msg;",
+		"outputs": 1,
+		"noerr": 0,
+		"x": 630,
+		"y": 240,
+		"wires": [
+			[
+				"86ce0e26.d0d4f8",
+				"75d76260.63b5a4"
+			]
+		]
+	},
+	{
+		"id": "690e153.ee64aec",
+		"type": "debug",
+		"z": "bffb2f34.580fc",
+		"name": "",
+		"active": true,
+		"tosidebar": true,
+		"console": false,
+		"tostatus": false,
+		"complete": "false",
+		"x": 330,
+		"y": 360,
+		"wires": []
+	},
+	{
+		"id": "75d76260.63b5a4",
+		"type": "ui_template",
+		"z": "bffb2f34.580fc",
+		"group": "a19f2634.5257d",
+		"name": "Template HeatMap 21st",
+		"order": 1,
+		"width": "0",
+		"height": "0",
+		"format": "<div class=\"map-2\">\n    <div class=\"sensor animated\" id=\"s21EastSensor1\">\n        <div class=\"popup\"></div>\n        <div class=\"sensorId\">21EastSensor1</div>\n    </div>\n    <div class=\"sensor animated\" id=\"s21EastSensor2\">\n        <div class=\"popup\"></div>\n        <div class=\"sensorId\">21EastSensor2</div>\n    </div>\n    <div class=\"sensor animated\" id=\"s21EastSensor3\">\n        <div class=\"popup\"></div>\n        <div class=\"sensorId\">21EastSensor3</div>\n    </div>\n    <div class=\"sensor animated\" id=\"s21EastSensor4\">\n        <div class=\"popup\"></div>\n    <div class=\"sensorId\">21EastSensor4</div>\n    </div>\n</div>\n\n<script>\n(function(scope)\n{\n    scope.$watch('msg',function(msg)\n    {\n        var sensor = document.getElementById(msg.deviceId);\n        if(sensor)\n        {\n            sensor.style.visibility=\"visible\";\n\n            popup = sensor.children[0]\n            popup.innerText = msg.payload.humidity + ' %';\n            \n            var prevColor = getComputedStyle(sensor).getPropertyValue('--color');\n            sensor.style.setProperty('--prevColor',prevColor);\n            sensor.style.setProperty('--color',msg.payload.color);\n            \n            // --- reload stylesheet ---\n            sensor.classList.remove(\"animated\");\n            sensor.innerText;\n            sensor.classList.add(\"animated\");\n        }\n    });\n})(scope);\n</script>",
+		"storeOutMessages": true,
+		"fwdInMessages": true,
+		"templateScope": "local",
+		"x": 870,
+		"y": 340,
+		"wires": [
+			[]
+		]
+	},
+	{
+		"id": "9c2af481.bb7d48",
+		"type": "ui_template",
+		"z": "bffb2f34.580fc",
+		"group": "a19f2634.5257d",
+		"name": "CSS Style Sheet",
+		"order": 0,
+		"width": 0,
+		"height": 0,
+		"format": "<link href=\"https://fonts.googleapis.com/css?family=IBM+Plex+Sans\" rel=\"stylesheet\"/>\n\n<style>\n    :root{\n        --color: 0, 255, 0;\n        --prevColor: 0, 255, 0;\n    }\n    body.nr-dashboard-theme {\n        font-family: 'IBM Plex Sans Condensed', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif !important;\n        font-weight:bold;\n    }\n    .map-2{\n        background-image: url('http://ricoh-data-visualization.eu-de.mybluemix.net/img/watersensor-floorplan-21.png');\n        background-size: contain;\n        background-repeat: no-repeat;\n        width: 100%;\n        height: 125px;\n    }\n    .sensor{\n        height: 10px;\n        width: 10px;\n        position: absolute;\n        border-radius: 50%;\n        background-size: cover;\n        color:rgba(var(--color), 1);\n        background-color: rgba(var(--color), 1);\n        visibility: hidden;\n    }\n    .popup{\n        height: 15px;\n        width: 30px;\n        top:-20px;\n        right:-20px;\n        position: relative;\n        border-radius: 20%;\n        background-size: cover;\n        background-color: rgba(var(--color), 0.5);\n        text-align: center;\n        font-size: 10px;\n        color: rgba(255, 255, 255, 0.75);\n        z-index:10;\n    }\n    .sensorId{\n        left:-40px;\n        bottom:-10px;\n        position: relative;\n        width: 80px;\n        color: rgba(154, 162, 172, 0.5);\n        font-size: 10px;\n        text-align: center;\n        z-index: 2;\n        visibility: visible;\n    }\n    #s21EastSensor4{\n        top: 50%;\n        left: 12%;\n    }\n    #s21EastSensor3{\n        bottom: 25%;\n        left: 27%;\n    }\n    #s21EastSensor2{\n        bottom: 25%;\n        left: 53%;\n    }\n    #s21EastSensor1{\n        top: 50%;\n        right: 17%;\n    }\n    .pinging{\n        animation: pingingEffect 4s infinite;\n    }\n    .animated{\n        animation: pingingEffect 5s, changeEffect 5s;\n    }\n    @keyframes changeEffect {\n        0%  {background-color:rgba(var(--prevColor), 1);}\n        100%{background-color:rgba(var(--color), 1);}\n    }\n    @keyframes pingingEffect{\n        0%  {color:rgba(var(--color), 0.5); box-shadow:0 0 0 0;}\n        100%{color:rgba(var(--color), 0); box-shadow:0 0 5px 25px;}\n    }\n</style>",
+		"storeOutMessages": true,
+		"fwdInMessages": true,
+		"templateScope": "local",
+		"x": 840,
+		"y": 380,
+		"wires": [
+			[]
+		]
+	},
+	{
+		"id": "21638c25.4928bc",
+		"type": "ui_template",
+		"z": "bffb2f34.580fc",
+		"group": "d6cb05d8.6bea1",
+		"name": "Template HeatMap 26th",
+		"order": 1,
+		"width": "0",
+		"height": "0",
+		"format": "<p style='opacity:0.5'>Coming soon...</p>",
+		"storeOutMessages": true,
+		"fwdInMessages": true,
+		"templateScope": "local",
+		"x": 870,
+		"y": 440,
+		"wires": [
+			[]
+		]
+	},
+	{
+		"id": "6ac32456.e214ac",
+		"type": "debug",
+		"z": "62474709.222638",
+		"name": "",
+		"active": true,
+		"tosidebar": true,
+		"console": false,
+		"tostatus": false,
+		"complete": "payload",
+		"x": 950,
+		"y": 320,
+		"wires": []
+	},
+	{
+		"id": "71c6f8f5.4c1288",
+		"type": "function",
+		"z": "62474709.222638",
+		"name": "Extract sensor location",
+		"func": "device = msg.deviceId;\n\nfloor = parseInt(device.slice(0, 2));\n\neast_west = device.slice(2, 6);\n\ntower = \"\";\nif(east_west == \"East\")\n{\n    tower = \"T1\";\n}\nelse if(east_west == \"West\")\n{\n    tower = \"T2\";\n}\n\nnorth_south = parseInt(device.slice(12));\n\nside = \"\";\nif(floor == 20)\n{\n    if(north_south > 2)\n    {\n        side = \"North\";\n    }\n    else\n    {\n        side = \"South\";\n    }\n}\nelse if(floor == 21)\n{\n    if(north_south > 2)\n    {\n        side = \"South\";\n    }\n    else\n    {\n        side = \"North\";\n    }\n}\n\nlocation = \"Tower \" + String(tower); \nlocation += \", Floor \" + String(floor);\nlocation += \", \" + side;\n\nmsg.payload = {humidity: msg.payload.humidity, location:location}\nreturn msg;",
+		"outputs": 1,
+		"noerr": 0,
+		"x": 530,
+		"y": 280,
+		"wires": [
+			[
+				"7d846b45.fb8cc4"
+			]
+		]
+	},
+	{
+		"id": "bb1188b8.d28b58",
+		"type": "debug",
+		"z": "48484c88.668724",
+		"name": "",
+		"active": true,
+		"tosidebar": true,
+		"console": false,
+		"tostatus": false,
+		"complete": "false",
+		"x": 590,
+		"y": 660,
+		"wires": []
+	},
+	{
+		"id": "5371961c.e1ac38",
+		"type": "function",
+		"z": "48484c88.668724",
+		"name": "Simulate sensor payload",
+		"func": "msg.deviceType = \"waterSensorsDemo\"\nmsg.deviceId = \"waterDemo01\";\nmsg.payload =  msg.payload.humidity;\n\nreturn msg;",
+		"outputs": 1,
+		"noerr": 0,
+		"x": 410,
+		"y": 580,
+		"wires": [
+			[
+				"a54642af.8bb29",
+				"bb1188b8.d28b58"
+			]
+		]
+	},
+	{
+		"id": "53aca75f.a001b8",
+		"type": "ibmiot in",
+		"z": "f6b78c52.71a04",
+		"authentication": "apiKey",
+		"apiKey": "f105f5ef.49b348",
+		"inputType": "evt",
+		"logicalInterface": "",
+		"ruleId": "",
+		"deviceId": "",
+		"applicationId": "",
+		"deviceType": "waterLeakDetector",
+		"eventType": "status",
+		"commandType": "",
+		"format": "json",
+		"name": "Water Leak Sensor Subscriber",
+		"service": "registered",
+		"allDevices": true,
+		"allApplications": "",
+		"allDeviceTypes": "",
+		"allLogicalInterfaces": "",
+		"allEvents": "",
+		"allCommands": "",
+		"allFormats": "",
+		"qos": 0,
+		"x": 220,
+		"y": 240,
+		"wires": [
+			[]
+		]
+	},
+	{
+		"id": "670fdb87.88f2a4",
+		"type": "e-mail",
+		"z": "f6b78c52.71a04",
+		"server": "smtp.mailgun.org",
+		"port": "465",
+		"secure": true,
+		"name": "alona.sakhnenko@ibm.com",
+		"dname": "Send Email",
+		"x": 750,
+		"y": 240,
+		"wires": []
+	},
+	{
+		"id": "3330f4e3.6c2124",
+		"type": "http request",
+		"z": "f6b78c52.71a04",
+		"name": "Post incident",
+		"method": "POST",
+		"ret": "txt",
+		"url": "https://bdp.eu-de.mybluemix.net/incident",
+		"tls": "",
+		"x": 670,
+		"y": 360,
+		"wires": [
+			[
+				"9cec7193.6fd3c"
+			]
+		]
+	},
+	{
+		"id": "9cec7193.6fd3c",
+		"type": "debug",
+		"z": "f6b78c52.71a04",
+		"name": "",
+		"active": true,
+		"tosidebar": true,
+		"console": false,
+		"tostatus": false,
+		"complete": "false",
+		"x": 830,
+		"y": 360,
+		"wires": []
+	},
+	{
+		"id": "92a27b3e.0971e",
+		"type": "inject",
+		"z": "f6b78c52.71a04",
+		"name": "",
+		"topic": "",
+		"payload": "{}",
+		"payloadType": "json",
+		"repeat": "",
+		"crontab": "",
+		"once": false,
+		"onceDelay": 0.1,
+		"x": 150,
+		"y": 340,
+		"wires": [
+			[
+				"8999eb8c.040c1"
+			]
+		]
+	},
+	{
+		"id": "8999eb8c.040c1",
+		"type": "function",
+		"z": "f6b78c52.71a04",
+		"name": "Create incident json",
+		"func": "msg.payload = {\n    'TENANT_ID': 'IBM Highlight',\n    'INCIDENT_DETAIL': 'Test',\n    'INCIDENT_TIME': msg.time\n}\nreturn msg;",
+		"outputs": 1,
+		"noerr": 0,
+		"x": 480,
+		"y": 360,
+		"wires": [
+			[
+				"3330f4e3.6c2124"
+			]
+		]
+	}
+]
