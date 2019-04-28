@@ -39,6 +39,8 @@ class BDPIncidentRespond2(Resource):
     def post(self):
         try:
             resp = make_response(render_template('respond_ok.html'))
+            print(request.form['contact'])
+            print(request.form['action'])
             resp.headers['Content-type'] = 'text/html; charset=utf-8'
             return resp
         except Exception as e:
