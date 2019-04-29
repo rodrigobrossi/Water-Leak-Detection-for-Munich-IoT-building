@@ -43,7 +43,7 @@ api = Api(app)
 
 class BDPGateway(Resource):
     def get(self):
-        return {'Building Damage Protection': 'alive'}
+        return {'Building Damage Protection': 'alive', 'ver': BDPProperty.getInstance().getValue('ver')}
 
 sysInit = BDPSysInit()
 sysInit.init()
