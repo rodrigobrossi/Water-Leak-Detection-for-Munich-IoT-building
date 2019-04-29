@@ -111,3 +111,24 @@ def getNotificationsByIncidentID(conn, incidentid): #not tested yet
         dictionary = ibm_db.fetch_assoc(stmt)
     return notificationgroups
 
+def getNotificationByNotificationID(conn, nid): #not tested yet
+    notificationgroups = []
+    sql_string = "SELECT * FROM " + getTableName("BDP_NOTIFICATION") + " WHERE NOTIFICATION_ID = '"  + str(nid) + "'"
+    print(sql_string)
+    stmt = ibm_db.exec_immediate(conn, sql_string)
+    dictionary = ibm_db.fetch_assoc(stmt)
+    return dictionary
+
+def getUserByUserID(conn, user_id):
+    print("getUserByUserID: " + str(user_id))
+    sql_string = "SELECT * FROM " + getTableName("BDP_USER") + " WHERE USER_ID = " + str(user_id)
+    stmt = ibm_db.exec_immediate(conn, sql_string)
+    dictionary = ibm_db.fetch_assoc(stmt)
+    return dictionary
+
+def getIncidentByIncidentID(conn, incident_id):
+    print("getIncidentByIncidentID: " + str(incident_id))
+    sql_string = "SELECT * FROM " + getTableName("BDP_INCIDENT") + " WHERE INCIDENT_ID = " + str(incident_id)
+    stmt = ibm_db.exec_immediate(conn, sql_string)
+    dictionary = ibm_db.fetch_assoc(stmt)
+    return dictionary

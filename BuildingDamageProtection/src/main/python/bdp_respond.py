@@ -19,6 +19,9 @@ from flask_restful import Resource, Api
 from flask import request
 from flask import json
 from flask_httpauth import HTTPBasicAuth
+from bdp_dbutil import *
+from bdp_util import *
+from bdp_property import BDPProperty
 
 from bdp_auth import BDPAuth
 auth = HTTPBasicAuth()
@@ -29,8 +32,11 @@ class BDPIncidentRespond(Resource):
 
     def get(self):
         try:
+            conn = BDPDBConnection.getInstance().getDBConnection()
             nid = request.args.get('nid')
-            resp = make_response(render_template('respond.html', contact = 'cyjiang@us.ibm.com', nid = nid))
+            notificationJson = getNotificationByNotificationID(conn, nid)
+            userJSON = getUserByUserID(conn, notificationJson["USER_ID"])
+            resp = make_response(render_template('respond.html', contact = userJSON["USER_CONTACT_1"], nid = nid))
             resp.headers['Content-type'] = 'text/html; charset=utf-8'
             return resp
         except Exception as e:
@@ -39,11 +45,18 @@ class BDPIncidentRespond(Resource):
 
     def post(self):
         try:
+            conn = BDPDBConnection.getInstance().getDBConnection()
             resp = make_response(render_template('respond_ok.html'))
             print(request.form['nid'])
             print(request.form['contact'])
             print(request.form['action'])
+            nid = request.form['nid']
+            action = request.form['action']
+            notificationJson = getNotificationByNotificationID(conn, nid)
+            incidentJSON = getIncidentByIncidentID(conn, notificationJson["INCIDENT_ID"])
+            usergroups = getAllUsers(conn, incidentJSON["TENANT_ID"])
             resp.headers['Content-type'] = 'text/html; charset=utf-8'
+            sendNotificationToUsers(BDPProperty.getInstance().getValue('nodered_endpoint'), usergroups)
             return resp
         except Exception as e:
             print(e)

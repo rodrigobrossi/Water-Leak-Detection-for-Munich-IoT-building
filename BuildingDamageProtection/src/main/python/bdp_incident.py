@@ -65,7 +65,7 @@ class BDPIncident(Resource):
                         tempjson = ibm_db.fetch_both(stmt)
                         incidentid = tempjson["INCIDENT_ID"]
                         print("new incidentid: " + str(incidentid))
-                    content = {'result':'incident created', 'snooze':'/respond?action=snooze&nid=', 'fix':'/respond?action=fix&nid='}
+                    content = {'result':'incident created', 'action':'/respond?nid='}
                     print("new incident added, need to determine if notification is needed: ")
                     usersgroup = self.timeToNotify(incidentjson, tenantjson, conn)
                     print(usersgroup)

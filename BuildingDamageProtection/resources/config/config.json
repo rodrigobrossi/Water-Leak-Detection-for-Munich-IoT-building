@@ -10,6 +10,7 @@
    "server_type_backup":"wsgi",
    "server_type":"flask",
    "debug_mode":"true",
+   "nodered_endpoint":"https://waterleakdetector.eu-de.mybluemix.net/",
    "https_cert":"resources/https/cert.pem",
    "https_key":"resources/https/key.pem"
 }

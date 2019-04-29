@@ -16,3 +16,8 @@ def randomString(string_length=10):
     random = random.upper() # Make all characters uppercase.
     random = random.replace("-","") # Remove the UUID '-'.
     return random[0:string_length] # Return the random string.
+
+def sendNotificationToUsers(endpoint, usergroups):
+    print(endpoint)
+    print(usergroups)
+    return
