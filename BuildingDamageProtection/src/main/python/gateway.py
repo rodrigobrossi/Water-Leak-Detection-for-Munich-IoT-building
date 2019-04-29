@@ -16,6 +16,7 @@ import gevent
 import gevent.monkey
 from gevent.pywsgi import WSGIServer
 gevent.monkey.patch_all()
+from threading import Thread
 
 #sys.setdefaultencoding('utf8')
 sys.dont_write_bytecode = True
@@ -34,6 +35,7 @@ from bdp_incident import BDPIncident
 from bdp_tenant import BDPTenant
 from bdp_user import BDPUser
 from bdp_respond import BDPIncidentRespond
+from bdp_servicecheck import BDPServiceCheck
 #from bdp_respond2 import BDPIncidentRespond2
 
 app = Flask(__name__)
@@ -48,14 +50,13 @@ class BDPGateway(Resource):
 sysInit = BDPSysInit()
 sysInit.init()
 
-'''def startScheduler():
-    periodic_scheduler = AIServiceInit()  
+def startScheduler():
+    periodic_scheduler = BDPServiceCheck()  
     periodic_scheduler.setup()
     periodic_scheduler.run()
 
 thread1 = Thread(target = startScheduler, args = ())
 thread1.start()
-'''
     
 api.add_resource(BDPGateway, '/')
 api.add_resource(BDPIncident, '/incident')
