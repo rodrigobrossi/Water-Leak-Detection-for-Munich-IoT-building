@@ -138,3 +138,21 @@ def updateNotificationResponse(conn, nid, response):
     sql_string = "UPDATE " + getTableName("BDP_NOTIFICATION") + " SET RESPONSE = '" + json.dumps(response) + "' WHERE NOTIFICATION_ID = '" + str(nid) + "'"
     print(sql_string)
     stmt = ibm_db.exec_immediate(conn, sql_string)
+
+def updateIncidentStatus(conn, incident_id, actionstr):
+    action = -1
+    if actionstr == 'fixed':
+        action = 1
+    elif actionstr == 'snooze':
+        action = 3
+    if action < 0:
+        return False
+    now = str(datetime.datetime.now())
+    if action == 1:
+        sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET INCIDENT_STATUS_CODE = '" + str(action) + "', FIX_TIME = '" + now + "' WHERE INCIDENT_ID = " + str(incident_id)
+    else:
+        sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET INCIDENT_STATUS_CODE = '" + str(action) + "', SNOOZE_TIME = '" + now + "' WHERE INCIDENT_ID = " + str(incident_id)
+    print(sql_string)
+    stmt = ibm_db.exec_immediate(conn, sql_string)
+    return True
+    

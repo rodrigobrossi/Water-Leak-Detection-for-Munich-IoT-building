@@ -65,11 +65,15 @@ class BDPIncidentRespond(Resource):
             updateNotificationResponse(conn, nid, notificationResponseJson)
             
             incidentJSON = getIncidentByIncidentID(conn, notificationJson["INCIDENT_ID"])
+            retbool = updateIncidentStatus(conn, notificationJson["INCIDENT_ID"], action)
+            if not retbool:
+                raise Exception('Not able to update incident status error')
+            
             usergroups = getAllUsers(conn, incidentJSON["TENANT_ID"])
-            resp.headers['Content-type'] = 'text/html; charset=utf-8'
             retbool = sendNotificationToUsers(BDPProperty.getInstance().getValue('nodered_endpoint'), usergroups)
             if not retbool:
                 raise Exception('Not able to send ack to all user error')
+            resp.headers['Content-type'] = 'text/html; charset=utf-8'
             return resp
         except Exception as e:
             print(e)
