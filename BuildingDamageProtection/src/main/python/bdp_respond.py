@@ -13,7 +13,7 @@ import sys
 import pprint
 import time
 import datetime
-from flask import Response
+from flask import Response, render_template, make_response
 from flask import Flask
 from flask_restful import Resource, Api
 from flask import request
@@ -27,27 +27,24 @@ authF = BDPAuth()
 
 class BDPIncidentRespond(Resource):
 
-    @auth.login_required
     def get(self):
         try:
-            content = {'user action':'received'}
-            action = request.args.get('action')
-            print(action)
             nid = request.args.get('nid')
-            print(nid)
-#todo
-#1. using nid to find the notification record
-#2. using notification field to find incident record
-#3. update the record using with response field
-#needs to update the response field in the notification record. response field is a json format ["action(snooze/fix)":timestamp]
-#4. update incident record
-
-            return content
+            resp = make_response(render_template('respond.html', contact = 'cyjiang@us.ibm.com', nid = nid))
+            resp.headers['Content-type'] = 'text/html; charset=utf-8'
+            return resp
         except Exception as e:
             print(e)
             return {"result":"fail", "msg": str(e)}, 400
 
-    @auth.verify_password
-    def verify(username, password):
-        print("BDPIncidentRespond called")
-        return authF.auth(username, password)
+    def post(self):
+        try:
+            resp = make_response(render_template('respond_ok.html'))
+            print(request.form['nid'])
+            print(request.form['contact'])
+            print(request.form['action'])
+            resp.headers['Content-type'] = 'text/html; charset=utf-8'
+            return resp
+        except Exception as e:
+            print(e)
+            return {"result":"fail", "msg": str(e)}, 400

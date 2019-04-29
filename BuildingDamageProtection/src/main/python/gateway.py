@@ -34,7 +34,7 @@ from bdp_incident import BDPIncident
 from bdp_tenant import BDPTenant
 from bdp_user import BDPUser
 from bdp_respond import BDPIncidentRespond
-from bdp_respond2 import BDPIncidentRespond2
+#from bdp_respond2 import BDPIncidentRespond2
 
 app = Flask(__name__)
 api = Api(app)
@@ -60,7 +60,7 @@ thread1.start()
 api.add_resource(BDPGateway, '/')
 api.add_resource(BDPIncident, '/incident')
 api.add_resource(BDPIncidentRespond, '/respond')
-api.add_resource(BDPIncidentRespond2, '/respond2')
+#api.add_resource(BDPIncidentRespond2, '/respond2')
 api.add_resource(BDPTenant, '/tenant')
 api.add_resource(BDPUser, '/user')
 
