@@ -12,6 +12,7 @@ import ibm_db
 from bdp_property import BDPProperty
 from bdp_util import *
 import datetime
+from flask import json
 
 
 class BDPDBConnection():
@@ -132,3 +133,8 @@ def getIncidentByIncidentID(conn, incident_id):
     stmt = ibm_db.exec_immediate(conn, sql_string)
     dictionary = ibm_db.fetch_assoc(stmt)
     return dictionary
+
+def updateNotificationResponse(conn, nid, response):
+    sql_string = "UPDATE " + getTableName("BDP_NOTIFICATION") + " SET RESPONSE = '" + json.dumps(response) + "' WHERE NOTIFICATION_ID = '" + str(nid) + "'"
+    print(sql_string)
+    stmt = ibm_db.exec_immediate(conn, sql_string)

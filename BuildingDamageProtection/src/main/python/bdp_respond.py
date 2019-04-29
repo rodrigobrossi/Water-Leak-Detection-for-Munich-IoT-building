@@ -53,6 +53,17 @@ class BDPIncidentRespond(Resource):
             nid = request.form['nid']
             action = request.form['action']
             notificationJson = getNotificationByNotificationID(conn, nid)
+            notificationResponseJson = []
+            responsestr = notificationJson["RESPONSE"].strip()
+            if notificationJson["RESPONSE"] is not None and len(responsestr) != 0 :
+                notificationResponseJson = eval(notificationJson["RESPONSE"])
+            print(notificationResponseJson)
+            now = datetime.datetime.now()
+            response = {'time' : now, 'action' : action}
+            notificationResponseJson.append(response)
+            print(notificationResponseJson)
+            updateNotificationResponse(conn, nid, notificationResponseJson)
+            
             incidentJSON = getIncidentByIncidentID(conn, notificationJson["INCIDENT_ID"])
             usergroups = getAllUsers(conn, incidentJSON["TENANT_ID"])
             resp.headers['Content-type'] = 'text/html; charset=utf-8'
