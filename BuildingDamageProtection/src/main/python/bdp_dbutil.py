@@ -37,8 +37,16 @@ class BDPDBConnection():
             print(conn_string)
             self.conn = ibm_db.pconnect(conn_string, "", "") 
             
-    def getDBConnection(self):
-        return self.conn
+    def getDBConnection(self, enforce = False):
+        if enforce:
+            conn_string = "DATABASE=" + BDPProperty.getInstance().getValue('db_dbname')
+            conn_string = conn_string + ";HOSTNAME=" + BDPProperty.getInstance().getValue('db_dbhost')
+            conn_string = conn_string + ";PORT=" + BDPProperty.getInstance().getValue('db_dbport')
+            conn_string = conn_string + ";PROTOCOL=TCPIP;UID=" + BDPProperty.getInstance().getValue('db_admin_user')
+            conn_string = conn_string + ";PWD=" + BDPProperty.getInstance().getValue('db_admin_password')
+            self.conn = ibm_db.pconnect(conn_string, "", "") 
+        else:
+            return self.conn
 
 '''def getDBConnection():
     conn_string = "DATABASE=" + BDPProperty.getInstance().getValue('db_dbname')
@@ -155,4 +163,3 @@ def updateIncidentStatus(conn, incident_id, actionstr):
     print(sql_string)
     stmt = ibm_db.exec_immediate(conn, sql_string)
     return True
-    

@@ -8,7 +8,8 @@
 # divested of its trade secrets, irrespective of what has
 # been deposited with the U.S. Copyright Office.
 #############################################################
-import uuid
+import uuid, json
+import requests
 
 def randomString(string_length=10):
     """Returns a random string of length string_length."""
@@ -17,7 +18,25 @@ def randomString(string_length=10):
     random = random.replace("-","") # Remove the UUID '-'.
     return random[0:string_length] # Return the random string.
 
-def sendNotificationToUsers(endpoint, usergroups):
-    print("sendNotificationToUsers: " + endpoint)
+def sendNotificationToUsers(endpoint, usergroups, action, userJSON):
+    print("sendNotificationToUsers: " + action)
+    print(userJSON)
     print(usergroups)
+    try:
+        url = endpoint + 'confirm'
+            
+        print(url)
+        requestbody = {"action": "CONFIRM", "responder_action": action, "group": usergroups, "responder_info": userJSON["USER_CONTACT_1"]}
+        print(requestbody)
+            
+        #resp = requests.post(url, headers=const.getAPMEnv(const.env)["pmi_headers"], data = json.dumps(requestbody))
+        resp = requests.post(url, headers=None, data = json.dumps(requestbody))
+    
+        print(resp.status_code)
+        print(resp.text)
+        if resp.status_code == 200:
+            return True
+    except Exception as e:
+        print(e)
+
     return False

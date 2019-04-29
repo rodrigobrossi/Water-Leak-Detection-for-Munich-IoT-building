@@ -51,6 +51,7 @@ def periodic_event():
         return ret
     except Exception as e:
         print(e)
+        conn = BDPDBConnection.getInstance().getDBConnection(True)
 
     
 
