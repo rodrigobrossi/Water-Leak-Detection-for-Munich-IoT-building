@@ -18,6 +18,6 @@ def randomString(string_length=10):
     return random[0:string_length] # Return the random string.
 
 def sendNotificationToUsers(endpoint, usergroups):
-    print(endpoint)
+    print("sendNotificationToUsers: " + endpoint)
     print(usergroups)
-    return
+    return False
