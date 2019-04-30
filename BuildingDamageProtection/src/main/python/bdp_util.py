@@ -29,8 +29,7 @@ def sendNotificationToUsers(endpoint, usergroups, action, userJSON):
         requestbody = {"action": "CONFIRM", "responder_action": action, "group": usergroups, "responder_info": userJSON["USER_CONTACT_1"]}
         print(requestbody)
             
-        #resp = requests.post(url, headers=const.getAPMEnv(const.env)["pmi_headers"], data = json.dumps(requestbody))
-        resp = requests.post(url, headers=None, data = json.dumps(requestbody))
+        resp = requests.post(url, headers=None, data = requestbody)
     
         print(resp.status_code)
         print(resp.text)
