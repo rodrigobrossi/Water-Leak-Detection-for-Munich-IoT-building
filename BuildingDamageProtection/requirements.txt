@@ -3,3 +3,4 @@ Flask==1.0.2
 gevent==1.4.0
 flask_restful==0.3.7
 flask_httpauth==3.2.4
+requests==2.19.1
