@@ -36,6 +36,7 @@ from bdp_tenant import BDPTenant
 from bdp_user import BDPUser
 from bdp_respond import BDPIncidentRespond
 from bdp_servicecheck import BDPServiceCheck
+from bdp_hardware import BDPHardware
 #from bdp_respond2 import BDPIncidentRespond2
 
 app = Flask(__name__)
@@ -64,6 +65,7 @@ api.add_resource(BDPIncidentRespond, '/respond')
 #api.add_resource(BDPIncidentRespond2, '/respond2')
 api.add_resource(BDPTenant, '/tenant')
 api.add_resource(BDPUser, '/user')
+api.add_resource(BDPHardware, '/hardware')
 
 #app.run(ssl_context='adhoc', host='0.0.0.0', port=int(AIProperty.getInstance().getValue('server_port')))
 #app.run(host='0.0.0.0', port=int(AIProperty.getInstance().getValue('server_port')))
