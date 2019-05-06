@@ -44,21 +44,29 @@ class BDPIncidentRespond(Resource):
             return {"result":"fail", "msg": str(e)}, 400
 
     def post(self):
+        print("RESPOND POST")
         try:
             conn = BDPDBConnection.getInstance().getDBConnection()
             resp = make_response(render_template('respond_ok.html'))
+            
             print(request.form['nid'])
             print(request.form['contact'])
             print(request.form['action'])
+            
             nid = request.form['nid']
             action = request.form['action']
             notificationJson = getNotificationByNotificationID(conn, nid)
             userJSON = getUserByUserID(conn, notificationJson["USER_ID"])
+            
             notificationResponseJson = []
-            responsestr = notificationJson["RESPONSE"].strip()
-            if notificationJson["RESPONSE"] is not None and len(responsestr) != 0 :
-                notificationResponseJson = eval(notificationJson["RESPONSE"])
-            print(notificationResponseJson)
+
+            response = notificationJson["RESPONSE"]
+            if response is not None:
+                responsestr = response.strip()
+                if len(responsestr) != 0 :
+                    notificationResponseJson = eval(notificationJson["RESPONSE"])
+                print(notificationResponseJson)
+            
             now = datetime.datetime.now()
             response = {'time' : now, 'action' : action}
             notificationResponseJson.append(response)
