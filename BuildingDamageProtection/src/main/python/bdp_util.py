@@ -48,24 +48,19 @@ def sendEmail(to):
     
     sent_from = gmail_user  
     to = ['cyjiang@us.ibm.com']
-    subject = 'Urgent Message from Building Damage Protection System'
-    body = 'Urgent Message from Building Damage Protection System'
+    subject = 'Subject: Urgent Message from Building Damage Protection System'
+    body = 'Body: Urgent Message from Building Damage Protection System'
     
-    email_text = """\  
-    From: %s  
-    To: %s  
-    Subject: %s
-    
-    %s
-    """ % (sent_from, ", ".join(to), subject, body)
+    message = 'Subject: {}\n\n{}'.format(subject, body)
     
     try:  
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.ehlo()
         server.login(gmail_user, gmail_password)
-        server.sendmail(sent_from, to, email_text)
+        server.sendmail(sent_from, to, message)
         server.close()
     
         print('Email sent!')
-    except:  
+    except Exception as e:
+        print(e)  
         print('Something went wrong...')
