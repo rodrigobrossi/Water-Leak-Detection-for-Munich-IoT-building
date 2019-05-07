@@ -10,6 +10,7 @@
 #############################################################
 import uuid, json
 import requests
+import smtplib
 
 def randomString(string_length=10):
     """Returns a random string of length string_length."""
@@ -28,8 +29,8 @@ def sendNotificationToUsers(endpoint, usergroups, action, userJSON):
         print(url)
         requestbody = {"action": "CONFIRM", "responder_action": action, "group": usergroups, "responder_info": userJSON["USER_CONTACT_1"]}
         print(requestbody)
-            
-        resp = requests.post(url, headers=None, data = requestbody)
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        resp = requests.post(url, headers=headers, data = json.dumps(requestbody))
     
         print(resp.status_code)
         print(resp.text)
@@ -39,3 +40,32 @@ def sendNotificationToUsers(endpoint, usergroups, action, userJSON):
         print(e)
 
     return False
+
+def sendEmail(to):
+    print("sendEmail: " + to)
+    gmail_user = 'water.intrusion.munich@gmail.com'
+    gmail_password = 'watsoniot'
+    
+    sent_from = gmail_user  
+    to = ['cyjiang@us.ibm.com']
+    subject = 'Urgent Message from Building Damage Protection System'
+    body = 'Urgent Message from Building Damage Protection System'
+    
+    email_text = """\  
+    From: %s  
+    To: %s  
+    Subject: %s
+    
+    %s
+    """ % (sent_from, ", ".join(to), subject, body)
+    
+    try:  
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server.ehlo()
+        server.login(gmail_user, gmail_password)
+        server.sendmail(sent_from, to, email_text)
+        server.close()
+    
+        print('Email sent!')
+    except:  
+        print('Something went wrong...')
