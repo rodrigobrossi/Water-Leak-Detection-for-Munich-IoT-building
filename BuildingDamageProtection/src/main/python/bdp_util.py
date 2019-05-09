@@ -11,6 +11,8 @@
 import uuid, json
 import requests
 import smtplib
+import ibmiotf.application
+
 
 def randomString(string_length=10):
     """Returns a random string of length string_length."""
@@ -64,3 +66,29 @@ def sendEmail(to):
     except Exception as e:
         print(e)  
         print('Something went wrong...')
+        
+
+def startIOT():
+    iotSubscribe()
+    
+def iotSubscribe():
+    try:
+        myDeviceType="WaterLeakDetector"
+        options = {
+            "org": "h9eyui",
+            "id": "nodered-waterleakdetectory-notify",
+            "auth-method": "apikey",
+            "auth-key": "a-h9eyui-s47l2nsryq",
+            "auth-token": "w90sjEoIEPjSsbko(H",
+            "clean-session": True
+        }
+        client = ibmiotf.application.Client(options)
+        client.connect()
+        client.deviceEventCallback = myEventCallback
+        client.subscribeToDeviceEvents(deviceType=myDeviceType)
+    except ibmiotf.ConnectionException  as e:
+        print(e)
+        
+def myEventCallback(event):
+    str = "%s event '%s' received from device [%s]: %s"
+    print(str % (event.format, event.event, event.device, json.dumps(event.data)))
