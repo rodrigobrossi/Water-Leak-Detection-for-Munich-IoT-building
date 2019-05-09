@@ -79,6 +79,7 @@ class BDPIncidentRespond(Resource):
                 raise Exception('Not able to update incident status error')
             
             usergroups = getAllUsers(conn, incidentJSON["TENANT_ID"])
+            print(usergroups)
             retbool = sendNotificationToUsers(BDPProperty.getInstance().getValue('nodered_endpoint'), usergroups, action, userJSON)
             if not retbool:
                 raise Exception('Not able to send ack to all user error')

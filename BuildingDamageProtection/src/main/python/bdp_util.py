@@ -73,13 +73,13 @@ def startIOT():
     
 def iotSubscribe():
     try:
-        myDeviceType="WaterLeakDetector"
+        myDeviceType="waterLeakDetector"
         options = {
             "org": "h9eyui",
-            "id": "nodered-waterleakdetectory-notify",
+            "id": "orgfx53ykk",
             "auth-method": "apikey",
-            "auth-key": "a-h9eyui-s47l2nsryq",
-            "auth-token": "w90sjEoIEPjSsbko(H",
+            "auth-key": "a-h9eyui-orgfx53ykk",
+            "auth-token": "rGXJy+2xk1FbSzCR&-",
             "clean-session": True
         }
         client = ibmiotf.application.Client(options)
