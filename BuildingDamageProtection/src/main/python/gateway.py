@@ -68,9 +68,8 @@ api.add_resource(BDPIncidentRespond, '/respond')
 api.add_resource(BDPTenant, '/tenant')
 api.add_resource(BDPUser, '/user')
 api.add_resource(BDPHardware, '/hardware')
-api.add_resource(BDPNotifier, '/notifier')
 
-#startIOT()
+startIOT()
 
 #app.run(ssl_context='adhoc', host='0.0.0.0', port=int(AIProperty.getInstance().getValue('server_port')))
 #app.run(host='0.0.0.0', port=int(AIProperty.getInstance().getValue('server_port')))

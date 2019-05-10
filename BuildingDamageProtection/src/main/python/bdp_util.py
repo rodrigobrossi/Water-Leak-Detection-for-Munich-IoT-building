@@ -12,6 +12,7 @@ import uuid, json
 import requests
 import smtplib
 import ibmiotf.application
+from bdp_notifier import BDPNotifier
 
 
 def randomString(string_length=10):
@@ -84,8 +85,8 @@ def iotSubscribe():
         }
         client = ibmiotf.application.Client(options)
         client.connect()
-        client.deviceEventCallback = myEventCallback
-        client.subscribeToDeviceEvents(deviceType=myDeviceType)
+        client.deviceEventCallback = BDPNotifier.hardwareCallback
+        client.subscribeToDeviceEvents(deviceType=myDeviceType,deviceId="20WestSensor2")
     except ibmiotf.ConnectionException  as e:
         print(e)
         

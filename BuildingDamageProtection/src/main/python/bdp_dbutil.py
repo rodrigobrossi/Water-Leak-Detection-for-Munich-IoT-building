@@ -163,3 +163,34 @@ def updateIncidentStatus(conn, incident_id, actionstr):
     print(sql_string)
     stmt = ibm_db.exec_immediate(conn, sql_string)
     return True
+
+def getHardwareByDevice(conn, device):
+    print("[getHardwareByDevice]: " + str(device))
+    
+    try:
+        deviceType, deviceId = device.split(':')
+    except Exception as e:
+        print("[getHardwareByDevice] Wrong format of device {}".format(e))
+    
+    sql_string = "SELECT * FROM " + getTableName("BDP_HARDWARE") 
+    sql_string += " WHERE HARDWARE_ID = '"+ deviceId + "' AND HARDWARE_TYPE = '" + deviceType + "'"
+    print("[getHardwareByDevice] injecting to DB: " + sql_string)
+
+    stmt = ibm_db.exec_immediate(conn, sql_string)
+    dictionary = ibm_db.fetch_assoc(stmt)
+    return dictionary
+
+def getRawEventsByHardwareUID(conn, hardware_uid):
+    print("[getRawEventsByDevice]: " + str(hardware_uid))
+    
+    sql_string = "SELECT * FROM " + getTableName("BDP_RAW_EVENTS") 
+    sql_string += " WHERE HARDWARE_UID = '"+ str(hardware_uid) + "'"
+    print("[getRawEventsByDevice] injecting to DB: " + sql_string)
+
+    notificationgroups = []
+    stmt = ibm_db.exec_immediate(conn, sql_string)
+    dictionary = ibm_db.fetch_assoc(stmt)
+    while dictionary != False:
+        notificationgroups.append(dictionary)
+        dictionary = ibm_db.fetch_assoc(stmt)
+    return notificationgroups
