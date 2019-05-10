@@ -35,16 +35,13 @@ class BDPHardware(Resource):
         try:
             conn = BDPDBConnection.getInstance().getDBConnection()
             jsonbody = request.get_json(force=True)
-            print(jsonbody)
+            print("[BDPHardware] POST request received: {}".format(jsonbody))
 
-            sql_string = "INSERT INTO " + BDPProperty.getInstance().getValue('db_admin_user')
-            sql_string += ".BDP_HARDWARE (HARDWARE_ID, HARDWARE_TYPE, HARDWARE_DETAIL, TENANT_ID) SELECT '" 
-            sql_string += jsonbody['HARDWARE_ID'] + "', '" 
-            sql_string += jsonbody['HARDWARE_TYPE'] + "', '" 
-            sql_string += jsonbody['HARDWARE_DETAIL'] + "', " 
-            sql_string += "TENANT_ID FROM " + BDPProperty.getInstance().getValue('db_admin_user')
-            sql_string += ".BDP_TENANT WHERE TENANT = '"+ jsonbody['TENANT'] + "'"
-
+            sql_string = "INSERT INTO " + bdp_dbutil.getTableName("BDP_HARDWARE") + " (HARDWARE_ID, HARDWARE_TYPE, HARDWARE_DETAIL, TENANT_ID) SELECT '" 
+            sql_string += jsonbody['HARDWARE_ID'] + "', '" + jsonbody['HARDWARE_TYPE'] + "', '" + jsonbody['HARDWARE_DETAIL'] + "', " 
+            sql_string += "TENANT_ID FROM " + bdp_dbutil.getTableName("BDP_TENANT") + " WHERE TENANT = '"+ jsonbody['TENANT'] + "'"
+            print("[BDPHardware] Injecting to DB: {}".format(sql_string))
+            
             stmt = ibm_db.exec_immediate(conn, sql_string)
             content = {'harware':'added'}
             if ibm_db.num_rows(stmt) == 0:

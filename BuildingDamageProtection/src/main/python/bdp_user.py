@@ -35,8 +35,14 @@ class BDPUser(Resource):
         try:
             conn = BDPDBConnection.getInstance().getDBConnection()
             jsonbody = request.get_json(force=True)
-            print(jsonbody)
-            sql_string = "INSERT INTO " + BDPProperty.getInstance().getValue('db_admin_user') + ".BDP_USER (USER_NAME, USER_CONTACT_1, TENANT_ID) SELECT '" + jsonbody['USER_NAME'] + "', '" + jsonbody['USER_CONTACT_1'] + "', TENANT_ID FROM LKR34911.BDP_TENANT WHERE TENANT = '"+ jsonbody['TENANT'] + "'"
+            print("[BDPUser] POST request received: {}".format(jsonbody))
+
+            sql_string = "INSERT INTO " + BDPProperty.getInstance().getValue('db_admin_user') 
+            sql_string += ".BDP_USER (USER_NAME, USER_CONTACT_1, TENANT_ID) SELECT '" 
+            sql_string += jsonbody['USER_NAME'] + "', '" 
+            sql_string += jsonbody['USER_CONTACT_1'] + "', " 
+            sql_string += "TENANT_ID FROM LKR34911.BDP_TENANT WHERE TENANT = '"+ jsonbody['TENANT'] + "'"
+
             stmt = ibm_db.exec_immediate(conn, sql_string)
             content = {'user':'created'}
             if ibm_db.num_rows(stmt) == 0:
