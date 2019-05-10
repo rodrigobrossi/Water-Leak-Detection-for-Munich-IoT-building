@@ -8,4 +8,5 @@
  
     <include file="resources/db/db2/01_dbinit.sql" />
     <include file="resources/db/db2/02_incident.sql" />
+    <include file="resources/db/db2/03_rawevent.sql" />
 </databaseChangeLog>
