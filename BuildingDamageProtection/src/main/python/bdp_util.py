@@ -93,3 +93,6 @@ def iotSubscribe():
 def myEventCallback(event):
     str = "%s event '%s' received from device [%s]: %s"
     print(str % (event.format, event.event, event.device, json.dumps(event.data)))
+    for attr in dir(event): 
+        print(attr)
+        print(getattr(event, attr)) 
