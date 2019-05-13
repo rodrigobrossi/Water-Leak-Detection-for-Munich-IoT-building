@@ -180,8 +180,19 @@ def getHardwareByDevice(conn, device):
     dictionary = ibm_db.fetch_assoc(stmt)
     return dictionary
 
+def getHardwareByHardwareUID(conn, hardware_uid):
+    print("[getHardwareByHardwareUID]: hardware_uid = " + str(hardware_uid))
+    
+    sql_string = "SELECT * FROM " + getTableName("BDP_HARDWARE") 
+    sql_string += " WHERE HARDWARE_UID = '"+ str(hardware_uid) + "'"
+    print("[getHardwareByHardwareUID] injecting to DB: " + sql_string)
+
+    stmt = ibm_db.exec_immediate(conn, sql_string)
+    dictionary = ibm_db.fetch_assoc(stmt)
+    return dictionary
+
 def getRawEventsByHardwareUID(conn, hardware_uid):
-    print("[getRawEventsByDevice]: " + str(hardware_uid))
+    print("[getRawEventsByDevice]: hardware_uid = " + str(hardware_uid))
     
     sql_string = "SELECT * FROM " + getTableName("BDP_RAW_EVENTS") 
     sql_string += " WHERE HARDWARE_UID = '"+ str(hardware_uid) + "'"
