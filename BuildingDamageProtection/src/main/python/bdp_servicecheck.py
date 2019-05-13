@@ -25,8 +25,8 @@ class BDPServiceCheck(object):
     def setup(self, actionargs=()):
         action = periodic_event
         action(*actionargs)
-        self.scheduler.enter(int(BDPProperty.getInstance().getValue('check_status_interval')) * 60, 60, self.setup,
-                        ())
+        self.scheduler.enter(int(BDPProperty.getInstance().getValue('check_status_interval')) * 60 * 60, 60, self.setup,
+                        ()) #hour level
 
     def run(self):
         self.scheduler.run()

@@ -1,6 +1,6 @@
 {
    "ver":"1.0",
-   "check_status_interval":"5",
+   "check_status_interval":"24",
    "server_port":"8080",
    "db_dbname":"BLUDB",
    "db_dbhost":"dashdb-txn-sbox-yp-dal09-04.services.dal.bluemix.net",
