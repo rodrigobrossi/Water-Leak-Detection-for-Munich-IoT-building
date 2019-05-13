@@ -58,18 +58,19 @@ class BDPDBConnection():
     conn = ibm_db.connect(conn_string, "", "")
     #conn.autocommit = True
     return conn'''
+    
+def getTableName(tablename):
+    return BDPProperty.getInstance().getValue('db_admin_user') + "." + tablename
 
 def getTenantByName(conn, tenant):
     sql_string = "SELECT * FROM " + getTableName("BDP_TENANT") + " WHERE TENANT = '" + tenant + "'"
     stmt = ibm_db.exec_immediate(conn, sql_string)
-    dictionary = ibm_db.fetch_both(stmt)
-    if dictionary != False:
-        return dictionary
-    else:
-        return None
-    
-def getTableName(tablename):
-    return BDPProperty.getInstance().getValue('db_admin_user') + "." + tablename
+    return ibm_db.fetch_both(stmt)
+
+def getTenantByTenantID(conn, tenant_id):
+    sql_string = "SELECT * FROM " + getTableName("BDP_TENANT") + " WHERE TENANT_ID = '" + str(tenant_id) + "'"
+    stmt = ibm_db.exec_immediate(conn, sql_string)
+    return ibm_db.fetch_both(stmt)
 
 def getAllUsers(conn, tenant_id):
     usergroups = []
@@ -135,9 +136,33 @@ def getUserByUserID(conn, user_id):
     dictionary = ibm_db.fetch_assoc(stmt)
     return dictionary
 
+def getIncidentID(conn, incident):
+    print("[getIncident]: " + str(incident))
+    
+    sql_string = "SELECT * FROM " + getTableName("BDP_INCIDENT") 
+    sql_string += " WHERE INCIDENT_DETAIL = '" + json.dumps(incident['INCIDENT_DETAIL']) 
+    sql_string += "' AND INCIDENT_TIME = '" + incident['INCIDENT_TIME'] 
+    sql_string += "' AND INCIDENT_STATUS_CODE = 2 AND TENANT_ID = '" + str(incident['TENANT']) 
+    sql_string += "' ORDER BY INCIDENT_ID DESC"
+    
+    stmt = ibm_db.exec_immediate(conn, sql_string)
+    dictionary = ibm_db.fetch_assoc(stmt)
+    return dictionary['INCIDENT_ID']
+
 def getIncidentByIncidentID(conn, incident_id):
     print("getIncidentByIncidentID: " + str(incident_id))
     sql_string = "SELECT * FROM " + getTableName("BDP_INCIDENT") + " WHERE INCIDENT_ID = " + str(incident_id)
+    stmt = ibm_db.exec_immediate(conn, sql_string)
+    dictionary = ibm_db.fetch_assoc(stmt)
+    return dictionary
+
+def checkExcistingIncident(conn, tenant_id):
+    print("[checkExcistingIncident]: tenant_id = " + str(tenant_id))
+    
+    sql_string = "SELECT * FROM " + getTableName("BDP_INCIDENT") 
+    sql_string += " WHERE INCIDENT_ID_ORIGINAL IS NULL AND TENANT_ID = " + str(tenant_id) 
+    sql_string += " AND INCIDENT_STATUS_CODE != 1 ORDER BY INCIDENT_TIME DESC FETCH FIRST 1 ROWS ONLY"
+
     stmt = ibm_db.exec_immediate(conn, sql_string)
     dictionary = ibm_db.fetch_assoc(stmt)
     return dictionary
@@ -174,7 +199,6 @@ def getHardwareByDevice(conn, device):
     
     sql_string = "SELECT * FROM " + getTableName("BDP_HARDWARE") 
     sql_string += " WHERE HARDWARE_ID = '"+ deviceId + "' AND HARDWARE_TYPE = '" + deviceType + "'"
-    print("[getHardwareByDevice] injecting to DB: " + sql_string)
 
     stmt = ibm_db.exec_immediate(conn, sql_string)
     dictionary = ibm_db.fetch_assoc(stmt)
@@ -185,18 +209,18 @@ def getHardwareByHardwareUID(conn, hardware_uid):
     
     sql_string = "SELECT * FROM " + getTableName("BDP_HARDWARE") 
     sql_string += " WHERE HARDWARE_UID = '"+ str(hardware_uid) + "'"
-    print("[getHardwareByHardwareUID] injecting to DB: " + sql_string)
 
     stmt = ibm_db.exec_immediate(conn, sql_string)
     dictionary = ibm_db.fetch_assoc(stmt)
     return dictionary
 
 def getRawEventsByHardwareUID(conn, hardware_uid):
-    print("[getRawEventsByDevice]: hardware_uid = " + str(hardware_uid))
+    print("[getRawEventsByHardwareUID]: hardware_uid = " + str(hardware_uid))
     
     sql_string = "SELECT * FROM " + getTableName("BDP_RAW_EVENTS") 
-    sql_string += " WHERE HARDWARE_UID = '"+ str(hardware_uid) + "'"
-    print("[getRawEventsByDevice] injecting to DB: " + sql_string)
+    # TODO: ORDER BY INCIDENT_TIME DESC FETCH FIRST 480 ROWS ONLY
+    sql_string += " WHERE HARDWARE_UID = "+ str(hardware_uid)
+    print("[getRawEventsByHardwareUID] injecting to DB: " + sql_string)
 
     notificationgroups = []
     stmt = ibm_db.exec_immediate(conn, sql_string)

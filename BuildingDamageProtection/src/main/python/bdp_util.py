@@ -10,7 +10,10 @@
 #############################################################
 import uuid, json, datetime
 import requests
+
 import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 import ibm_db
 import ibmiotf.application
@@ -47,23 +50,29 @@ def sendNotificationToUsers(endpoint, usergroups, action, userJSON):
 
     return False
 
-def sendEmail(to):
-    print("sendEmail: " + to)
+def sendEmail(to, subject, plain_body, html_body):
     gmail_user = 'water.intrusion.munich@gmail.com'
     gmail_password = 'watsoniot'
-    
     sent_from = gmail_user  
-    to = ['cyjiang@us.ibm.com']
-    subject = 'Subject: Urgent Message from Building Damage Protection System'
-    body = 'Body: Urgent Message from Building Damage Protection System'
     
-    message = 'Subject: {}\n\n{}'.format(subject, body)
+    message = MIMEMultipart('alternative')
+    message['Subject'] = subject
+    message['From'] = sent_from
+    message['To'] = to
+
+    plain_text = MIMEText(plain_body, 'plain')
+    html_text = MIMEText(html_body, 'html')
+
+    message.attach(plain_text)
+    message.attach(html_text)
+
+    #message = 'Subject: {}\n\n{}'.format(subject, body)
     
     try:  
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.ehlo()
         server.login(gmail_user, gmail_password)
-        server.sendmail(sent_from, to, message)
+        server.sendmail(sent_from, to, message.as_string())
         server.close()
     
         print('Email sent!')
@@ -90,7 +99,7 @@ def iotSubscribe():
         client = ibmiotf.application.Client(options)
         client.connect()
         client.deviceEventCallback = hardwareCallback
-        client.subscribeToDeviceEvents(deviceType=myDeviceType,deviceId="20WestSensor2")
+        client.subscribeToDeviceEvents(deviceType=myDeviceType,deviceId="20WestSensor1")
     except ibmiotf.ConnectionException  as e:
         print(e)
 
