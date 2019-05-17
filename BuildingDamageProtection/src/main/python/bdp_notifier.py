@@ -22,20 +22,7 @@ class BDPNotifier():
     
     def getIncidentOccurence(conn, hardware):
         # Read all the values
-        table = pd.DataFrame(bdp_dbutil.getRawEventsByHardwareUID(conn, hardware["HARDWARE_UID"]))
-        # TODO: Find a better way
-        # Consider only the last 2 h
-
-        table = table.tail(4)
-        table.reset_index(drop=True, inplace=True)
-        print('[BDPNotifier] Table \n {}'.format(table))
-        table.sort_values(by=['READING_TIME'],inplace=True)
-
-        # Get important values
-        table['HUMIDITY'] = None
-        for i in range(table.shape[0]):
-            hardware_json = json.loads(table.READING.iloc[i])
-            table.at[i, 'HUMIDITY']  = hardware_json['humidity']
+        table = bdp_util.createHumidityTable(conn, hardware["HARDWARE_UID"], 480)
        
         value_of_interest = table.HUMIDITY.iloc[-1]
         if value_of_interest < 10:
@@ -64,20 +51,60 @@ class BDPNotifier():
             return
         incident['GROUP'] = response['GROUP']
         incident['ACTION'] = response['ACTION']
-        BDPNotifier.generateNotifications(incident)
+        BDPNotifier.generateAlarmNotifications(conn, incident)
     
-    def generateNotifications(incident):
+    def generateAlarmNotifications(conn, incident):
+        if incident['ACTION'] == 'ALARM':
+            subject = 'Water Intusion Detected!'
+        else:
+            return
+        
+        tenant = bdp_dbutil.getTenantByTenantID(conn, incident['TENANT_ID'])['TENANT_NAME']
+        urgency = incident['INCIDENT_DETAIL']['URGENCY']
+        
+        params = {
+            'name': incident['GROUP'][0]['USER_NAME'], 
+            'tenant': tenant,
+            'sensor_id': incident['INCIDENT_DETAIL']['HARDWARE_ID'],
+            'location': incident['INCIDENT_DETAIL']['HARDWARE_DETAIL'], 
+            'urgency': urgency,
+            'urgency_vis_1': 'visible',
+            'urgency_vis_2': 'visible',
+            'urgency_vis_3': 'visible' if urgency=='critical' else 'hidden',
+            # TODO: Fix
+            'link': 'http://0.0.0.0:8080/respond?nid=' + incident['GROUP'][0]['NOTIFICATION_ID']
+        }
+        print('[BDPNotifier] generating template with params {}'.format(params))
+        current_dir = os.path.dirname(__file__)
+
+        template_plain = open(os.path.join(current_dir, 'templates/alarm_email.txt')).read()
+        template_html = open(os.path.join(current_dir, 'templates/alarm_email.html')).read()
+        
+        body_plain = pystache.render(template_plain, params)
+        body_html = pystache.render(template_html, params)
+        
+        bdp_util.sendEmail('alona.sakhnenko@ibm.com', subject, body_plain, body_html)
+    
+    def generateSmoozeNotifications(conn, nid):
         if incident['ACTION'] == 'ALARM':
             subject = 'Water Intusion Detected!'
         
-        print('GENERATING TEMPLATE')
+        tenant = bdp_dbutil.getTenantByTenantID(conn, incident['TENANT_ID'])['TENANT_NAME']
+        urgency = incident['INCIDENT_DETAIL']['URGENCY']
+        
         params = {
             'name': incident['GROUP'][0]['USER_NAME'], 
-            'location': incident['INCIDENT_DETAIL']['URGENCY'], 
-            'urgency': incident['INCIDENT_DETAIL']['URGENCY'],
+            'tenant': tenant,
+            'sensor_id': incident['INCIDENT_DETAIL']['HARDWARE_ID'],
+            'location': incident['INCIDENT_DETAIL']['HARDWARE_DETAIL'], 
+            'urgency': urgency,
+            'urgency_vis_1': 'visible',
+            'urgency_vis_2': 'visible',
+            'urgency_vis_3': 'visible' if urgency=='critical' else 'hidden',
+            # TODO: Fix
             'link': 'http://0.0.0.0:8080/respond?nid=' + incident['GROUP'][0]['NOTIFICATION_ID']
         }
-
+        print('[BDPNotifier] generating template with params {}'.format(params))
         current_dir = os.path.dirname(__file__)
 
         template_plain = open(os.path.join(current_dir, 'templates/alarm_email.txt')).read()

@@ -101,12 +101,12 @@ def updateIncidentNotifyTime(conn, incidentid):
     print(sql_string)
     stmt = ibm_db.exec_immediate(conn, sql_string)
     
-def createNotificationRecord(conn, incidentid, usergroups):
+def createNotificationRecord(conn, incidentid, type_code, usergroups):
     now = str(datetime.datetime.now())
     for user in usergroups:
         notificationid = user["NOTIFICATION_ID"]
         userid = str(user["USER_ID"])
-        sql_string = "INSERT INTO " + getTableName("BDP_NOTIFICATION") + " (NOTIFICATION_ID, INCIDENT_ID, NOTIFICATION_TYPE, NOTIFICATION_TIME, USER_ID) VALUES( '" + notificationid + "', '" + str(incidentid) + "', 1, '" + now + "', " + userid + ")"
+        sql_string = "INSERT INTO " + getTableName("BDP_NOTIFICATION") + " (NOTIFICATION_ID, INCIDENT_ID, NOTIFICATION_TYPE, NOTIFICATION_TIME, USER_ID) VALUES( '" + notificationid + "', '" + str(incidentid) + "', "+ str(type_code)+", '" + now + "', " + userid + ")"
         print(sql_string)
         stmt = ibm_db.exec_immediate(conn, sql_string)
         
@@ -150,8 +150,9 @@ def getIncidentID(conn, incident):
     return dictionary['INCIDENT_ID']
 
 def getIncidentByIncidentID(conn, incident_id):
-    print("getIncidentByIncidentID: " + str(incident_id))
+    print("[getIncidentByIncidentID]: " + str(incident_id))
     sql_string = "SELECT * FROM " + getTableName("BDP_INCIDENT") + " WHERE INCIDENT_ID = " + str(incident_id)
+    print("[getIncidentByIncidentID] injecting into BD: {}".format(sql_string))
     stmt = ibm_db.exec_immediate(conn, sql_string)
     dictionary = ibm_db.fetch_assoc(stmt)
     return dictionary
@@ -185,7 +186,6 @@ def updateIncidentStatus(conn, incident_id, actionstr):
         sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET INCIDENT_STATUS_CODE = '" + str(action) + "', FIX_TIME = '" + now + "' WHERE INCIDENT_ID = " + str(incident_id)
     else:
         sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET INCIDENT_STATUS_CODE = '" + str(action) + "', SNOOZE_TIME = '" + now + "' WHERE INCIDENT_ID = " + str(incident_id)
-    print(sql_string)
     stmt = ibm_db.exec_immediate(conn, sql_string)
     return True
 
@@ -214,12 +214,12 @@ def getHardwareByHardwareUID(conn, hardware_uid):
     dictionary = ibm_db.fetch_assoc(stmt)
     return dictionary
 
-def getRawEventsByHardwareUID(conn, hardware_uid):
+def getRawEventsByHardwareUID(conn, hardware_uid, datapoints_amount):
     print("[getRawEventsByHardwareUID]: hardware_uid = " + str(hardware_uid))
     
     sql_string = "SELECT * FROM " + getTableName("BDP_RAW_EVENTS") 
-    # TODO: ORDER BY INCIDENT_TIME DESC FETCH FIRST 480 ROWS ONLY
     sql_string += " WHERE HARDWARE_UID = "+ str(hardware_uid)
+    sql_string += " ORDER BY READING_TIME DESC FETCH FIRST " +str(datapoints_amount) + " ROWS ONLY"
     print("[getRawEventsByHardwareUID] injecting to DB: " + sql_string)
 
     notificationgroups = []

@@ -10,6 +10,7 @@
 #############################################################
 import uuid, json, datetime
 import requests
+import pandas as pd
 
 import smtplib
 from email.mime.text import MIMEText
@@ -134,3 +135,17 @@ def hardwareCallback(event):
         
     except Exception as e:
         print(e)
+
+def createHumidityTable(conn, hardware_uid, datapoint_amount):
+    table = pd.DataFrame(bdp_dbutil.getRawEventsByHardwareUID(conn, hardware_uid, 480))
+
+    # Get important values
+    table['HUMIDITY'] = None
+    for i in range(table.shape[0]):
+        hardware_json = json.loads(table.READING.iloc[i])
+        table.at[i, 'HUMIDITY']  = hardware_json['humidity']
+    return table
+
+def createPlot(conn, hardware_uid):
+    table = createHumidityTable(conn, hardware_uid, 480)
+    #TODO

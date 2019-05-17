@@ -38,7 +38,7 @@ class BDPIncident():
             notification["ACTION"] = "ALARM"
 
             bdp_dbutil.updateIncidentNotifyTime(conn, incident_id)
-            bdp_dbutil.createNotificationRecord(conn, incident_id, users)
+            bdp_dbutil.createNotificationRecord(conn, incident_id, 1, users)
 
             return notification
         except Exception as e:
@@ -70,6 +70,8 @@ class BDPIncident():
                     if diff > interval:
                         print("[BDPIncident] No snooze, sent an hour ago: SEND!")
                         send = True
+                    # TODO: REMOVE
+                    send = True
             else:
                 lastsnooze = incident_record["SNOOZE_TIME"]
                 interval = tenant_record["SNOOZE_HR"] * 60
