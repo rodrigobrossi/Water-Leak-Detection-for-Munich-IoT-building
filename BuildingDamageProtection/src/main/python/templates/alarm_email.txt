@@ -1,6 +1,10 @@
-Dear {{name}},
+Hello {{name}},
 
-A {{urgency}} water intrusion was detected at {{location}}.
+A {{urgency}} water intrusion was detected. Here is a brief summary of the incident:
 
-Please follow the link below for more information.
+Building: {{building}}
+Sensor ID: {{sensor_id}}
+Location: {{location}}
+
+To go to building damage system click the link below.
 {{link}}
