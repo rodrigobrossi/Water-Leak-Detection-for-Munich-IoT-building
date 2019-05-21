@@ -18,45 +18,67 @@ from flask import request
 from flask import json
 from flask_httpauth import HTTPBasicAuth
 
-import bdp_dbutil
-import bdp_util
+import bdp_dbutil, bdp_util
 from bdp_property import BDPProperty
+from bdp_notifier import BDPNotifier
 
 class BDPIncidentRespond(Resource):
 
     def get(self):
         try:
-            conn = bdp_dbutil.BDPDBConnection.getInstance().getDBConnection()
             nid = request.args.get('nid')
-            notification = bdp_dbutil.getNotificationByNotificationID(conn, nid)
-            user = bdp_dbutil.getUserByUserID(conn, notification["USER_ID"])
+            notification = bdp_dbutil.getNotificationByNotificationID(nid)
+            user = bdp_dbutil.getUserByUserID(notification["USER_ID"])
 
-            incident_id = bdp_dbutil.getNotificationByNotificationID(conn, nid)["INCIDENT_ID"]
-            incident = bdp_dbutil.getIncidentByIncidentID(conn, incident_id)
-
+            incident_id = bdp_dbutil.getNotificationByNotificationID(nid)["INCIDENT_ID"]
+            incident = bdp_dbutil.getIncidentByIncidentID(incident_id)
+            print('[BDPIncidentRespond] {}'.format(incident))
             # TODO: Fix original incident assignment
             #original_incident = bdp_dbutil.getIncidentByIncidentID(conn, incident['INCIDENT_ID_ORIGINAL'])
             original_ts = incident['INCIDENT_TIME']
 
-            tenant = bdp_dbutil.getTenantByTenantID(conn, incident["TENANT_ID"])['TENANT_NAME']
+            tenant = bdp_dbutil.getTenantByTenantID(incident['TENANT_ID'])
+            tenant_name = tenant['TENANT_NAME']
+
+            users_group = bdp_dbutil.getAllUsers(tenant['TENANT_ID'])
+
+            users_names = []
+            for user in users_group:
+                users_names.append(user['USER_NAME'])
 
             status_code = {
                 1: 'Fixed',
                 2: 'New',
                 3: 'Snoozed'
             }
+
             incident_status = status_code[incident['INCIDENT_STATUS_CODE']]
             incident_detail = json.loads(incident['INCIDENT_DETAIL'])
+            urgency = incident_detail['URGENCY']
+
+            handler = 'Not assigned'
+            if 'RESPONDER' in incident_detail.keys():
+                handler_id = incident_detail['RESPONDER']
+                handler = bdp_dbutil.getUserByUserID(handler_id)['USER_NAME']
+
+            bdp_util.createPlot(incident_detail['HARDWARE_UID'])
 
             resp = make_response(render_template('respond.html', 
                                                 name = user['USER_NAME'],
-                                                tenant = tenant,
+                                                tenant = tenant_name,
                                                 sensor_id = incident_detail['HARDWARE_ID'],
                                                 sensor_type = incident_detail['HARDWARE_TYPE'],
+                                                hardware_uid = incident_detail['HARDWARE_UID'],
                                                 location = incident_detail['HARDWARE_DETAIL'],
                                                 timestamp = original_ts,
                                                 status = incident_status,
-                                                handler = 'None'))
+                                                handler = handler,
+                                                urgency_vis_1 = 'visible',
+                                                urgency_vis_2 = 'visible',
+                                                urgency_vis_3 = 'visible' if urgency=='critical' else 'hidden',
+                                                users = users_names,
+                                                users_amount = len(users_names)
+                                                ))
             resp.headers['Content-type'] = 'text/html; charset=utf-8'
 
             return resp
@@ -67,34 +89,29 @@ class BDPIncidentRespond(Resource):
     def post(self):
         print("[BDPIncidentRespond] post request received")
         try:
-            conn = bdp_dbutil.BDPDBConnection.getInstance().getDBConnection()
-            resp = make_response(render_template('respond_ok.html'))
             request_json = request.get_json(force=True)
             nid = str(request.referrer).split('?')[1][4:]
 
             action = request_json['ACTION']
 
-            notification = bdp_dbutil.getNotificationByNotificationID(conn, nid)
-            user = bdp_dbutil.getUserByUserID(conn, notification["USER_ID"])
-            
-            print(notification)
-            if notification['RESPONSE'] is not None:
-                # TODO: Somebody already answered
-                return {'result': 'Something went wrong'}
-            
-            now = datetime.datetime.now()
-            response = {'TIME' : now, 'ACTION' : action}
-            bdp_dbutil.updateNotificationResponse(conn, nid, response)
-            
-            retbool = bdp_dbutil.updateIncidentStatus(conn, notification["INCIDENT_ID"], action)
-            if not retbool:
-                return {'result': 'Not able to update incident status'}
-            
-            incident = bdp_dbutil.getIncidentByIncidentID(conn, notification["INCIDENT_ID"])
-            users = bdp_dbutil.getAllUsers(conn, incident["TENANT_ID"])
-            bdp_dbutil.createNotificationRecord(conn, incident["INCIDENT_ID"], 2, users)
+            notification = bdp_dbutil.getNotificationByNotificationID(nid)
+            user = bdp_dbutil.getUserByUserID(notification["USER_ID"])
 
-            return resp
+            if notification['RESPONSE'] is not None:
+                return {'result': 'You already have already responded to this incident'}, 200
+            
+            bdp_dbutil.insertResponderToIncidentID(notification["INCIDENT_ID"], user["USER_ID"])
+
+            notification = {
+                "ACTION": action,
+                "RESPONDER": user["USER_NAME"],
+                "NOTIFICATION_ID": nid,
+                "INCIDENT_ID": notification["INCIDENT_ID"]
+            }
+
+            BDPNotifier.notify(notification, user["TENANT_ID"])
+
+            return {"result":"OK"}, 200
         except Exception as e:
             print(e)
             return {"result":"fail", "msg": str(e)}, 400
