@@ -3,40 +3,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Bootstrap CSS -->
+    
+    <!-- Bootstrap-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    
+    <link rel="stylesheet" type="text/css" href={{ url_for('static',filename='css/stylesheet.css')}}>
+    
     <!-- IBM font -->
     <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans" rel="stylesheet"/>
 <title>Building Damage Protection</title>
-<style>
-body {
-    font-family: 'IBM Plex Sans Condensed', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif !important;
-}
-.header {
-    background-color: rgb(24,41,53);
-    font-family: 'IBM Plex Sans Condensed', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif !important;
-    color: white;
-}
-#heatmap {
-    width:100%;
-    height: 300px;
-}
-.urgency_battery {
-    height: 15px;
-    width: 92px;
-    border: solid; 
-    border-radius: 3px;
-    border-width: thin;
-}
-.urgency_battery_cell{
-    border-radius: 1px; 
-    height: 100%; 
-    width: 30px; 
-    float: left;
-    margin: 0;
-    padding: 0;
-}
-</style>
 </head>
 <body>
 <div class="container-fluid h-100" id="m_container">
@@ -53,56 +31,33 @@ body {
     <div class="row p-3">
         <div class="col-sm-4">
                 <div class="card border-secodary h-100">
-                    <div class="card-header">Incident</div>
+                    <div class="card-header mcard-header">Incident</div>
                     <div class="card-body">
                         <table class="table table-sm">
                             <tbody>
-                                <td>Urgency</td>
+                                <tr><td>Building</td><td>{{tenant}}</td></tr>
+                                <tr><td>Location</td><td>{{location}}</td></tr>
+                                <tr><td>Timestamp</td><td>{{timestamp}}</td></tr>
+                                <tr><td>Sensor Type</td><td>{{sensor_type}}</td></tr>
+                                <tr><td>Sensor ID</td><td>{{sensor_id}}</td></tr>
+                                <tr><td>Status</td><td>{{status}}</td></tr>
+                                <tr><td>Handler</td><td>{{handler}}</td></tr>
+                                <tr><td>Urgency</td>
                                 <td>
                                 <div class="urgency_battery">
                                     <div class="urgency_battery_cell" style="background-color:yellow; visibility:{{urgency_vis_1}}"></div>
                                     <div class="urgency_battery_cell" style="background-color:orange; visibility:{{urgency_vis_2}}"></div>
                                     <div class="urgency_battery_cell" style="background-color:red; visibility:{{urgency_vis_3}}"></div>
                                 </div>
-                                </td>
-                                </tr>
-                                <tr>
-                                <td>Tenant</td>
-                                <td>{{tenant}}</td>
-                                </tr>
-                                <tr>
-                                <td>Sensor Type</td>
-                                <td>{{sensor_type}}</td>
-                                </tr>
-                                <tr>
-                                <td>Sensor ID</td>
-                                <td>{{sensor_id}}</td>
-                                </tr>
-                                <tr>
-                                <td>Location</td>
-                                <td>{{location}}</td>
-                                </tr>
-                                <tr>
-                                <td>Timestamp</td>
-                                <td>{{timestamp}}</td>
-                                </tr>
-                                <tr>                            
-                                <td>Status</td>
-                                <td>{{status}}</td>
-                                </tr>
-                                <tr>
-                                <td>Handler</td>
-                                <td>{{handler}}</td>
-                                </tr>
-                                <tr>
+                                </td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
         </div>
         <div class="col-xl-8">
-            <div class="card border-secodary">
-                <div class="card-header">Floor plan</div>
+            <div class="card border-secodary h-100">
+                <div class="card-header mcard-header">Floor plan</div>
                 <div class="card-body">
                     <iframe id="heatmap" src="https://waterleakdetector.eu-de.mybluemix.net/ui/#/1"></iframe>
                 </div>
@@ -111,39 +66,107 @@ body {
     </div>
     <div class="row p-3">
         <div class="col-sm-4">
-            <div class="card border-secodary">
-                <div class="card-header">Take action</div>
+            <div class="card border-secodary h-100">
+                <div class="card-header mcard-header">Take action</div>
                 <div class="card-body">
-                        <button id="snooze_button" type="button" class="btn btn-info m-2">Snooze messages</button>
-                        <button id="fixed_button" type="button" class="btn btn-success m-2">Mark as fixed</button>
+                  <button type="button" class="btn btn-info m-2" data-toggle="modal" data-target="#snoozeModal">Snooze messages</button>
+                  <button type="button" class="btn btn-success m-2" data-toggle="modal" data-target="#fixedModal">Mark as fixed</button>
+                 <div class="card-text text-align-center"><small>Use the buttons above to respond to this incident.</small></div>
                 </div>
             </div>
         </div>
         <div class="col-sm-5">
-            <div class="card border-secodary">
-                <div class="card-header">Overview over the past 2h</div>
+            <div class="card border-secodary h-100">
+                <div class="card-header mcard-header">Humidity overview</div>
                 <div class="card-body">
-                PLOT GOES HERE
+                <img src="../static/img/plot_{{hardware_uid}}.png" width='100%'/>
                 </div>
             </div>
         </div>
         <div class="col-sm-3">
-            <div class="card border-secodary">
-                <div class="card-header">Users in this group</div>
+            <div class="card border-secodary h-100">
+                <div class="card-header mcard-header">Users in this group</div>
                 <div class="card-body">
                     <div class="card-text">
-                    People 
-
+                        <ul class="list-group list-group-flush">
+                        {%for i in range(0, users_amount)%}
+                            <li class="list-group-item">{{users[i]}}</li>
+                        {%endfor%}
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="snoozeModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header mcard-header">
+        <h5 class="modal-title" >Confirm your action</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        This action will snooze notifications for 24 hours and assign you as a handler for this incident. All users in your group will be notified of this action. </br></br> Would you like to proceed? 
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button id="snooze_button" type="button" data-dismiss="modal" data-toggle="modal" data-target="#responseModal">Proceed</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="fixedModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header mcard-header">
+        <h5 class="modal-title" >Confirm your action</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        This action will mark this incident as fixed. All users in your group will be notified of this action. </br></br> Would you like to proceed? 
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button id="fixed_button" type="button" data-dismiss="modal">Proceed</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="responseModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header mcard-header">
+        <h5 class="modal-title" >Server response</h5>
+        Thank you
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body" id='responseModalBody'>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
 
 document.getElementById('snooze_button').addEventListener('click', function(event){
     var request = new XMLHttpRequest();
+    request.onreadystatechange = function() {
+      console.log(request.responseText);
+      console.log(request.readyState);
+      console.log(request.status);
+        if (request.readyState == 4){
+            document.getElementById('responseModalBody').innerHtml = request.responseText;
+        }
+    }
     request.open("POST","/respond",true);
     request.setRequestHeader('Content-Type', 'application/json');
     request.send(JSON.stringify({'ACTION':'SNOOZE'}))
@@ -151,6 +174,11 @@ document.getElementById('snooze_button').addEventListener('click', function(even
 
 document.getElementById('fixed_button').addEventListener('click', function(event){
     var request = new XMLHttpRequest();
+    request.onreadystatechange = function() {
+        if (this.status == 200){
+            document.getElementById('responseModalBody').innerHtml = request.responseText;
+        }
+    }
     request.open("POST","/respond",true);
     request.setRequestHeader('Content-Type', 'application/json');
     request.send(JSON.stringify({'ACTION':'FIXED'}))
