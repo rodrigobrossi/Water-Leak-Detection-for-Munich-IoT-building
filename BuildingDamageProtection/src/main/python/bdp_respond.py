@@ -47,14 +47,15 @@ class BDPIncidentRespond(Resource):
                 users_names.append(user['USER_NAME'])
 
             status_code = {
-                1: 'Fixed',
+                1: 'Resolved',
                 2: 'New',
-                3: 'Snoozed'
+                3: 'In progress'
             }
 
             incident_status = status_code[incident['INCIDENT_STATUS_CODE']]
             incident_detail = json.loads(incident['INCIDENT_DETAIL'])
             urgency = incident_detail['URGENCY']
+            hardware = bdp_dbutil.getHardwareByHardwareUID(incident_detail['HARDWARE_UID'])
 
             handler = 'Not assigned'
             if 'RESPONDER' in incident_detail.keys():
@@ -66,10 +67,10 @@ class BDPIncidentRespond(Resource):
             resp = make_response(render_template('respond.html', 
                                                 name = user['USER_NAME'],
                                                 tenant = tenant_name,
-                                                sensor_id = incident_detail['HARDWARE_ID'],
-                                                sensor_type = incident_detail['HARDWARE_TYPE'],
-                                                hardware_uid = incident_detail['HARDWARE_UID'],
-                                                location = incident_detail['HARDWARE_DETAIL'],
+                                                sensor_id = hardware['HARDWARE_ID'],
+                                                sensor_type = hardware['HARDWARE_TYPE'],
+                                                hardware_uid = hardware['HARDWARE_UID'],
+                                                location = hardware['HARDWARE_DETAIL'],
                                                 timestamp = original_ts,
                                                 status = incident_status,
                                                 handler = handler,
@@ -98,7 +99,7 @@ class BDPIncidentRespond(Resource):
             user = bdp_dbutil.getUserByUserID(notification["USER_ID"])
 
             if notification['RESPONSE'] is not None:
-                return {'result': 'You already have already responded to this incident'}, 200
+                return {'result': 'You already have already responded to this incident'}, 400
             
             bdp_dbutil.insertResponderToIncidentID(notification["INCIDENT_ID"], user["USER_ID"])
 
@@ -106,7 +107,8 @@ class BDPIncidentRespond(Resource):
                 "ACTION": action,
                 "RESPONDER": user["USER_NAME"],
                 "NOTIFICATION_ID": nid,
-                "INCIDENT_ID": notification["INCIDENT_ID"]
+                "INCIDENT_ID": notification["INCIDENT_ID"],
+                "TENANT_ID": user["TENANT_ID"]
             }
 
             BDPNotifier.notify(notification, user["TENANT_ID"])

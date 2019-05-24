@@ -148,6 +148,6 @@ def createPlot(hardware_uid):
     figure, ax = plt.subplots(1,1)
     ax.set_facecolor('#182935')
     ax.xaxis.set_label_text('')
-    figure = table.plot(x='READING_TIME', y='HUMIDITY', ax=ax, figsize=(12,4), legend=None).get_figure()
-    #Fix path
+    figure = table.plot(x='READING_TIME', y='HUMIDITY', ax=ax, figsize=(12,4), legend=None, linewidth=4).get_figure()
+    #TODO Fix path
     figure.savefig('src/main/python/static/img/plot_' + str(hardware_uid) +'.png', bbox_inches='tight')

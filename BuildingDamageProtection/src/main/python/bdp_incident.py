@@ -27,7 +27,8 @@ class BDPIncident():
 
         # TODO: check the slope
         response = {}
-        response['INCIDENT_DETAIL'] = hardware
+        response['INCIDENT_DETAIL'] = {}
+        response['INCIDENT_DETAIL']['HARDWARE_UID'] = hardware['HARDWARE_UID']
         response['INCIDENT_DETAIL']['URGENCY'] = 'moderate' if value_of_interest < 75 else 'critical'
         response['INCIDENT_TIME'] = str(table.READING_TIME.iloc[-1])
         response['TENANT_ID'] = hardware['TENANT_ID']
