@@ -14,7 +14,7 @@
     
     <!-- IBM font -->
     <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans" rel="stylesheet"/>
-<title>Building Damage Protection</title>
+<title>Water Damage Prevention System</title>
 </head>
 <body>
 <div class="container-fluid h-100" id="m_container">
@@ -70,7 +70,7 @@
                 <div class="card-header mcard-header">Take action</div>
                 <div class="card-body">
                   <button type="button" class="btn btn-info m-2" data-toggle="modal" data-target="#snoozeModal">Snooze messages</button>
-                  <button type="button" class="btn btn-success m-2" data-toggle="modal" data-target="#fixedModal">Mark as fixed</button>
+                  <button type="button" class="btn btn-success m-2" data-toggle="modal" data-target="#fixedModal">Mark as resolved</button>
                  <div class="card-text text-align-center"><small>Use the buttons above to respond to this incident.</small></div>
                 </div>
             </div>
@@ -110,11 +110,11 @@
         </button>
       </div>
       <div class="modal-body">
-        This action will snooze notifications for 24 hours and assign you as a handler for this incident. All users in your group will be notified of this action. </br></br> Would you like to proceed? 
+        This action will snooze notifications for {{snooze_time}} hours and assign you as a handler for this incident. All users in your group will be notified of this action. </br></br> Would you like to proceed? 
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button id="snooze_button" type="button" data-dismiss="modal" data-toggle="modal" data-target="#responseModal">Proceed</button>
+        <button id="snooze_button" type="button" class="btn btn-success" data-dismiss="modal" data-target="#responseModal">Proceed</button>
       </div>
     </div>
   </div>
@@ -129,11 +129,11 @@
         </button>
       </div>
       <div class="modal-body">
-        This action will mark this incident as fixed. All users in your group will be notified of this action. </br></br> Would you like to proceed? 
+        This action will mark this incident as resolved. All users in your group will be notified of this action. </br></br> Would you like to proceed? 
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button id="fixed_button" type="button" data-dismiss="modal">Proceed</button>
+        <button id="fixed_button" type="button" class="btn btn-success" data-dismiss="modal">Proceed</button>
       </div>
     </div>
   </div>
@@ -142,12 +142,11 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header mcard-header">
-        <h5 class="modal-title" >Server response</h5>
-        Thank you
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
         </button>
       </div>
-      <div class="modal-body" id='responseModalBody'>
+      <div class="modal-body">
+      <p id="responseModalBody"> Thank you for your submission</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -159,13 +158,15 @@
 
 document.getElementById('snooze_button').addEventListener('click', function(event){
     var request = new XMLHttpRequest();
+    modal_id = document.getElementById('responseModal');
+    modal = new bootstrap.Modal(modal_id);
     request.onreadystatechange = function() {
-      console.log(request.responseText);
-      console.log(request.readyState);
-      console.log(request.status);
-        if (request.readyState == 4){
-            document.getElementById('responseModalBody').innerHtml = request.responseText;
-        }
+      if (request.status == 200){
+          modal.show()
+      }
+      else {
+          document.getElementById('responseModalBody').innerHTML = 'Something went wrong';
+      }
     }
     request.open("POST","/respond",true);
     request.setRequestHeader('Content-Type', 'application/json');
@@ -174,10 +175,15 @@ document.getElementById('snooze_button').addEventListener('click', function(even
 
 document.getElementById('fixed_button').addEventListener('click', function(event){
     var request = new XMLHttpRequest();
+    modal_id = document.getElementById('responseModal');
+    modal = new bootstrap.Modal(modal_id);
     request.onreadystatechange = function() {
-        if (this.status == 200){
-            document.getElementById('responseModalBody').innerHtml = request.responseText;
-        }
+      if (request.status == 200){
+          modal.show()
+      }
+      else {
+          document.getElementById('responseModalBody').innerHTML = 'Something went wrong';
+      }
     }
     request.open("POST","/respond",true);
     request.setRequestHeader('Content-Type', 'application/json');

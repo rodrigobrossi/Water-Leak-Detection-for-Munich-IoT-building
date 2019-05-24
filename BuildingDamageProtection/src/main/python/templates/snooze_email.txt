@@ -1,6 +1,6 @@
 Hello {{name}},
 
-{{handler}} snoozed notifications for the next 24 hours and has been assigned as a handler for this incident.
+{{handler}} snoozed notifications for the next {{snooze_time}} hours.
 
 To go to building damage system click the link below.
 {{link}}
