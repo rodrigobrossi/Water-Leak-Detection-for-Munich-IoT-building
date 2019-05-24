@@ -80,6 +80,21 @@ def sendEmail(to, subject, plain_body, html_body):
         print(e)  
         print('Something went wrong...')
         
+def sendSlack(to, msg):
+    try:
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        
+        body = {}
+        body['text'] = msg
+        print(body)
+        resp = requests.post('https://hooks.slack.com/services/' + str(to), headers=headers, data = json.dumps(body))
+    
+        print(resp.status_code)
+        print(resp.text)
+        if resp.status_code == 200:
+            return True
+    except Exception as e:
+        print(e)
 
 def startIOT():
     iotSubscribe()
@@ -99,7 +114,7 @@ def iotSubscribe():
         client = ibmiotf.application.Client(options)
         client.connect()
         client.deviceEventCallback = hardwareCallback
-        client.subscribeToDeviceEvents(deviceType=myDeviceType,deviceId="20WestSensor1")
+        client.subscribeToDeviceEvents(deviceType=myDeviceType)
     except ibmiotf.ConnectionException  as e:
         print(e)
 
@@ -126,7 +141,12 @@ def hardwareCallback(event):
         if ibm_db.num_rows(stmt) == 0:
             print("[hardwareCallback] Could not add the event to DB!")
             return
-        
+
+        # Remove old points
+        week_ago = (datetime.datetime.now() - datetime.timedelta(days=7)).strftime("%Y-%m-%d-%H.%M.%S")
+        sql_string = "DELETE FROM " + bdp_dbutil.getTableName("BDP_RAW_EVENTS") + " WHERE date(READING_TIME) < date('" + str(week_ago) +"')"
+        stmt = ibm_db.exec_immediate(conn, sql_string)
+
         # Process event
         BDPIncident.handleRawEvents(hardware)
         

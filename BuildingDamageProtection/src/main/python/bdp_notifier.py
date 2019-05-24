@@ -137,6 +137,7 @@ class BDPNotifier():
             body_html = pystache.render(template_html, params)
             
             bdp_util.sendEmail(user['USER_CONTACT_1'], subject, body_plain, body_html)
+            bdp_util.sendSlack(user['USER_CONTACT_2'], body_plain)
     
     def _generateSnoozeEmails(notification, users):
         subject = 'Water Intrusion Notification Snoozed'
@@ -161,6 +162,7 @@ class BDPNotifier():
             body_html = pystache.render(template_html, params)
             
             bdp_util.sendEmail(user['USER_CONTACT_1'], subject, body_plain, body_html)
+            bdp_util.sendSlack(user['USER_CONTACT_2'], body_plain)
 
     def _generateFixedEmails(notification, users):
         subject = 'Water Intrusion Incident Resolved'
@@ -183,4 +185,5 @@ class BDPNotifier():
             body_html = pystache.render(template_html, params)
             
             bdp_util.sendEmail(user['USER_CONTACT_1'], subject, body_plain, body_html)
+            bdp_util.sendSlack(user['USER_CONTACT_2'], body_plain)
         

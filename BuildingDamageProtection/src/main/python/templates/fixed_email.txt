@@ -2,5 +2,5 @@ Hello {{name}},
 
 {{handler}} marked the incident as resolved. The system resumes nomimal humidity monitoring.
 
-To go to building damage system click the link below.
-{{link}}
+To go to building damage system click the link below:
+<{{link}}| More information>
