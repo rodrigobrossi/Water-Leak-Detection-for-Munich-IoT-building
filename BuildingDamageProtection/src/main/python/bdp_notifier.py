@@ -113,7 +113,7 @@ class BDPNotifier():
             tenant = bdp_dbutil.getTenantByTenantID(incident['TENANT_ID'])['TENANT_NAME']
             incident_detail = json.loads(incident['INCIDENT_DETAIL'])
             urgency = incident_detail['URGENCY']
-            hardware = bdp_dbutil.getHardwareByHardwareUID(incident_detail['HARDWARE_UID'])
+            hardware = bdp_dbutil.getHardwareByHardwareUID(incident['CAUSE_HARDWARE'])
 
             params = {
                 'name': user['USER_NAME'], 

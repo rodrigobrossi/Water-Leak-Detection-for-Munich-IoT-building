@@ -55,7 +55,7 @@ class BDPIncidentRespond(Resource):
             incident_status = status_code[incident['INCIDENT_STATUS_CODE']]
             incident_detail = json.loads(incident['INCIDENT_DETAIL'])
             urgency = incident_detail['URGENCY']
-            hardware = bdp_dbutil.getHardwareByHardwareUID(incident_detail['HARDWARE_UID'])
+            hardware = bdp_dbutil.getHardwareByHardwareUID(incident['CAUSE_HARDWARE'])
 
             handler = 'Not assigned'
             if 'RESPONDER' in incident_detail.keys():
@@ -98,8 +98,8 @@ class BDPIncidentRespond(Resource):
             notification = bdp_dbutil.getNotificationByNotificationID(nid)
             user = bdp_dbutil.getUserByUserID(notification["USER_ID"])
 
-            if notification['RESPONSE'] is not None:
-                return {'result': 'You already have already responded to this incident'}, 400
+            if notification['RESPONSE'] is not None and action == 'SNOOZE':
+                return {'result': 'You already have already responded to this incident'}, 208
             
             bdp_dbutil.insertResponderToIncidentID(notification["INCIDENT_ID"], user["USER_ID"])
 

@@ -171,12 +171,13 @@ def getIncidentByIncidentID(incident_id):
     return dictionary
 
 
-def checkExcistingIncident(tenant_id):
+def checkExcistingIncident(tenant_id, hardware_uid):
     conn = BDPDBConnection.getInstance().getDBConnection()
     print("[checkExcistingIncident]: tenant_id = " + str(tenant_id))
     
     sql_string = "SELECT * FROM " + getTableName("BDP_INCIDENT") 
     sql_string += " WHERE INCIDENT_ID_ORIGINAL IS NULL AND TENANT_ID = " + str(tenant_id) 
+    sql_string += " AND CAUSE_HARDWARE = " + str(hardware_uid)
     sql_string += " AND INCIDENT_STATUS_CODE != 1 ORDER BY INCIDENT_TIME DESC FETCH FIRST 1 ROWS ONLY"
 
     stmt = ibm_db.exec_immediate(conn, sql_string)
@@ -263,9 +264,9 @@ def insertIncident(existing_incident, new_incident, tenant_id):
     if not existing_incident:  
         #new incident
         sql_string = "INSERT INTO " + getTableName("BDP_INCIDENT") 
-        sql_string += " (INCIDENT_DETAIL, INCIDENT_TIME, INCIDENT_STATUS_CODE, TENANT_ID) " 
+        sql_string += " (INCIDENT_DETAIL, INCIDENT_TIME, INCIDENT_STATUS_CODE, TENANT_ID, CAUSE_HARDWARE) " 
         sql_string += "VALUES( '" + json.dumps(new_incident['INCIDENT_DETAIL']) + "', '" 
-        sql_string += new_incident['INCIDENT_TIME'] + "', 2, '" + str(tenant_id) + "')"
+        sql_string += new_incident['INCIDENT_TIME'] + "', 2, '" + str(tenant_id) + "'," + str(new_incident['CAUSE_HARDWARE']) +")"
         
         stmt = ibm_db.exec_immediate(conn, sql_string)
         incident_id = getIncidentID(new_incident)
@@ -276,9 +277,9 @@ def insertIncident(existing_incident, new_incident, tenant_id):
         print('[insertIncident] Existing incident_id = {}'.format(incident_id))
 
         sql_string = "INSERT INTO " + getTableName("BDP_INCIDENT") 
-        sql_string += " (INCIDENT_DETAIL, INCIDENT_TIME, INCIDENT_STATUS_CODE, TENANT_ID, INCIDENT_ID_ORIGINAL) " 
+        sql_string += " (INCIDENT_DETAIL, INCIDENT_TIME, INCIDENT_STATUS_CODE, TENANT_ID, CAUSE_HARDWARE, INCIDENT_ID_ORIGINAL) " 
         sql_string += "VALUES( '" + json.dumps(new_incident['INCIDENT_DETAIL']) + "', '" 
-        sql_string += new_incident['INCIDENT_TIME'] + "', 2, '" + str(tenant_id) + "', " + incident_id + ")"
+        sql_string += new_incident['INCIDENT_TIME'] + "', 2, '" + str(tenant_id) + "', "+ str(new_incident['CAUSE_HARDWARE']) + ", " + incident_id + ")"
 
         stmt = ibm_db.exec_immediate(conn, sql_string)
     
