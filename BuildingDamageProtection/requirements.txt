@@ -5,3 +5,6 @@ flask_restful==0.3.7
 flask_httpauth==3.2.4
 requests==2.19.1
 ibmiotf==0.4.0
+pandas==0.23.4
+pystache==0.5.4
+matplolib==2.2.3
