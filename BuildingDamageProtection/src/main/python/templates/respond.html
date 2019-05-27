@@ -161,11 +161,13 @@ document.getElementById('snooze_button').addEventListener('click', function(even
     modal_id = document.getElementById('responseModal');
     modal = new bootstrap.Modal(modal_id);
     request.onreadystatechange = function() {
+      console.log(request.status)
       if (request.status == 200){
           modal.show()
       }
-      else {
-          document.getElementById('responseModalBody').innerHTML = 'Something went wrong';
+      else if(request.status == 208){
+          document.getElementById('responseModalBody').innerHTML = 'This incident is already snoozed';
+          modal.show()
       }
     }
     request.open("POST","/respond",true);
@@ -178,11 +180,13 @@ document.getElementById('fixed_button').addEventListener('click', function(event
     modal_id = document.getElementById('responseModal');
     modal = new bootstrap.Modal(modal_id);
     request.onreadystatechange = function() {
+      console.log(request.status)
       if (request.status == 200){
           modal.show()
       }
       else {
           document.getElementById('responseModalBody').innerHTML = 'Something went wrong';
+          modal.show()
       }
     }
     request.open("POST","/respond",true);
