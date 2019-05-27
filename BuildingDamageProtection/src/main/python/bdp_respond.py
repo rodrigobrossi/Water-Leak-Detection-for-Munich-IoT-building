@@ -40,7 +40,7 @@ class BDPIncidentRespond(Resource):
             tenant = bdp_dbutil.getTenantByTenantID(incident['TENANT_ID'])
             tenant_name = tenant['TENANT_NAME']
 
-            users_group = bdp_dbutil.getAllUsers(tenant['TENANT_ID'])
+            users_group = bdp_dbutil.getUsersWithNIDs(tenant['TENANT_ID'])
 
             users_names = []
             for user in users_group:
@@ -62,7 +62,7 @@ class BDPIncidentRespond(Resource):
                 handler_id = incident_detail['RESPONDER']
                 handler = bdp_dbutil.getUserByUserID(handler_id)['USER_NAME']
 
-            bdp_util.createPlot(incident_detail['HARDWARE_UID'])
+            bdp_util.createPlot(hardware['HARDWARE_UID'])
 
             resp = make_response(render_template('respond.html', 
                                                 name = user['USER_NAME'],

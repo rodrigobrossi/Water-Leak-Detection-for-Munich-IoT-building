@@ -30,7 +30,7 @@ class BDPNotifier():
             if len(users) == 0:
                 print('[BDPNotifier] No notification will be send out.')
                 return
-
+            print(users)
             bdp_dbutil.updateIncidentNotifyTime(notification["NEW_INCIDENT_ID"])
             bdp_dbutil.createNotificationRecord(notification["NEW_INCIDENT_ID"], 2, users)
 
@@ -38,21 +38,21 @@ class BDPNotifier():
             return
 
         elif notification["ACTION"] == "SNOOZE":
-            now = datetime.datetime.now()
+            now = datetime.datetime.now().strftime("%Y-%m-%d-%H.%M.%S")
             response = {'TIME' : now, 'ACTION' : notification["ACTION"]}
             bdp_dbutil.updateNotificationResponse(notification["NOTIFICATION_ID"], response)
-            
+
             retbool = bdp_dbutil.updateIncidentStatus(notification["INCIDENT_ID"], notification["ACTION"])
             if not retbool:
                 print('Not able to update incident status')
                 return
-            
-            users = bdp_dbutil.getAllUsers(tenant)
+                
+            users = bdp_dbutil.getUsersWithNIDs(tenant)
             bdp_dbutil.createNotificationRecord(notification["INCIDENT_ID"], 3, users)
             BDPNotifier._generateSnoozeEmails(notification, users)
             
         elif notification["ACTION"] == "FIXED":
-            now = datetime.datetime.now()
+            now = datetime.datetime.now().strftime("%Y-%m-%d-%H.%M.%S")
             response = {'TIME' : now, 'ACTION' : notification["ACTION"]}
             bdp_dbutil.updateNotificationResponse(notification["NOTIFICATION_ID"], response)
             
@@ -61,7 +61,7 @@ class BDPNotifier():
                 print('Not able to update incident status')
                 return
             
-            users = bdp_dbutil.getAllUsers(tenant)
+            users = bdp_dbutil.getUsersWithNIDs(tenant)
             bdp_dbutil.createNotificationRecord(notification["INCIDENT_ID"], 1, users)
             BDPNotifier._generateFixedEmails(notification, users)
             return
@@ -101,7 +101,7 @@ class BDPNotifier():
                     bdp_dbutil.snoozeFlip(incident_record, False)
 
         if send is True:
-            usergroups = bdp_dbutil.getAllUsers(tenant_record["TENANT_ID"])
+            usergroups = bdp_dbutil.getUsersWithNIDs(tenant_record["TENANT_ID"])
         return usergroups
     
     def _generateAlarmEmails(incident_id, users):

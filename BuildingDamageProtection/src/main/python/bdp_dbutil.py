@@ -8,11 +8,13 @@
 # divested of its trade secrets, irrespective of what has
 # been deposited with the U.S. Copyright Office.
 #############################################################
-import ibm_db
-from bdp_property import BDPProperty
-from bdp_util import *
 import datetime
 from flask import json
+
+import ibm_db
+
+from bdp_property import BDPProperty
+from bdp_util import *
 
 
 class BDPDBConnection():
@@ -66,21 +68,30 @@ def getTenantByTenantID(tenant_id):
     stmt = ibm_db.exec_immediate(conn, sql_string)
     return ibm_db.fetch_both(stmt)
 
-
-def getAllUsers(tenant_id):
+def getUsersWithNIDsAtTimes(tenant_id, times):
     conn = BDPDBConnection.getInstance().getDBConnection()
-
     usergroups = []
     if tenant_id < 0:
         sql_string = "SELECT * FROM " + getTableName("BDP_USER")
     else:
-        sql_string = "SELECT * FROM " + getTableName("BDP_USER") + " WHERE TENANT_ID = " + str(tenant_id)
+        sql_string = "SELECT * FROM " + getTableName("BDP_USER") + " WHERE TENANT_ID = " + str(tenant_id) + " AND USER_TIMES = " + str(times)
     stmt = ibm_db.exec_immediate(conn, sql_string)
     dictionary = ibm_db.fetch_assoc(stmt)
     while dictionary != False:
         dictionary["NOTIFICATION_ID"] = randomString()
         usergroups.append(dictionary)
         dictionary = ibm_db.fetch_assoc(stmt)
+    return usergroups
+
+def getUsersWithNIDs(tenant_id):
+    usergroups = getUsersWithNIDsAtTimes(tenant_id, 3)
+    
+    timestamp = datetime.datetime.now()
+    if timestamp.weekday() > 4 or timestamp.hour < 8 or timestamp.hour > 18:
+        usergroups.extend(getUsersWithNIDsAtTimes(tenant_id, 2))
+    else:
+        usergroups.extend(getUsersWithNIDsAtTimes(tenant_id, 1))
+
     return usergroups
     
 
