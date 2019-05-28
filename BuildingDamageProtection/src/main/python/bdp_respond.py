@@ -23,8 +23,13 @@ from bdp_property import BDPProperty
 from bdp_notifier import BDPNotifier
 
 class BDPIncidentRespond(Resource):
-
+    """
+    Class that handles UI POST and GET requests
+    """
     def get(self):
+        """
+        Generates UI web page based on notification id parameter
+        """
         try:
             nid = request.args.get('nid')
             notification = bdp_dbutil.getNotificationByNotificationID(nid)
@@ -88,6 +93,9 @@ class BDPIncidentRespond(Resource):
             return {"result":"fail", "msg": str(e)}, 400
 
     def post(self):
+        """
+        Receives POST requests with action type
+        """
         print("[BDPIncidentRespond] post request received")
         try:
             request_json = request.get_json(force=True)
