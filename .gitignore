@@ -1,0 +1,8 @@
+# Compiled python
+*.pyc
+
+# Log files
+*.log
+
+# Generated web content
+BuildingDamageProtection/src/main/python/static/img/*
