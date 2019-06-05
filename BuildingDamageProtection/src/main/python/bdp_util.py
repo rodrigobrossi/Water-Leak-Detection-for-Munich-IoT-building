@@ -171,6 +171,6 @@ def createPlot(hardware_uid):
     ax.set_facecolor('#182935')
     ax.xaxis.set_label_text('')
     figure = table.plot(x='READING_TIME', y='HUMIDITY', ax=ax, figsize=(12,4), legend=None, linewidth=4).get_figure()
-    file_directory = Path('src/main/python/static/img')
+    file_directory = Path('static/img')
     file_directory.mkdir(parents=True, exist_ok=True)
     figure.savefig(str(file_directory) + '/plot_' + str(hardware_uid) +'.png', bbox_inches='tight')
