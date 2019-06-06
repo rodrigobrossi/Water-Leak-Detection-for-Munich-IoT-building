@@ -18,13 +18,12 @@ from gevent.pywsgi import WSGIServer
 gevent.monkey.patch_all()
 from threading import Thread
 
-#sys.setdefaultencoding('utf8')
-sys.dont_write_bytecode = True
+from waitress import serve
 
+sys.dont_write_bytecode = True
 
 from bdp_auth import BDPAuth
 from bdp_sysinit import BDPSysInit
-#import psycopg2
 from time import sleep
 
 from flask import Flask
@@ -42,10 +41,8 @@ from bdp_notifier import BDPNotifier
 
 import bdp_util, bdp_dbutil
 
-app = Flask(__name__)
-api = Api(app)
-#auth = HTTPBasicAuth()
-#authF = AIAuth()
+application = Flask(__name__)
+api = Api(application)
 
 class BDPGateway(Resource):
     def get(self):
@@ -73,14 +70,16 @@ api.add_resource(BDPHardware, '/hardware')
 
 bdp_util.startIOT()
 
-#app.run(ssl_context='adhoc', host='0.0.0.0', port=int(AIProperty.getInstance().getValue('server_port')))
-#app.run(host='0.0.0.0', port=int(AIProperty.getInstance().getValue('server_port')))
-#app.run(threaded=True, ssl_context=(AIProperty.getInstance().getValue('https_cert'), AIProperty.getInstance().getValue('https_key')), host='0.0.0.0', port=int(AIProperty.getInstance().getValue('server_port')))
-
-if 'flask' == BDPProperty.getInstance().getValue('server_type'):
-    app.run(host='0.0.0.0', port=int(BDPProperty.getInstance().getValue('server_port')))
-#    app.run(ssl_context=(BDPProperty.getInstance().getValue('https_cert'), BDPProperty.getInstance().getValue('https_key')), host='0.0.0.0', port=int(BDPProperty.getInstance().getValue('server_port')))
-else:
-    http_server = WSGIServer(('0.0.0.0', int(BDPProperty.getInstance().getValue('server_port'))), app, keyfile=BDPProperty.getInstance().getValue('https_key'), certfile=BDPProperty.getInstance().getValue('https_cert'))
-    http_server.serve_forever()
-
+if __name__ == "__main__":
+    server_type = BDPProperty.getInstance().getValue('server_type')
+    server_port = int(BDPProperty.getInstance().getValue('server_port'))
+    print('server type' + server_type)
+    if 'waitress' == server_type:
+        print('running waitress')
+        serve(application, host='0.0.0.0', port=server_port)
+    elif 'flask' == server_type:
+        print('running flask')
+        application.run(threaded=True, host='0.0.0.0', port=server_port)
+    elif 'cli' != server_type:
+        http_server = WSGIServer(('0.0.0.0', server_port), app, keyfile=BDPProperty.getInstance().getValue('https_key'), certfile=BDPProperty.getInstance().getValue('https_cert'))
+        http_server.serve_forever()

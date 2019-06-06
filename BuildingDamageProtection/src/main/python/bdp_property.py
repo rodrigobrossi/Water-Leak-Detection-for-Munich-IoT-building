@@ -24,7 +24,7 @@ class BDPProperty():
             raise Exception("This class is a singleton!")
         else:
             BDPProperty.__instance = self
-            with open('resources/config/config.json') as f:
+            with open('../../../resources/config/config.json') as f:
 #            with open('resources/config/ai_task_manager_config_local.json') as f:
                 self.data = json.load(f)
                 print(self.data)

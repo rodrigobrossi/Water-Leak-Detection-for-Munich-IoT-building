@@ -33,7 +33,7 @@ class BDPSysInit():
         # columns as a dictionary (hash) in the next example.
         print("BDP tables: " + str(rownum))
         if rownum == 0:
-            f = open("resources/db/db2/init.sql", "r")
+            f = open("../../../resources/db/db2/init.sql", "r")
             flines = f.readlines()
             command = ''
             for line in flines:
@@ -44,7 +44,7 @@ class BDPSysInit():
                     ibm_db.exec_immediate(conn, command)
                     command = ''
         
-        xmldoc = minidom.parse('resources/db/db2/db.changelog.xml')
+        xmldoc = minidom.parse('../../../resources/db/db2/db.changelog.xml')
         itemlist = xmldoc.getElementsByTagName('include')
         print(len(itemlist))
         for s in itemlist:
