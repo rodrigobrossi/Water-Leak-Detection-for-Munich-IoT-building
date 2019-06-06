@@ -14,7 +14,6 @@ from flask import json
 import ibm_db
 
 from bdp_property import BDPProperty
-from bdp_util import *
 
 
 class BDPDBConnection():

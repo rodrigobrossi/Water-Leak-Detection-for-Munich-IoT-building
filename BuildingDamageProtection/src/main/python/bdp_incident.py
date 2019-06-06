@@ -10,7 +10,7 @@
 #############################################################
 import datetime, json
 
-import ibm_db
+import ibm_db, ibmiotf
 
 import bdp_dbutil, bdp_util
 from bdp_notifier import BDPNotifier
@@ -100,4 +100,60 @@ class BDPIncident():
             return notification
 
         except Exception as e:
+            print(e)
+    
+    def _hardwareCallback(event):
+        try:
+            conn = bdp_dbutil.BDPDBConnection.getInstance().getDBConnection()
+
+            # Generate timestamp and query hardware uid
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H.%M.%S")
+
+            hardware = bdp_dbutil.getHardwareByDevice(event.device)
+            if not hardware:
+                print("[hardwareCallback] Device {} not found.".format(event.device))
+                return
+            hardware_uid = hardware["HARDWARE_UID"]
+
+            # Generate SQL string
+            sql_string = "INSERT INTO " + bdp_dbutil.getTableName("BDP_RAW_EVENTS") + "(READING_TIME, READING, HARDWARE_UID) VALUES ('" 
+            sql_string += str(timestamp) + "', '" + json.dumps(event.data) + "', '" + str(hardware_uid)  + "')"
+            
+            # Save to DB
+            stmt = ibm_db.exec_immediate(conn, sql_string)
+            if ibm_db.num_rows(stmt) == 0:
+                print("[hardwareCallback] Could not add the event to DB!")
+                return
+
+            # Remove old points
+            week_ago = (datetime.datetime.now() - datetime.timedelta(days=7)).strftime("%Y-%m-%d-%H.%M.%S")
+            sql_string = "DELETE FROM " + bdp_dbutil.getTableName("BDP_RAW_EVENTS") + " WHERE date(READING_TIME) < date('" + str(week_ago) +"')"
+            stmt = ibm_db.exec_immediate(conn, sql_string)
+
+            # Process event
+            BDPIncident.handleRawEvents(hardware)
+            
+        except Exception as e:
+            print(e)
+
+    def start():
+        BDPIncident._iotSubscribe()
+
+    def _iotSubscribe():
+        try:
+            myDeviceType="waterLeakDetector"
+            options = {
+                "org": "h9eyui",
+                "id": "orgfx53ykk",
+                "auth-method": "apikey",
+                "auth-key": "a-h9eyui-orgfx53ykk",
+                "auth-token": "rGXJy+2xk1FbSzCR&-",
+                "type": "shared",
+                "clean-session": True
+            }
+            client = ibmiotf.application.Client(options)
+            client.connect()
+            client.deviceEventCallback = BDPIncident._hardwareCallback
+            client.subscribeToDeviceEvents(deviceType=myDeviceType)
+        except ibmiotf.ConnectionException  as e:
             print(e)
