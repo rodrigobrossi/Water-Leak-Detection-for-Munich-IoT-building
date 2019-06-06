@@ -16,8 +16,22 @@ import bdp_dbutil, bdp_util
 from bdp_notifier import BDPNotifier
 
 class BDPIncident():
-
+    """
+    Class that checks for incident
+    """
     def _checkForIncident(hardware):
+        """
+        Check if incident occured
+
+        :param hardware_uid: Hardware ID
+        :type hardware_uid: int
+
+        :todo: check rate of change and change urgency accordingly
+        :todo: make sure that anomaly persists before marking as incident
+        :todo: account for multiple sensors at once
+
+        :return: response JSON to insert into DB
+        """
         # Read all the values
         table = bdp_util.createHumidityTable(hardware["HARDWARE_UID"], 480)
        
@@ -26,9 +40,13 @@ class BDPIncident():
             return None
 
         # TODO: check the slope
+        # TODO: make sure that anomaly persists
         response = {}
+
         response['INCIDENT_DETAIL'] = {}
         response['INCIDENT_DETAIL']['URGENCY'] = 'moderate' if value_of_interest < 75 else 'critical'
+        response['INCIDENT_DETAIL']['HUMIDITY'] = value_of_interest
+
         response['INCIDENT_TIME'] = str(table.READING_TIME.iloc[-1])
         response['TENANT_ID'] = hardware['TENANT_ID']
         response['CAUSE_HARDWARE'] = hardware['HARDWARE_UID']
@@ -36,15 +54,31 @@ class BDPIncident():
         return response
 
     def handleRawEvents(hardware_uid):
+        """
+        Check incoming events from device
+
+        :param hardware_uid: Hardware ID
+        :type hardware_uid: int
+        """
         # Process the humidity values
         incident = BDPIncident._checkForIncident(hardware_uid)
         if incident is None:
             # No incident occured
             return
         # Post an incident
-        response = BDPIncident._insertIncidentInDB(incident)
+        notification = BDPIncident._insertIncidentInDB(incident)
+        # Send notifications out
+        BDPNotifier.notify(notification, incident['TENANT_ID'])
 
     def _insertIncidentInDB(new_incident):
+        """
+        Save incident info into DB
+
+        :param new_incident: incident JSON to insert 
+        :type new_incident: JSON
+
+        :return: notification
+        """
         try:
             print('[BDPIncident] Incident received!')
 
@@ -63,7 +97,7 @@ class BDPIncident():
                 "NEW_INCIDENT_ID": new_incident_id
             }
 
-            BDPNotifier.notify(notification, tenant_id)
+            return notification
 
         except Exception as e:
             print(e)

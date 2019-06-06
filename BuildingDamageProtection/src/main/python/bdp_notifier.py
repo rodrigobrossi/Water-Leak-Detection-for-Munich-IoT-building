@@ -18,10 +18,21 @@ from bdp_property import BDPProperty
 
 
 class BDPNotifier():
-
+    """ 
+    Class that handles notifications
+    """
     def notify(notification, tenant):
-        print('[BDPNotifier] notify')
+        """ 
+        Notifies all user about an event
+
+        :param notification: JSON constaining action type 
+        :type notification: JSON
+        :param tenant: Tenant ID
+        :type tenant: int
+        """
+        print('[BDPNotifier] Notify')
         if notification["ACTION"] == "ALARM":
+            # Incident notification
             old_incident_record = notification["OLD_INCIDENT"]
             tenant_record = bdp_dbutil.getTenantByTenantID(tenant)
 
@@ -34,10 +45,11 @@ class BDPNotifier():
             bdp_dbutil.updateIncidentNotifyTime(notification["NEW_INCIDENT_ID"])
             bdp_dbutil.createNotificationRecord(notification["NEW_INCIDENT_ID"], 2, users)
 
-            BDPNotifier._generateAlarmEmails(notification["NEW_INCIDENT_ID"], users)
+            BDPNotifier._generateAlarm(notification["NEW_INCIDENT_ID"], users)
             return
 
         elif notification["ACTION"] == "SNOOZE":
+            # Snoozing notification
             now = datetime.datetime.now().strftime("%Y-%m-%d-%H.%M.%S")
             response = {'TIME' : now, 'ACTION' : notification["ACTION"]}
             bdp_dbutil.updateNotificationResponse(notification["NOTIFICATION_ID"], response)
@@ -46,12 +58,13 @@ class BDPNotifier():
             if not retbool:
                 print('Not able to update incident status')
                 return
-                
+
             users = bdp_dbutil.getUsersWithNIDs(tenant)
             bdp_dbutil.createNotificationRecord(notification["INCIDENT_ID"], 3, users)
-            BDPNotifier._generateSnoozeEmails(notification, users)
+            BDPNotifier._generateSnooze(notification, users)
             
         elif notification["ACTION"] == "FIXED":
+            # Incident is resolved notification
             now = datetime.datetime.now().strftime("%Y-%m-%d-%H.%M.%S")
             response = {'TIME' : now, 'ACTION' : notification["ACTION"]}
             bdp_dbutil.updateNotificationResponse(notification["NOTIFICATION_ID"], response)
@@ -63,11 +76,14 @@ class BDPNotifier():
             
             users = bdp_dbutil.getUsersWithNIDs(tenant)
             bdp_dbutil.createNotificationRecord(notification["INCIDENT_ID"], 1, users)
-            BDPNotifier._generateFixedEmails(notification, users)
+            BDPNotifier._generateFixed(notification, users)
             return
 
 
     def _timeToNotify(incident_record, tenant_record):
+        """
+        Check if it is time to notify based on existing notification stamp and incident status
+        """
         usergroups = []
         send = False
 
@@ -104,7 +120,10 @@ class BDPNotifier():
             usergroups = bdp_dbutil.getUsersWithNIDs(tenant_record["TENANT_ID"])
         return usergroups
     
-    def _generateAlarmEmails(incident_id, users):
+    def _generateAlarm(incident_id, users):
+        """
+        Generate alarm template and send it out
+        """
         subject = 'Water Intusion Detected!'
 
         print('[_generateAlarmEmails] to {}'.format(users))
@@ -139,7 +158,10 @@ class BDPNotifier():
             bdp_util.sendEmail(user['USER_CONTACT_1'], subject, body_plain, body_html)
             bdp_util.sendSlack(user['USER_CONTACT_2'], body_plain)
     
-    def _generateSnoozeEmails(notification, users):
+    def _generateSnooze(notification, users):
+        """
+        Generate snooze alarm template and send it out
+        """
         subject = 'Water Intrusion Notification Snoozed'
         
         print('[_generateSnoozeEmails] to {}'.format(users))
@@ -164,7 +186,10 @@ class BDPNotifier():
             bdp_util.sendEmail(user['USER_CONTACT_1'], subject, body_plain, body_html)
             bdp_util.sendSlack(user['USER_CONTACT_2'], body_plain)
 
-    def _generateFixedEmails(notification, users):
+    def _generateFixed(notification, users):
+        """
+        Generate fixed template and send it out
+        """
         subject = 'Water Intrusion Incident Resolved'
         
         print('[_generateFixedEmails] to {}'.format(users))

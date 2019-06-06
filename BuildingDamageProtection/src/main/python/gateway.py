@@ -58,6 +58,9 @@ def startScheduler():
 
 thread1 = Thread(target = startScheduler, args = ())
 thread1.start()
+
+#thread_ui = Thread(target = BDPIncidentRespond.get, args = ())
+#thread_ui.start()
     
 api.add_resource(BDPGateway, '/')
 api.add_resource(BDPIncidentRespond, '/respond')

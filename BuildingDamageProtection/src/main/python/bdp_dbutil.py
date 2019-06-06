@@ -53,13 +53,11 @@ class BDPDBConnection():
 def getTableName(tablename):
     return BDPProperty.getInstance().getValue('db_admin_user') + "." + tablename
 
-
 def getTenantByName(tenant):
     conn = BDPDBConnection.getInstance().getDBConnection()
     sql_string = "SELECT * FROM " + getTableName("BDP_TENANT") + " WHERE TENANT = '" + tenant + "'"
     stmt = ibm_db.exec_immediate(conn, sql_string)
     return ibm_db.fetch_both(stmt)
-
 
 def getTenantByTenantID(tenant_id):
     conn = BDPDBConnection.getInstance().getDBConnection()
@@ -93,7 +91,6 @@ def getUsersWithNIDs(tenant_id):
         usergroups.extend(getUsersWithNIDsAtTimes(tenant_id, 1))
 
     return usergroups
-    
 
 def snoozeFlip(incident_record, state):
     conn = BDPDBConnection.getInstance().getDBConnection()
@@ -106,14 +103,12 @@ def snoozeFlip(incident_record, state):
         sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET SNOOZE_TIME = null WHERE INCIDENT_ID = " + str(incident_record["INCIDENT_ID"])
     stmt = ibm_db.exec_immediate(conn, sql_string)
 
-
 def updateIncidentNotifyTime(incidentid):
     conn = BDPDBConnection.getInstance().getDBConnection()
 
     print("[updateIncidentNotifyTime] incident_id = {}".format(incidentid))
     sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET NOTIFY_TIME = '" + str(datetime.datetime.now()) + "' WHERE INCIDENT_ID = " + str(incidentid)
     stmt = ibm_db.exec_immediate(conn, sql_string)
-    
 
 def createNotificationRecord(incidentid, type_code, usergroups):
     conn = BDPDBConnection.getInstance().getDBConnection()
@@ -126,7 +121,6 @@ def createNotificationRecord(incidentid, type_code, usergroups):
         sql_string = "INSERT INTO " + getTableName("BDP_NOTIFICATION") + " (NOTIFICATION_ID, INCIDENT_ID, NOTIFICATION_TYPE, NOTIFICATION_TIME, USER_ID) VALUES( '" 
         sql_string += notificationid + "', '" + str(incidentid) + "', "+ str(type_code)+", '" + now + "', " + userid + ")"
         stmt = ibm_db.exec_immediate(conn, sql_string)
-        
 
 def getNotificationsByIncidentID(incidentid): #not tested yet
     conn = BDPDBConnection.getInstance().getDBConnection()
@@ -139,7 +133,6 @@ def getNotificationsByIncidentID(incidentid): #not tested yet
         dictionary = ibm_db.fetch_assoc(stmt)
     return notificationgroups
 
-
 def getNotificationByNotificationID(nid): #not tested yet
     conn = BDPDBConnection.getInstance().getDBConnection()
     notificationgroups = []
@@ -147,7 +140,6 @@ def getNotificationByNotificationID(nid): #not tested yet
     stmt = ibm_db.exec_immediate(conn, sql_string)
     dictionary = ibm_db.fetch_assoc(stmt)
     return dictionary
-
 
 def getUserByUserID(user_id):
     conn = BDPDBConnection.getInstance().getDBConnection()
@@ -157,10 +149,8 @@ def getUserByUserID(user_id):
     dictionary = ibm_db.fetch_assoc(stmt)
     return dictionary
 
-
 def getIncidentID(incident):
     conn = BDPDBConnection.getInstance().getDBConnection()
-    print("[getIncident]: " + str(incident))
     
     sql_string = "SELECT * FROM " + getTableName("BDP_INCIDENT") 
     sql_string += " WHERE INCIDENT_DETAIL = '" + json.dumps(incident['INCIDENT_DETAIL']) 
@@ -172,7 +162,6 @@ def getIncidentID(incident):
     dictionary = ibm_db.fetch_assoc(stmt)
     return dictionary['INCIDENT_ID']
 
-
 def getIncidentByIncidentID(incident_id):
     conn = BDPDBConnection.getInstance().getDBConnection()
 
@@ -181,10 +170,18 @@ def getIncidentByIncidentID(incident_id):
     dictionary = ibm_db.fetch_assoc(stmt)
     return dictionary
 
-
 def checkExcistingIncident(tenant_id, hardware_uid):
+    """
+    Check whether an incident was already created
+
+    :param tenant_id: Tenant ID
+    :type tenant_id: int 
+    :param hardware_uid: Hardware unique ID
+    :type hardware_uid: int 
+
+    :return: dictionary if found else False
+    """
     conn = BDPDBConnection.getInstance().getDBConnection()
-    print("[checkExcistingIncident]: tenant_id = " + str(tenant_id))
     
     sql_string = "SELECT * FROM " + getTableName("BDP_INCIDENT") 
     sql_string += " WHERE INCIDENT_ID_ORIGINAL IS NULL AND TENANT_ID = " + str(tenant_id) 
@@ -197,8 +194,8 @@ def checkExcistingIncident(tenant_id, hardware_uid):
 
 def updateNotificationResponse(nid, response):
     conn = BDPDBConnection.getInstance().getDBConnection()
+
     sql_string = "UPDATE " + getTableName("BDP_NOTIFICATION") + " SET RESPONSE = '" + json.dumps(response) + "' WHERE NOTIFICATION_ID = '" + str(nid) + "'"
-    print(sql_string)
     stmt = ibm_db.exec_immediate(conn, sql_string)
 
 def updateIncidentStatus(incident_id, actionstr):
@@ -228,8 +225,6 @@ def updateIncidentStatus(incident_id, actionstr):
 
 def getHardwareByDevice(device):
     conn = BDPDBConnection.getInstance().getDBConnection()
-
-    print("[getHardwareByDevice]: " + str(device))
     
     try:
         deviceType, deviceId = device.split(':')
