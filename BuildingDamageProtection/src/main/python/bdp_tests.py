@@ -1,10 +1,24 @@
 import datetime
 import colorama
 
+import unittest
+from  unittest.mock import patch
+
 import ibm_db
 
 from bdp_incident import BDPIncident
+from bdp_notifier import BDPNotifier
 import bdp_dbutil
+
+class TestNotifier(unittest.TestCase):
+    @patch('bdp_dbutil.getUsersWithNIDs')
+    def getUsersMock(self):
+        print('MOCKING')
+        return
+
+    def test_timeToNotify(self):
+        #BDPNotifier._timeToNotify({'SNOOZE_TIME':None,'NOTIFY_TIME':str(datetime.datetime.now().strftime("%Y-%m-%d-%H.%M.%S"))},{})
+        self.assertTrue(True)
 
 class Tests():
     def getTestResult(condition):
@@ -78,3 +92,6 @@ class Tests():
         over_all_condition = over_all_condition and condition
         # ----------------------------------------------------------------------------
         print(test_name + Tests.getTestResult(over_all_condition))
+
+if __name__ == '__main__':
+    unittest.main()
