@@ -70,7 +70,6 @@ class TestNotifier(unittest.TestCase):
         result = BDPNotifier._timeToNotify(incident_record, tenant_record)
         self.assertEqual(result, [])
 
-
     @mock.patch('bdp_dbutil.getUsersWithNIDs')
     def test_not_send(self, getUsers):
         userList = ['jo']
@@ -83,6 +82,13 @@ class TestNotifier(unittest.TestCase):
 
         result = BDPNotifier._timeToNotify(incident_record, tenant_record)
         self.assertEqual(result, [])
+    
+    def buildTenantRecord(self, alarm_interval_hour, snooze_hour):
+        tenant_record = {}
+        tenant_record["ALARM_INTERVAL_HR"] = alarm_interval_hour
+        tenant_record["SNOOZE_HR"] = snooze_hour
+        tenant_record["TENANT_ID"] = 1
+        return tenant_record
 
 class TestExistingIncident(unittest.TestCase):
 
@@ -110,34 +116,34 @@ class TestExistingIncident(unittest.TestCase):
         return incident
         
     def test_newIncident(self):
-        incident = self.createIncident(str(datetime.datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
+        incident = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
         notification = BDPIncident._insertIncidentInDB(incident)
 
         self.assertFalse(notification['OLD_INCIDENT'])
 
     def test_sameIncident(self):
-        incident = self.createIncident(str(datetime.datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
+        incident = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
         notification = BDPIncident._insertIncidentInDB(incident)
 
-        incident = self.createIncident(str(datetime.datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
+        incident = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
         notification = BDPIncident._insertIncidentInDB(incident)
 
         self.assertNotEqual(notification['OLD_INCIDENT'], False)
 
     def test_differentIncident(self):
-        incident = self.createIncident(str(datetime.datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
+        incident = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
         notification = BDPIncident._insertIncidentInDB(incident)
 
-        incident = self.createIncident(str(datetime.datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 11)
+        incident = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 11)
         notification = BDPIncident._insertIncidentInDB(incident)
 
         self.assertFalse(notification['OLD_INCIDENT'])
 
     def test_updateIncident(self):
-        incident = self.createIncident(str(datetime.datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
+        incident = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
         notification = BDPIncident._insertIncidentInDB(incident)
 
-        incident = self.createIncident(str(datetime.datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
+        incident = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
         notification = BDPIncident._insertIncidentInDB(incident)
 
         self.assertIsNotNone(notification['OLD_INCIDENT'])
@@ -157,12 +163,6 @@ class TestExistingIncident(unittest.TestCase):
         response_2 = ibm_db.fetch_assoc(ibm_db.exec_immediate(conn, sql_string))
         
         self.assertFalse(response_2)
-    def buildTenantRecord(self, alarm_interval_hour, snooze_hour):
-        tenant_record = {}
-        tenant_record["ALARM_INTERVAL_HR"] = alarm_interval_hour
-        tenant_record["SNOOZE_HR"] = snooze_hour
-        tenant_record["TENANT_ID"] = 1
-        return tenant_record
 
 if __name__ == '__main__':
     unittest.main()
