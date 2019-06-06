@@ -5,7 +5,7 @@ import datetime
 
 from bdp_notifier import BDPNotifier
 
-class TestStringMethods(unittest.TestCase):
+class TestNotifier(unittest.TestCase):
 
     def test_upper(self):
         self.assertEqual('foo'.upper(), 'FOO')
@@ -24,7 +24,7 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(result, userList)
 
     @mock.patch('bdp_dbutil.getUsersWithNIDs')
-    def test_time_to_notify(self, getUsers):
+    def test_not_send(self, getUsers):
         userList = ['jo']
         getUsers.return_value = userList
 
@@ -37,8 +37,7 @@ class TestStringMethods(unittest.TestCase):
         tenant_record["TENANT_ID"] = 1
 
         result = BDPNotifier._timeToNotify(incident_record, tenant_record)
-        self.assertEqual(result, userList)
-
+        self.assertEqual(result, [])
 
 if __name__ == '__main__':
     unittest.main()
