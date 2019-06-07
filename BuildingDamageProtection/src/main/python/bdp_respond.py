@@ -31,8 +31,8 @@ class BDPIncidentRespond(Resource):
         Generates UI web page based on notification id parameter
         """
         try:
-
-            context = BDPIncidentRespond.buildContext(request)
+            nid = request.args.get('nid')
+            context = BDPIncidentRespond.buildContext(nid)
 
             resp = make_response(render_template('respond.html', **context))
             resp.headers['Content-type'] = 'text/html; charset=utf-8'
@@ -43,27 +43,32 @@ class BDPIncidentRespond(Resource):
             print(e)
             return {"result":"fail", "msg": str(e)}, 400
 
-    def buildContext(request):
+    def buildContext(nid):
+        """
+        Builds a context required for an UI tempate
+        
+        :param nid: notification ID
+        :type nid: int
 
-        nid = request.args.get('nid')
+        :return: json of context
+        """
         notification = bdp_dbutil.getNotificationByNotificationID(nid)
         user = bdp_dbutil.getUserByUserID(notification["USER_ID"])
 
         incident_id = bdp_dbutil.getNotificationByNotificationID(nid)["INCIDENT_ID"]
         incident = bdp_dbutil.getIncidentByIncidentID(incident_id)
         print('[BDPIncidentRespond] {}'.format(incident))
-        # TODO: Fix original incident assignment
-        #original_incident = bdp_dbutil.getIncidentByIncidentID(conn, incident['INCIDENT_ID_ORIGINAL'])
+        
         original_ts = incident['INCIDENT_TIME']
 
         tenant = bdp_dbutil.getTenantByTenantID(incident['TENANT_ID'])
         tenant_name = tenant['TENANT_NAME']
 
-        users_group = bdp_dbutil.getUsersWithNIDs(tenant['TENANT_ID'])
+        users_group = bdp_dbutil.getUsersWithNIDs(incident_id, tenant['TENANT_ID'])
 
         users_names = []
-        for user in users_group:
-            users_names.append(user['USER_NAME'])
+        for u in users_group:
+            users_names.append(u['USER_NAME'])
 
         status_code = {
             1: 'Resolved',
@@ -81,7 +86,7 @@ class BDPIncidentRespond(Resource):
             handler_id = incident_detail['RESPONDER']
             handler = bdp_dbutil.getUserByUserID(handler_id)['USER_NAME']
 
-        bdp_util.createPlot(hardware['HARDWARE_UID'])
+        bdp_dbutil.createPlot(hardware['HARDWARE_UID'], 480)
 
         return {'name': user['USER_NAME'],
                 'tenant' : tenant_name,

@@ -8,10 +8,8 @@
 # divested of its trade secrets, irrespective of what has
 # been deposited with the U.S. Copyright Office.
 #############################################################
-import uuid, json, datetime
+import json, datetime
 import requests
-import pandas as pd
-import matplotlib.pyplot as plt
 
 import smtplib
 from email.mime.text import MIMEText
@@ -20,16 +18,18 @@ from email.mime.multipart import MIMEMultipart
 import ibm_db
 import ibmiotf.application
 
-import bdp_dbutil
+def generateHash(user, incident, length=10):
+    """
+    Returns a hash value of user and incident combination
 
-from pathlib import Path
-
-def randomString(string_length=10):
-    """Returns a random string of length string_length."""
-    random = str(uuid.uuid4()) # Convert UUID format to a Python string.
-    random = random.upper() # Make all characters uppercase.
-    random = random.replace("-","") # Remove the UUID '-'.
-    return random[0:string_length] # Return the random string.
+    :param user: user ID
+    :type user: int
+    :param incident: incident ID
+    :type incident: int
+    
+    :return: int 
+    """
+    return hash(str(user) + str(incident)) % 10**length
 
 def sendNotificationToUsers(endpoint, usergroups, action, userJSON):
     print("sendNotificationToUsers: " + action)
@@ -96,23 +96,3 @@ def sendSlack(to, msg):
             return True
     except Exception as e:
         print(e)
-        
-def createHumidityTable(hardware_uid, datapoint_amount):
-    table = pd.DataFrame(bdp_dbutil.getRawEventsByHardwareUID(hardware_uid, 480))
-
-    # Get important values
-    table['HUMIDITY'] = None
-    for i in range(table.shape[0]):
-        hardware_json = json.loads(table.READING.iloc[i])
-        table.at[i, 'HUMIDITY']  = hardware_json['humidity']
-    return table
-
-def createPlot(hardware_uid):
-    table = createHumidityTable(hardware_uid, 480)
-    figure, ax = plt.subplots(1,1)
-    ax.set_facecolor('#182935')
-    ax.xaxis.set_label_text('')
-    figure = table.plot(x='READING_TIME', y='HUMIDITY', ax=ax, figsize=(12,4), legend=None, linewidth=4).get_figure()
-    file_directory = Path('static/img')
-    file_directory.mkdir(parents=True, exist_ok=True)
-    figure.savefig(str(file_directory) + '/plot_' + str(hardware_uid) +'.png', bbox_inches='tight')

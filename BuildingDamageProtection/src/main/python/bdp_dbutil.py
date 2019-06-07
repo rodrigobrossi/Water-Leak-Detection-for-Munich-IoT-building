@@ -10,11 +10,15 @@
 #############################################################
 import datetime
 from flask import json
+import pandas as pd
+import matplotlib.pyplot as plt
 
 import ibm_db
 
 from bdp_property import BDPProperty
+import bdp_util
 
+from pathlib import Path
 
 class BDPDBConnection():
     __instance = None
@@ -65,7 +69,7 @@ def getTenantByTenantID(tenant_id):
     stmt = ibm_db.exec_immediate(conn, sql_string)
     return ibm_db.fetch_both(stmt)
 
-def getUsersWithNIDsAtTimes(tenant_id, times):
+def getUsersWithNIDsAtTimes(incident_id, tenant_id, times):
     conn = BDPDBConnection.getInstance().getDBConnection()
     usergroups = []
     if tenant_id < 0:
@@ -75,19 +79,19 @@ def getUsersWithNIDsAtTimes(tenant_id, times):
     stmt = ibm_db.exec_immediate(conn, sql_string)
     dictionary = ibm_db.fetch_assoc(stmt)
     while dictionary != False:
-        dictionary["NOTIFICATION_ID"] = randomString()
+        dictionary["NOTIFICATION_ID"] = bdp_util.generateHash(incident_id, dictionary["USER_ID"])
         usergroups.append(dictionary)
         dictionary = ibm_db.fetch_assoc(stmt)
     return usergroups
 
-def getUsersWithNIDs(tenant_id):
-    usergroups = getUsersWithNIDsAtTimes(tenant_id, 3)
+def getUsersWithNIDs(incident_id, tenant_id):
+    usergroups = getUsersWithNIDsAtTimes(incident_id, tenant_id, 3)
     
     timestamp = datetime.datetime.now()
     if timestamp.weekday() > 4 or timestamp.hour < 8 or timestamp.hour > 18:
-        usergroups.extend(getUsersWithNIDsAtTimes(tenant_id, 2))
+        usergroups.extend(getUsersWithNIDsAtTimes(incident_id, tenant_id, 2))
     else:
-        usergroups.extend(getUsersWithNIDsAtTimes(tenant_id, 1))
+        usergroups.extend(getUsersWithNIDsAtTimes(incident_id, tenant_id, 1))
 
     return usergroups
 
@@ -118,7 +122,7 @@ def createNotificationRecord(incidentid, type_code, usergroups):
         notificationid = user["NOTIFICATION_ID"]
         userid = str(user["USER_ID"])
         sql_string = "INSERT INTO " + getTableName("BDP_NOTIFICATION") + " (NOTIFICATION_ID, INCIDENT_ID, NOTIFICATION_TYPE, NOTIFICATION_TIME, USER_ID) VALUES( '" 
-        sql_string += notificationid + "', '" + str(incidentid) + "', "+ str(type_code)+", '" + now + "', " + userid + ")"
+        sql_string += str(notificationid) + "', '" + str(incidentid) + "', "+ str(type_code)+", '" + now + "', " + str(userid) + ")"
         stmt = ibm_db.exec_immediate(conn, sql_string)
 
 def getNotificationsByIncidentID(incidentid): #not tested yet
@@ -294,7 +298,6 @@ def insertIncident(existing_incident, new_incident, tenant_id):
     
     return incident_id
 
-
 def insertResponderToIncidentID(incident_id, responder_id):
     conn = BDPDBConnection.getInstance().getDBConnection()
 
@@ -304,8 +307,47 @@ def insertResponderToIncidentID(incident_id, responder_id):
     sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET INCIDENT_DETAIL = '" + json.dumps(incident_details) + "' WHERE INCIDENT_ID = " + str(incident_id)
     stmt = ibm_db.exec_immediate(conn, sql_string)
 
-
 def removeUser(user_id):
     conn = BDPDBConnection.getInstance().getDBConnection()
     sql_string = "DELETE FROM " + getTableName("BDP_USER") + " WHERE USER_ID = " + str(user_id)
     stmt = ibm_db.exec_immediate(conn, sql_string)
+
+def createHumidityTable(hardware_uid, datapoint_amount):
+    """
+    Creates a pandas table with humidity
+
+    :param hardware_uid: Hardware unique ID
+    :type hardware_uid: int
+    :param datapoint_amount: Amount to datapoints to extract
+    :type datapoint_amount: int
+
+    :return: pandas.DataFrame
+    """
+    table = pd.DataFrame(getRawEventsByHardwareUID(hardware_uid, 480))
+
+    # Get important values
+    table['HUMIDITY'] = None
+    for i in range(table.shape[0]):
+        hardware_json = json.loads(table.READING.iloc[i])
+        table.at[i, 'HUMIDITY']  = hardware_json['humidity']
+    return table
+
+def createPlot(hardware_uid, datapoint_amount):
+    """
+    Creates a plot in static/img
+
+    :param hardware_uid: Hardware unique ID
+    :type hardware_uid: int
+    :param datapoint_amount: Amount to datapoints to extract
+    :type datapoint_amount: int
+    """
+    table = createHumidityTable(hardware_uid, datapoint_amount)
+
+    figure, ax = plt.subplots(1,1)
+    ax.set_facecolor('#182935')
+    ax.xaxis.set_label_text('')
+    figure = table.plot(x='READING_TIME', y='HUMIDITY', ax=ax, figsize=(12,4), legend=None, linewidth=4).get_figure()
+    
+    file_directory = Path('static/img')
+    file_directory.mkdir(parents=True, exist_ok=True)
+    figure.savefig(str(file_directory) + '/plot_' + str(hardware_uid) +'.png', bbox_inches='tight')
