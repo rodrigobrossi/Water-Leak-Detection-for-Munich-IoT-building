@@ -7,6 +7,7 @@ import ibm_db
 
 from bdp_notifier import BDPNotifier
 from bdp_incident import BDPIncident
+from bdp_respond import BDPIncidentRespond
 import bdp_dbutil
 
 class TestNotifier(unittest.TestCase):
@@ -90,17 +91,7 @@ class TestNotifier(unittest.TestCase):
         tenant_record["TENANT_ID"] = 1
         return tenant_record
 
-class TestExistingIncident(unittest.TestCase):
-
-    def setUp(self):
-        old_incident = bdp_dbutil.checkExcistingIncident(2, 1)
-        if old_incident: 
-            bdp_dbutil.updateIncidentStatus(old_incident['INCIDENT_ID'], 'FIXED')
-        
-        old_incident = bdp_dbutil.checkExcistingIncident(2, 11)
-        if old_incident:     
-            bdp_dbutil.updateIncidentStatus(old_incident['INCIDENT_ID'], 'FIXED')
-        
+class TestRespondWithDB(unittest.TestCase):
 
     def createIncident(self, time, sensor):
         incident = {}
@@ -113,39 +104,81 @@ class TestExistingIncident(unittest.TestCase):
         incident['TENANT_ID'] = 2
         incident['CAUSE_HARDWARE'] = sensor
 
-        return incident
+        return BDPIncident._insertIncidentInDB(incident)
+    
+    def getUsersWithNotificationIDs(self, incident):
+        users = bdp_dbutil.getUsersWithNIDs(incident, 2)
+        bdp_dbutil.createNotificationRecord(incident, 2, users)
+
+        return users
+
+    def setUp(self):
+        old_incident = bdp_dbutil.checkExcistingIncident(2, 1)
+        if old_incident: 
+            bdp_dbutil.updateIncidentStatus(old_incident['INCIDENT_ID'], 'FIXED')
+        
+        old_incident = bdp_dbutil.checkExcistingIncident(2, 11)
+        if old_incident:     
+            bdp_dbutil.updateIncidentStatus(old_incident['INCIDENT_ID'], 'FIXED')
+
+    @mock.patch("bdp_dbutil.createPlot")
+    def test_buildContext(self, createPlot):
+        incident_respond = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
+        users = self.getUsersWithNotificationIDs(incident_respond["NEW_INCIDENT_ID"])
+        context = BDPIncidentRespond.buildContext(users[0]["NOTIFICATION_ID"])
+        
+        self.assertEqual(context['name'], users[0]["USER_NAME"])
+        self.assertEqual(context['tenant'], 'IBM Test')
+        self.assertEqual(context['sensor_id'], 'TestSensor1')
+        self.assertEqual(context['hardware_uid'], 1)
+        self.assertEqual(context['status'], 'New')
+        self.assertEqual(context['handler'], 'Not assigned')
+
+class TestExistingIncidentWithDB(unittest.TestCase):
+
+    def createIncident(self, time, sensor):
+        incident = {}
+
+        incident['INCIDENT_DETAIL'] = {}
+        incident['INCIDENT_DETAIL']['URGENCY'] = 'moderate'
+        incident['INCIDENT_DETAIL']['HUMIDITY'] = 50
+
+        incident['INCIDENT_TIME'] = time
+        incident['TENANT_ID'] = 2
+        incident['CAUSE_HARDWARE'] = sensor
+
+        return BDPIncident._insertIncidentInDB(incident)
+
+    def setUp(self):
+        old_incident = bdp_dbutil.checkExcistingIncident(2, 1)
+        if old_incident: 
+            bdp_dbutil.updateIncidentStatus(old_incident['INCIDENT_ID'], 'FIXED')
+        
+        old_incident = bdp_dbutil.checkExcistingIncident(2, 11)
+        if old_incident:     
+            bdp_dbutil.updateIncidentStatus(old_incident['INCIDENT_ID'], 'FIXED')
         
     def test_newIncident(self):
-        incident = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
-        notification = BDPIncident._insertIncidentInDB(incident)
-
+        notification = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
+        
         self.assertFalse(notification['OLD_INCIDENT'])
 
     def test_sameIncident(self):
-        incident = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
-        notification = BDPIncident._insertIncidentInDB(incident)
-
-        incident = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
-        notification = BDPIncident._insertIncidentInDB(incident)
-
+        notification = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
+        notification = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
+        
         self.assertNotEqual(notification['OLD_INCIDENT'], False)
 
     def test_differentIncident(self):
-        incident = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
-        notification = BDPIncident._insertIncidentInDB(incident)
-
-        incident = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 11)
-        notification = BDPIncident._insertIncidentInDB(incident)
-
+        notification = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
+        notification = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 11)
+        
         self.assertFalse(notification['OLD_INCIDENT'])
 
     def test_updateIncident(self):
-        incident = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
-        notification = BDPIncident._insertIncidentInDB(incident)
-
-        incident = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
-        notification = BDPIncident._insertIncidentInDB(incident)
-
+        notification = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
+        notification = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
+        
         self.assertIsNotNone(notification['OLD_INCIDENT'])
 
         old_incident = bdp_dbutil.checkExcistingIncident(2, 1)
@@ -155,7 +188,7 @@ class TestExistingIncident(unittest.TestCase):
         # Check that incident was updated
         sql_string = "SELECT * FROM " + bdp_dbutil.getTableName("BDP_INCIDENT") + " WHERE INCIDENT_STATUS_CODE != 1 AND INCIDENT_ID = " + str(old_incident['INCIDENT_ID'])
         response_1 = ibm_db.fetch_assoc(ibm_db.exec_immediate(conn, sql_string))
-
+        
         self.assertFalse(response_1)
 
         # Check that children incidents are updated
