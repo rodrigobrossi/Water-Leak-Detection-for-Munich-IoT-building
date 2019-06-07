@@ -68,7 +68,7 @@ api.add_resource(BDPTenant, '/tenant')
 api.add_resource(BDPUser, '/user')
 api.add_resource(BDPHardware, '/hardware')
 
-bdp_util.startIOT()
+BDPIncident.start()
 
 if __name__ == "__main__":
     server_type = BDPProperty.getInstance().getValue('server_type')

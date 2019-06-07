@@ -100,7 +100,7 @@ class BDPNotifier():
             print("[BDPNotifier]: No previous incident, send immediately")
             send = True
         else:
-            #is it snoozed? if so, past the znoozed period yet? if past, needs to reset and send. otherwise, hibernate. 
+            #is it snoozed? if so, past the snoozed period yet? if past, needs to reset and send. otherwise, hibernate. 
             #if not snoozed, what was the last time sent out? past period yet?
             if incident_record["SNOOZE_TIME"] is None:
                 lastsent = incident_record["NOTIFY_TIME"]
@@ -126,6 +126,7 @@ class BDPNotifier():
                     
         if send is True:
             usergroups = bdp_dbutil.getUsersWithNIDs(tenant_record["TENANT_ID"])
+
         return usergroups
     
     def _generateAlarm(incident_id, users):

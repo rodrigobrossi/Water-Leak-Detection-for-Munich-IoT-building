@@ -13,6 +13,14 @@
             "console": "integratedTerminal"
         },
         {
+            "name": "Python: BDP from src",
+            "type": "python",
+            "request": "launch",
+            "cwd":"${workspaceFolder}/BuildingDamageProtection/src/main/python",
+            "program": "${workspaceFolder}/BuildingDamageProtection/src/main/python/gateway.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",

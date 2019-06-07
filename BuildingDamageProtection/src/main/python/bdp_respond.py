@@ -52,49 +52,41 @@ class BDPIncidentRespond(Resource):
 
         :return: json of context
         """
-        notification = bdp_dbutil.getNotificationByNotificationID(nid)
-        user = bdp_dbutil.getUserByUserID(notification["USER_ID"])
 
-        incident_id = bdp_dbutil.getNotificationByNotificationID(nid)["INCIDENT_ID"]
-        incident = bdp_dbutil.getIncidentByIncidentID(incident_id)
-        print('[BDPIncidentRespond] {}'.format(incident))
-        
-        original_ts = incident['INCIDENT_TIME']
+        details = bdp_dbutil.getNotificationDetailsById(nid)
 
-        tenant = bdp_dbutil.getTenantByTenantID(incident['TENANT_ID'])
-        tenant_name = tenant['TENANT_NAME']
-
-        users_group = bdp_dbutil.getUsersWithNIDs(incident_id, tenant['TENANT_ID'])
+        users_group = bdp_dbutil.getUsersWithNIDs(details['INCIDENT_ID'], details['TENANT_ID'])
 
         users_names = []
-        for u in users_group:
-            users_names.append(u['USER_NAME'])
+        for user in users_group:
+            users_names.append(user['USER_NAME'])
+
+        bdp_dbutil.createPlot(details['HARDWARE_UID'], 480)
 
         status_code = {
-            1: 'Resolved',
-            2: 'New',
-            3: 'In progress'
-        }
+                    1: 'Resolved',
+                    2: 'New',
+                    3: 'In progress'
+                }
 
-        incident_status = status_code[incident['INCIDENT_STATUS_CODE']]
-        incident_detail = json.loads(incident['INCIDENT_DETAIL'])
+        incident_status = status_code[details['INCIDENT_STATUS_CODE']]
+        incident_detail = json.loads(details['INCIDENT_DETAIL'])
         urgency = incident_detail['URGENCY']
-        hardware = bdp_dbutil.getHardwareByHardwareUID(incident['CAUSE_HARDWARE'])
 
         handler = 'Not assigned'
         if 'RESPONDER' in incident_detail.keys():
             handler_id = incident_detail['RESPONDER']
             handler = bdp_dbutil.getUserByUserID(handler_id)['USER_NAME']
 
-        bdp_dbutil.createPlot(hardware['HARDWARE_UID'], 480)
+        bdp_dbutil.createPlot(details['HARDWARE_UID'], 480)
 
-        return {'name': user['USER_NAME'],
-                'tenant' : tenant_name,
-                'sensor_id' : hardware['HARDWARE_ID'],
-                'sensor_type' : hardware['HARDWARE_TYPE'],
-                'hardware_uid' : hardware['HARDWARE_UID'],
-                'location' : hardware['HARDWARE_DETAIL'],
-                'timestamp' : original_ts,
+        return {'name': details['USER_NAME'],
+                'tenant' : details['TENANT_NAME'],
+                'sensor_id' : details['HARDWARE_ID'],
+                'sensor_type' : details['HARDWARE_TYPE'],
+                'hardware_uid' : details['HARDWARE_UID'],
+                'location' : details['HARDWARE_DETAIL'],
+                'timestamp' : details['INCIDENT_TIME'],
                 'status' : incident_status,
                 'handler' : handler,
                 'urgency_vis_1' : 'visible',

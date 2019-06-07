@@ -33,7 +33,7 @@ class BDPIncident():
         :return: response JSON to insert into DB
         """
         # Read all the values
-        table = bdp_util.createHumidityTable(hardware["HARDWARE_UID"], 480)
+        table = bdp_dbutil.createHumidityTable(hardware["HARDWARE_UID"], 480)
        
         value_of_interest = table.HUMIDITY.iloc[-1]
         if value_of_interest < 50:

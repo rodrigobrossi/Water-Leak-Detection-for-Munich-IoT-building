@@ -84,6 +84,13 @@ def getUsersWithNIDsAtTimes(incident_id, tenant_id, times):
         dictionary = ibm_db.fetch_assoc(stmt)
     return usergroups
 
+def randomString(string_length=10):
+    """Returns a random string of length string_length."""
+    random = str(uuid.uuid4()) # Convert UUID format to a Python string.
+    random = random.upper() # Make all characters uppercase.
+    random = random.replace("-","") # Remove the UUID '-'.
+    return random[0:string_length] # Return the random string.
+
 def getUsersWithNIDs(incident_id, tenant_id):
     usergroups = getUsersWithNIDsAtTimes(incident_id, tenant_id, 3)
     
@@ -351,3 +358,22 @@ def createPlot(hardware_uid, datapoint_amount):
     file_directory = Path('static/img')
     file_directory.mkdir(parents=True, exist_ok=True)
     figure.savefig(str(file_directory) + '/plot_' + str(hardware_uid) +'.png', bbox_inches='tight')
+def getNotificationDetailsById(notification_id):
+
+    conn = BDPDBConnection.getInstance().getDBConnection()
+
+    sql = """ SELECT usr.USER_NAME, 
+        incident.INCIDENT_TIME, incident.INCIDENT_STATUS_CODE, INCIDENT.INCIDENT_DETAIL, incident.INCIDENT_ID,
+        HARDWARE.HARDWARE_ID, HARDWARE.HARDWARE_DETAIL, HARDWARE.HARDWARE_TYPE, HARDWARE.HARDWARE_UID, 
+        TENANT.TENANT_NAME, TENANT.TENANT_ID 
+        FROM BDP_NOTIFICATION notification 
+        INNER JOIN BDP_USER usr ON NOTIFICATION.USER_ID = usr.USER_ID 
+        INNER JOIN BDP_INCIDENT incident ON INCIDENT.INCIDENT_ID = notification.INCIDENT_ID 
+        INNER JOIN BDP_TENANT tenant ON INCIDENT.TENANT_ID = TENANT.TENANT_ID 
+        INNER JOIN BDP_HARDWARE hardware ON INCIDENT.CAUSE_HARDWARE = HARDWARE.HARDWARE_UID 
+        WHERE notification.NOTIFICATION_ID = ? """
+
+    stmt = ibm_db.prepare(conn, sql)
+    ibm_db.bind_param(stmt, 1, str(notification_id))
+    ibm_db.execute(stmt)
+    return ibm_db.fetch_assoc(stmt)
