@@ -31,6 +31,7 @@ class BDPNotifier():
         :type tenant: int
         """
         print('[BDPNotifier] Notify')
+        # TODO: try except block
         if notification["ACTION"] == "ALARM":
             # Incident notification
             old_incident_record = notification["OLD_INCIDENT"]
@@ -83,6 +84,13 @@ class BDPNotifier():
     def _timeToNotify(incident_record, tenant_record):
         """
         Check if it is time to notify based on existing notification stamp and incident status
+        
+        :param incident_record: incident information
+        :type incident_record: json
+        :param tenant_record: tenant information
+        :type tenant_record: json
+
+        :return: list of users if it is time to notify else empty list
         """
         usergroups = []
         send = False
@@ -102,7 +110,7 @@ class BDPNotifier():
                 else:
                     interval = tenant_record["ALARM_INTERVAL_HR"] * 60
                     now = datetime.datetime.now()
-                    diff = (now - lastsent).seconds/60
+                    diff = (now - lastsent).total_seconds() / 60
                     if diff > interval:
                         print("[BDPNotifier] No snooze, sent an hour ago: SEND!")
                         send = True
@@ -110,12 +118,12 @@ class BDPNotifier():
                 lastsnooze = incident_record["SNOOZE_TIME"]
                 interval = tenant_record["SNOOZE_HR"] * 60
                 now = datetime.datetime.now()
-                diff = (now - lastsnooze).seconds/60
+                diff = (now - lastsnooze).total_seconds() / 60
                 if diff > interval:
                     print("[BDPIncident] Snoozed, snoozed an hour ago: SEND!")
                     send = True
                     bdp_dbutil.snoozeFlip(incident_record, False)
-
+                    
         if send is True:
             usergroups = bdp_dbutil.getUsersWithNIDs(tenant_record["TENANT_ID"])
         return usergroups
