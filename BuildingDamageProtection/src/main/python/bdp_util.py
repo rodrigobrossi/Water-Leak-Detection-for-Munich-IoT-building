@@ -18,19 +18,6 @@ from email.mime.multipart import MIMEMultipart
 import ibm_db
 import ibmiotf.application
 
-def generateHash(user, incident, length=10):
-    """
-    Returns a hash value of user and incident combination
-
-    :param user: user ID
-    :type user: int
-    :param incident: incident ID
-    :type incident: int
-    
-    :return: int 
-    """
-    return hash(str(user) + str(incident)) % 10**length
-
 def sendNotificationToUsers(endpoint, usergroups, action, userJSON):
     print("sendNotificationToUsers: " + action)
     print(userJSON)
@@ -83,15 +70,19 @@ def sendEmail(to, subject, plain_body, html_body):
         
 def sendSlack(to, msg):
     try:
-        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        headers = {
+            'Content-type': 'application/json', 
+            'Accept': 'text/plain',
+            'Authorization': 'Bearer xoxb-83959766341-650053210930-Nf6jYeLVuACXwYKeRLPQMO57'
+        }
         
         body = {}
         body['text'] = msg
-        print(body)
-        resp = requests.post('https://hooks.slack.com/services/' + str(to), headers=headers, data = json.dumps(body))
-    
-        print(resp.status_code)
-        print(resp.text)
+        body['channel'] = to
+        resp = requests.post('https://slack.com/api/chat.postMessage', 
+                            headers=headers, 
+                            data = json.dumps(body))
+
         if resp.status_code == 200:
             return True
     except Exception as e:

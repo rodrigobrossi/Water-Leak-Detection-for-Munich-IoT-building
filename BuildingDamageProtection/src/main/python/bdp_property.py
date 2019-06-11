@@ -8,7 +8,7 @@
 # divested of its trade secrets, irrespective of what has
 # been deposited with the U.S. Copyright Office.
 #############################################################
-import json
+import json, os
 
 class BDPProperty():
     __instance = None
@@ -24,8 +24,9 @@ class BDPProperty():
             raise Exception("This class is a singleton!")
         else:
             BDPProperty.__instance = self
-            with open('../../../resources/config/config.json') as f:
-#            with open('resources/config/ai_task_manager_config_local.json') as f:
+            dirname = os.path.dirname(__file__)
+            confpath = os.path.join(dirname, '../../../resources/config/config.json')
+            with open(confpath) as f:
                 self.data = json.load(f)
                 print(self.data)
             

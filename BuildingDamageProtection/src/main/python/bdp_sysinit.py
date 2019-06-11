@@ -8,7 +8,7 @@
 # divested of its trade secrets, irrespective of what has
 # been deposited with the U.S. Copyright Office.
 #############################################################
-import pprint
+import pprint, os
 from bdp_dbutil import *
 import ibm_db
 
@@ -32,8 +32,10 @@ class BDPSysInit():
         # for most people this isn't very useful so we'll show you how to return
         # columns as a dictionary (hash) in the next example.
         print("BDP tables: " + str(rownum))
+        dirname = os.path.dirname(__file__)
         if rownum == 0:
-            f = open("../../../resources/db/db2/init.sql", "r")
+            initpath = os.path.join(dirname, '../../../resources/db/db2/init.sql')
+            f = open(initpath, "r")
             flines = f.readlines()
             command = ''
             for line in flines:
@@ -43,8 +45,8 @@ class BDPSysInit():
                     print(command)
                     ibm_db.exec_immediate(conn, command)
                     command = ''
-        
-        xmldoc = minidom.parse('../../../resources/db/db2/db.changelog.xml')
+        changepath = os.path.join(dirname, '../../../resources/db/db2/db.changelog.xml')
+        xmldoc = minidom.parse(changepath)
         itemlist = xmldoc.getElementsByTagName('include')
         print(len(itemlist))
         for s in itemlist:

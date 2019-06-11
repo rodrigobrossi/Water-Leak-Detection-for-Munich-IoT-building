@@ -1,1 +1,1 @@
-web: python src/main/python/gateway.py 
+web: gunicorn -w 3 --pythonpath src/main/python/ --log-level debug gateway:application

@@ -11,7 +11,7 @@
 import datetime, uuid
 from flask import json
 import pandas as pd
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 import ibm_db
 
@@ -373,6 +373,7 @@ def createPlot(hardware_uid, datapoint_amount):
     :param datapoint_amount: Amount to datapoints to extract
     :type datapoint_amount: int
     """
+    """
     table = createHumidityTable(hardware_uid, datapoint_amount)
 
     figure, ax = plt.subplots(1,1)
@@ -383,6 +384,8 @@ def createPlot(hardware_uid, datapoint_amount):
     file_directory = Path('static/img')
     file_directory.mkdir(parents=True, exist_ok=True)
     figure.savefig(str(file_directory) + '/plot_' + str(hardware_uid) +'.png', bbox_inches='tight')
+    """
+    
 def getNotificationDetailsById(notification_id):
 
     conn = BDPDBConnection.getInstance().getDBConnection()

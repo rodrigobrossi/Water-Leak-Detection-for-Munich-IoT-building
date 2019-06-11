@@ -61,7 +61,7 @@ class BDPIncidentRespond(Resource):
         for user in users_group:
             users_names.append(user['USER_NAME'])
 
-        bdp_dbutil.createPlot(details['HARDWARE_UID'], 480)
+        #bdp_dbutil.createPlot(details['HARDWARE_UID'], 480)
 
         status_code = {
                     1: 'Resolved',
@@ -101,7 +101,7 @@ class BDPIncidentRespond(Resource):
         """
         print("[BDPIncidentRespond] post request received")
         try:
-            request_json : request.get_json(force=True)
+            request_json = request.get_json(force=True)
             nid = str(request.referrer).split('?')[1][4:]
 
             action = request_json['ACTION']

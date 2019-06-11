@@ -8,9 +8,10 @@
 # divested of its trade secrets, irrespective of what has
 # been deposited with the U.S. Copyright Office.
 #############################################################
-import os, datetime
+import os, datetime, socket
 import json, pystache
 import pandas as pd
+
 import ibm_db
 
 import bdp_dbutil, bdp_util
@@ -142,7 +143,7 @@ class BDPNotifier():
             incident_detail = json.loads(incident['INCIDENT_DETAIL'])
             urgency = incident_detail['URGENCY']
             hardware = bdp_dbutil.getHardwareByHardwareUID(incident['CAUSE_HARDWARE'])
-
+            print('ATTENTION {}'.format(socket.getfqdn()))
             params = {
                 'name': user['USER_NAME'], 
                 'tenant': tenant,
@@ -152,8 +153,7 @@ class BDPNotifier():
                 'urgency_vis_1': 'visible',
                 'urgency_vis_2': 'visible',
                 'urgency_vis_3': 'visible' if urgency=='critical' else 'hidden',
-                # TODO: Fix
-                'link': 'http://0.0.0.0:8080/respond?nid=' + user['NOTIFICATION_ID']
+                'link': 'https://bdp.eu-de.mybluemix.net/respond?nid=' + user['NOTIFICATION_ID']
             }
             print('[BDPNotifier] generating template with params {}'.format(params))
             current_dir = os.path.dirname(__file__)
@@ -180,8 +180,7 @@ class BDPNotifier():
                 'name': user['USER_NAME'], 
                 'handler': 'You have' if user['USER_NAME'] == notification["RESPONDER"] else notification["RESPONDER"],
                 'snooze_time': tenant["SNOOZE_HR"],
-                # TODO: Fix
-                'link': 'http://0.0.0.0:8080/respond?nid=' + user['NOTIFICATION_ID']
+                'link': 'https://bdp.eu-de.mybluemix.net/respond?nid=' + user['NOTIFICATION_ID']
             }
             print('[BDPNotifier] generating template with params {}'.format(params))
             current_dir = os.path.dirname(__file__)
@@ -206,8 +205,7 @@ class BDPNotifier():
             params = {
                 'name': user['USER_NAME'], 
                 'handler': 'You have' if user['USER_NAME'] == notification["RESPONDER"] else notification["RESPONDER"],
-                # TODO: Fix
-                'link': 'http://0.0.0.0:8080/respond?nid=' + user['NOTIFICATION_ID']
+                'link': 'https://bdp.eu-de.mybluemix.net/respond?nid=' + user['NOTIFICATION_ID']
             }
             print('[BDPNotifier] generating template with params {}'.format(params))
             current_dir = os.path.dirname(__file__)
