@@ -91,6 +91,49 @@ class TestNotifier(unittest.TestCase):
         tenant_record["TENANT_ID"] = 1
         return tenant_record
 
+class StubDate(datetime):
+    pass
+
+class TestDBUtil(unittest.TestCase):
+
+    def user_time_mock(tenant_id, times):
+        if times == 1: #all hours
+            return ['1']
+        elif times == 2:
+            return ['2']
+        elif times == 3:
+            return ['3']
+        return []
+
+    @mock.patch('bdp_dbutil.getUsersWithNIDsAtTimes', side_effect=user_time_mock)
+    @mock.patch('bdp_dbutil.datetime.datetime', StubDate)
+    def test_users_in_business_hours(self, getUsersAtTimes):
+
+        StubDate.now = classmethod(lambda cls: datetime(2020, 11, 13, 10, 00, 00, 00))
+
+        users = bdp_dbutil.getUsersWithNIDs(1)
+        self.assertCountEqual(users, ['1', '3'])
+
+    @mock.patch('bdp_dbutil.getUsersWithNIDsAtTimes', side_effect=user_time_mock)
+    @mock.patch('bdp_dbutil.datetime.datetime', StubDate)
+    def test_users_late_on_weekday(self, getUsersAtTimes):
+
+        StubDate.now = classmethod(lambda cls: datetime(2020, 11, 13, 20, 00, 00, 00)) 
+
+        users = bdp_dbutil.getUsersWithNIDs(1)
+        self.assertCountEqual(users, ['2', '3'])
+
+    @mock.patch('bdp_dbutil.getUsersWithNIDsAtTimes', side_effect=user_time_mock)
+    @mock.patch('bdp_dbutil.datetime.datetime', StubDate)
+    def test_users_on_weekend(self, getUsersAtTimes):
+
+        StubDate.now = classmethod(lambda cls: datetime(2020, 11, 15, 10, 00, 00, 00)) 
+
+        users = bdp_dbutil.getUsersWithNIDs(1)
+        self.assertCountEqual(users, ['2', '3'])
+
+
+
 class TestRespondWithDB(unittest.TestCase):
 
     def createIncident(self, time, sensor):
@@ -107,7 +150,7 @@ class TestRespondWithDB(unittest.TestCase):
         return BDPIncident._insertIncidentInDB(incident)
     
     def getUsersWithNotificationIDs(self, incident):
-        users = bdp_dbutil.getUsersWithNIDs(incident, 2)
+        users = bdp_dbutil.getUsersWithNIDs(2)
         bdp_dbutil.createNotificationRecord(incident, 2, users)
 
         return users
