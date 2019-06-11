@@ -35,14 +35,14 @@
                     <div class="card-body">
                         <table class="table table-sm">
                             <tbody>
-                                <tr><td>Building</td><td>{{tenant}}</td></tr>
-                                <tr><td>Location</td><td>{{location}}</td></tr>
-                                <tr><td>Timestamp</td><td>{{timestamp}}</td></tr>
-                                <tr><td>Sensor Type</td><td>{{sensor_type}}</td></tr>
-                                <tr><td>Sensor ID</td><td>{{sensor_id}}</td></tr>
-                                <tr><td>Status</td><td>{{status}}</td></tr>
-                                <tr><td>Handler</td><td>{{handler}}</td></tr>
-                                <tr><td>Urgency</td>
+                                <tr id='table_building'><td>Building</td><td>{{tenant}}</td></tr>
+                                <tr id='table_location'><td>Location</td><td>{{location}}</td></tr>
+                                <tr id='table_timestamp'><td>Timestamp</td><td>{{timestamp}}</td></tr>
+                                <tr id='table_sensor_type'><td>Sensor Type</td><td>{{sensor_type}}</td></tr>
+                                <tr id='table_sensor_id'><td>Sensor ID</td><td>{{sensor_id}}</td></tr>
+                                <tr id='table_status'><td>Status</td><td>{{status}}</td></tr>
+                                <tr id='table_handler'><td>Handler</td><td>{{handler}}</td></tr>
+                                <tr id='table_urgency'><td>Urgency</td>
                                 <td>
                                 <div class="urgency_battery">
                                     <div class="urgency_battery_cell" style="background-color:yellow; visibility:{{urgency_vis_1}}"></div>
@@ -69,8 +69,8 @@
             <div class="card border-secodary h-100">
                 <div class="card-header mcard-header">Take action</div>
                 <div class="card-body">
-                  <button type="button" class="btn btn-info m-2" data-toggle="modal" data-target="#snoozeModal">Snooze messages</button>
-                  <button type="button" class="btn btn-success m-2" data-toggle="modal" data-target="#fixedModal">Mark as resolved</button>
+                  <button type="button" id="action_snooze_button" class="btn btn-info m-2" data-toggle="modal" data-target="#snoozeModal">Snooze messages</button>
+                  <button type="button" id="action_fixed_button" class="btn btn-success m-2" data-toggle="modal" data-target="#fixedModal">Mark as resolved</button>
                  <div class="card-text text-align-center"><small>Use the buttons above to respond to this incident.</small></div>
                 </div>
             </div>
@@ -156,6 +156,24 @@
 </div>
 <script>
 
+function disable_button(elem_id){
+  var button = document.getElementById(elem_id);
+  button.disabled = true;
+}
+
+document.addEventListener('DOMContentLoaded', function(event){
+  var status = document.getElementById('table_status').children[1].innerHTML;
+  if(status == 'In progress')
+  {
+    disable_button('action_snooze_button');
+  }
+  else if(status == 'Resolved')
+  {
+    disable_button('action_snooze_button');
+    disable_button('action_fixed_button');
+  }
+})
+
 document.getElementById('snooze_button').addEventListener('click', function(event){
     var request = new XMLHttpRequest();
     modal_id = document.getElementById('responseModal');
@@ -193,6 +211,7 @@ document.getElementById('fixed_button').addEventListener('click', function(event
     request.setRequestHeader('Content-Type', 'application/json');
     request.send(JSON.stringify({'ACTION':'FIXED'}))
 })
+
 </script>
 </body>
 </html>
