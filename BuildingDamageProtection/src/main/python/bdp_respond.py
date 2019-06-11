@@ -55,7 +55,7 @@ class BDPIncidentRespond(Resource):
 
         details = bdp_dbutil.getNotificationDetailsById(nid)
 
-        users_group = bdp_dbutil.getUsersWithNIDs(details['INCIDENT_ID'], details['TENANT_ID'])
+        users_group = bdp_dbutil.getUsersWithNIDs(details['TENANT_ID'])
 
         users_names = []
         for user in users_group:

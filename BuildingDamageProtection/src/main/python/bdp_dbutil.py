@@ -8,7 +8,7 @@
 # divested of its trade secrets, irrespective of what has
 # been deposited with the U.S. Copyright Office.
 #############################################################
-import datetime
+import datetime, uuid
 from flask import json
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -69,7 +69,31 @@ def getTenantByTenantID(tenant_id):
     stmt = ibm_db.exec_immediate(conn, sql_string)
     return ibm_db.fetch_both(stmt)
 
-def getUsersWithNIDsAtTimes(incident_id, tenant_id, times):
+def _randomString(string_length=10):
+    """
+    Returns a random string of a certain length.
+
+    :param string_length: length
+    :type string_length: int
+
+    :return: str
+    """
+    random = str(uuid.uuid4()) # Convert UUID format to a Python string.
+    random = random.upper() # Make all characters uppercase.
+    random = random.replace("-","") # Remove the UUID '-'.
+    return random[0:string_length] # Return the random string.
+
+def getUsersWithNIDsAtTimes(tenant_id, times):
+    """
+    Returns a list of users that are associated with certain times and assigns a notification ID
+
+    :param tenant_id: length
+    :type tenant_id: int
+    :param times: availability times
+    :type times: enum
+
+    :return: list of users 
+    """
     conn = BDPDBConnection.getInstance().getDBConnection()
     usergroups = []
     if tenant_id < 0:
@@ -79,26 +103,27 @@ def getUsersWithNIDsAtTimes(incident_id, tenant_id, times):
     stmt = ibm_db.exec_immediate(conn, sql_string)
     dictionary = ibm_db.fetch_assoc(stmt)
     while dictionary != False:
-        dictionary["NOTIFICATION_ID"] = bdp_util.generateHash(incident_id, dictionary["USER_ID"])
+        dictionary["NOTIFICATION_ID"] = _randomString()
         usergroups.append(dictionary)
         dictionary = ibm_db.fetch_assoc(stmt)
     return usergroups
 
-def randomString(string_length=10):
-    """Returns a random string of length string_length."""
-    random = str(uuid.uuid4()) # Convert UUID format to a Python string.
-    random = random.upper() # Make all characters uppercase.
-    random = random.replace("-","") # Remove the UUID '-'.
-    return random[0:string_length] # Return the random string.
+def getUsersWithNIDs(tenant_id):
+    """
+    Returns a list of users that are associated with current time and assigns a notification ID
 
-def getUsersWithNIDs(incident_id, tenant_id):
-    usergroups = getUsersWithNIDsAtTimes(incident_id, tenant_id, 3)
+    :param tenant_id: length
+    :type tenant_id: int
+
+    :return: list of users 
+    """
+    usergroups = getUsersWithNIDsAtTimes(tenant_id, 3)
     
     timestamp = datetime.datetime.now()
     if timestamp.weekday() > 4 or timestamp.hour < 8 or timestamp.hour > 18:
-        usergroups.extend(getUsersWithNIDsAtTimes(incident_id, tenant_id, 2))
+        usergroups.extend(getUsersWithNIDsAtTimes(tenant_id, 2))
     else:
-        usergroups.extend(getUsersWithNIDsAtTimes(incident_id, tenant_id, 1))
+        usergroups.extend(getUsersWithNIDsAtTimes(tenant_id, 1))
 
     return usergroups
 
