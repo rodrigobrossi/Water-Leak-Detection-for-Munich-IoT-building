@@ -4,15 +4,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     
-    <!-- Bootstrap-->
+    <!--Bootstrap-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     
+    <!-- Chartist-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chartist/0.11.1/chartist.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartist/0.11.1/chartist.min.js"></script>
+
     <link rel="stylesheet" type="text/css" href={{ url_for('static',filename='css/stylesheet.css')}}>
     
-    <!-- IBM font -->
+    <!--IBM font-->
     <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans" rel="stylesheet"/>
 <title>Water Damage Prevention System</title>
 </head>
@@ -79,7 +83,8 @@
             <div class="card border-secodary h-100">
                 <div class="card-header mcard-header">Humidity overview</div>
                 <div class="card-body">
-                <img src="../static/img/plot_{{hardware_uid}}.png" width='100%'/>
+                  <div class="ct-chart ct-golden-section">
+                  </div>
                 </div>
             </div>
         </div>
@@ -161,7 +166,7 @@ function disable_button(elem_id){
   button.disabled = true;
 }
 
-document.addEventListener('DOMContentLoaded', function(event){
+function toggle_button_availability(){
   var status = document.getElementById('table_status').children[1].innerHTML;
   if(status == 'In progress')
   {
@@ -172,6 +177,29 @@ document.addEventListener('DOMContentLoaded', function(event){
     disable_button('action_snooze_button');
     disable_button('action_fixed_button');
   }
+}
+
+function plot_chart(){
+  var data = {
+    labels: {{labels|safe}},
+    series: {{datapoints}}
+  };
+
+  var options = {
+    high: Math.max({{datapoints}}) + 5,
+    low: Math.min({{datapoints}}) - 5,
+    height: 200,
+    fullWidth: true,
+    showPoint: false,
+    showArea:true,
+  };
+
+  new Chartist.Line('.ct-chart', data, options);
+}
+
+document.addEventListener('DOMContentLoaded', function(event){
+  toggle_button_availability();
+  plot_chart();
 })
 
 document.getElementById('snooze_button').addEventListener('click', function(event){
