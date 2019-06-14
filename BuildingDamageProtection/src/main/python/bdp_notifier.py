@@ -12,6 +12,8 @@ import os, datetime, socket
 import json, pystache
 import pandas as pd
 
+from threading import Thread
+
 import ibm_db
 
 import bdp_dbutil, bdp_util
@@ -167,7 +169,10 @@ class BDPNotifier():
             
             bdp_util.sendEmail(user['USER_CONTACT_1'], subject, body_plain, body_html)
             bdp_util.sendSlack(user['USER_CONTACT_2'], body_plain)
-    
+
+    def _sendEmails(emailList):
+        bdp_util.sendEmails(emailList)
+
     def _generateSnooze(notification, users):
         """
         Generate snooze alarm template and send it out
@@ -204,7 +209,9 @@ class BDPNotifier():
 
             bdp_util.sendSlack(user['USER_CONTACT_2'], body_plain)
 
-        bdp_util.sendEmails(emailList)
+        emailThread = Thread(target = BDPNotifier._sendEmails, args = (emailList,))
+        emailThread.start()
+
 
     def _generateFixed(notification, users):
         """

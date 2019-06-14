@@ -23,6 +23,17 @@ from bdp_property import BDPProperty
 from bdp_notifier import BDPNotifier
 
 class BDPIncidentRespond(Resource):
+
+    status_snoozed = 3
+    status_fixed = 1
+    status_new = 2
+
+    status_code = {
+                    1: 'Resolved',
+                    2: 'New',
+                    3: 'In progress'
+                }
+
     """
     Class that handles UI POST and GET requests
     """
@@ -61,15 +72,7 @@ class BDPIncidentRespond(Resource):
         for user in users_group:
             users_names.append(user['USER_NAME'])
 
-        #bdp_dbutil.createPlot(details['HARDWARE_UID'], 480)
-
-        status_code = {
-                    1: 'Resolved',
-                    2: 'New',
-                    3: 'In progress'
-                }
-
-        incident_status = status_code[details['INCIDENT_STATUS_CODE']]
+        incident_status = BDPIncidentRespond.status_code[details['INCIDENT_STATUS_CODE']]
         incident_detail = json.loads(details['INCIDENT_DETAIL'])
         urgency = incident_detail['URGENCY']
 
@@ -122,8 +125,17 @@ class BDPIncidentRespond(Resource):
                 "TENANT_ID": user["TENANT_ID"]
             }
 
+            new_status = BDPIncidentRespond._getStatusForAction(action)
+
             BDPNotifier.notify(notification, user["TENANT_ID"])
-            return {"result":"OK"}, 200
+            return {"newStatus": BDPIncidentRespond.status_code[new_status]}, 200
         except Exception as e:
             print(e)
             return {"result":"fail", "msg": str(e)}, 400
+
+    def _getStatusForAction(action):
+        if (action == 'SNOOZE'):
+            return BDPIncidentRespond.status_snoozed
+        if (action == 'FIX'):
+            return BDPIncidentRespond.status_fixed
+        return BDPIncidentRespond.status_new
