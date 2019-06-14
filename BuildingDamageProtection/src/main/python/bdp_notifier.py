@@ -24,7 +24,6 @@ class BDPNotifier():
     Class that handles notifications
     """
     def notify(notification, tenant):
-        print('NOTIFY START: ' + str(datetime.datetime.now()))
         """ 
         Notifies all user about an event
 
@@ -82,8 +81,6 @@ class BDPNotifier():
             bdp_dbutil.createNotificationRecord(notification["INCIDENT_ID"], 1, users)
             BDPNotifier._generateFixed(notification, users)
             return
-
-        print('NOTIFY END: ' + str(datetime.datetime.now()))
 
 
     def _timeToNotify(incident_record, tenant_record):
@@ -172,7 +169,6 @@ class BDPNotifier():
             bdp_util.sendSlack(user['USER_CONTACT_2'], body_plain)
     
     def _generateSnooze(notification, users):
-        print('GENERATE SNOOZE START: ' + str(datetime.datetime.now()))
         """
         Generate snooze alarm template and send it out
         """
@@ -209,9 +205,6 @@ class BDPNotifier():
             bdp_util.sendSlack(user['USER_CONTACT_2'], body_plain)
 
         bdp_util.sendEmails(emailList)
-        print('GENERATE SNOOZE END: ' + str(datetime.datetime.now()))    
-            # bdp_util.sendEmail(user['USER_CONTACT_1'], subject, body_plain, body_html)
-            # bdp_util.sendSlack(user['USER_CONTACT_2'], body_plain)
 
     def _generateFixed(notification, users):
         """
