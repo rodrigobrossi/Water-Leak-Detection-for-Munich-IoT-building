@@ -136,6 +136,6 @@ class BDPIncidentRespond(Resource):
     def _getStatusForAction(action):
         if (action == 'SNOOZE'):
             return BDPIncidentRespond.status_snoozed
-        if (action == 'FIX'):
+        if (action == 'FIXED'):
             return BDPIncidentRespond.status_fixed
         return BDPIncidentRespond.status_new
