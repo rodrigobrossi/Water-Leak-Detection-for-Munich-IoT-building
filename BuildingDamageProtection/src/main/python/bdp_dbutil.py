@@ -339,11 +339,6 @@ def insertResponderToIncidentID(incident_id, responder_id):
     sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET INCIDENT_DETAIL = '" + json.dumps(incident_details) + "' WHERE INCIDENT_ID = " + str(incident_id)
     stmt = ibm_db.exec_immediate(conn, sql_string)
 
-def removeUser(user_id):
-    conn = BDPDBConnection.getInstance().getDBConnection()
-    sql_string = "DELETE FROM " + getTableName("BDP_USER") + " WHERE USER_ID = " + str(user_id)
-    stmt = ibm_db.exec_immediate(conn, sql_string)
-
 def createHumidityTable(hardware_uid, datapoint_amount):
     """
     Creates a pandas table with humidity
@@ -357,35 +352,60 @@ def createHumidityTable(hardware_uid, datapoint_amount):
     """
     table = pd.DataFrame(getRawEventsByHardwareUID(hardware_uid, 480))
 
-    # Get important values
     table['HUMIDITY'] = None
+    table['TIME_ONLY'] = None
+
     for i in range(table.shape[0]):
+        # Extract data from json
         hardware_json = json.loads(table.READING.iloc[i])
+        # Save humidity in a seperate row
         table.at[i, 'HUMIDITY']  = hardware_json['humidity']
+        # Extract time from datetime
+        table.at[i, 'TIME'] = table.loc[i, 'READING_TIME'].strftime('%H:%m:%-S')
     return table
 
-def createPlot(hardware_uid, datapoint_amount):
+def getPlottingData(hardware_uid, datapoint_amount=480, plotpoint_amount=8, datapoint_types=['TIME','HUMIDITY']):
     """
-    Creates a plot in static/img
+    Create an overview points od the plotpoint_amount about the data points of datapoint_amount
 
     :param hardware_uid: Hardware unique ID
     :type hardware_uid: int
     :param datapoint_amount: Amount to datapoints to extract
     :type datapoint_amount: int
-    """
+    :param plotpoint_amount: Amount to plotting points to extract (values are averaged out from datapoints)
+    :type plotpoint_amount: int
+    :param datapoint_types: List of datapoints types that should be extracted from the table
+    :type datapoint_types: list
+
+    :return: list arrays that contain different datapoint types
     """
     table = createHumidityTable(hardware_uid, datapoint_amount)
+    #tmp storage
+    tmp = pd.DataFrame(data=None, columns=datapoint_types)
+    #data chunk size
+    jump_size = int(datapoint_amount / plotpoint_amount)
+    
+    for i in range(0, table.shape[0], jump_size):
+        # slice out the interesting part of the table
+        table_slice = table[i:i + jump_size + 1]
+        # calculate means of numeric columns
+        column_means = table_slice.mean()
+        # append an empty row
+        tmp = tmp.append(pd.Series(), ignore_index=True)
+        print(tmp)
+        for t in datapoint_types:
+            # if one of the datapoint types is not numeric
+            if not t in column_means.index:
+                # take the value in the middle of the table slice
+                middle_row = int(i + jump_size/2)
+                tmp[t].iat[-1] = table_slice.loc[middle_row, t]
+            else:
+                # else take the mean
+                tmp[t].iat[-1] = round(column_means[t], 2)
+    print('jump_size {}'.format(jump_size))
+    print('small table shape {}'.format(tmp.shape))
+    return [tmp[i].values for i in datapoint_types]
 
-    figure, ax = plt.subplots(1,1)
-    ax.set_facecolor('#182935')
-    ax.xaxis.set_label_text('')
-    figure = table.plot(x='READING_TIME', y='HUMIDITY', ax=ax, figsize=(12,4), legend=None, linewidth=4).get_figure()
-    
-    file_directory = Path('static/img')
-    file_directory.mkdir(parents=True, exist_ok=True)
-    figure.savefig(str(file_directory) + '/plot_' + str(hardware_uid) +'.png', bbox_inches='tight')
-    """
-    
 def getNotificationDetailsById(notification_id):
 
     conn = BDPDBConnection.getInstance().getDBConnection()

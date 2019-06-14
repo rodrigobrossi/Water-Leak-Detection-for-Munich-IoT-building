@@ -61,8 +61,6 @@ class BDPIncidentRespond(Resource):
         for user in users_group:
             users_names.append(user['USER_NAME'])
 
-        #bdp_dbutil.createPlot(details['HARDWARE_UID'], 480)
-
         status_code = {
                     1: 'Resolved',
                     2: 'New',
@@ -78,7 +76,7 @@ class BDPIncidentRespond(Resource):
             handler_id = incident_detail['RESPONDER']
             handler = bdp_dbutil.getUserByUserID(handler_id)['USER_NAME']
 
-        bdp_dbutil.createPlot(details['HARDWARE_UID'], 480)
+        plot_points = bdp_dbutil.getPlottingData(details['HARDWARE_UID'])
 
         return {'name': details['USER_NAME'],
                 'tenant' : details['TENANT_NAME'],
@@ -89,6 +87,8 @@ class BDPIncidentRespond(Resource):
                 'timestamp' : details['INCIDENT_TIME'],
                 'status' : incident_status,
                 'handler' : handler,
+                'datapoints': [plot_points[1].tolist()],
+                'labels': plot_points[0].tolist(),
                 'urgency_vis_1' : 'visible',
                 'urgency_vis_2' : 'visible',
                 'urgency_vis_3' : 'visible' if urgency=='critical' else 'hidden',

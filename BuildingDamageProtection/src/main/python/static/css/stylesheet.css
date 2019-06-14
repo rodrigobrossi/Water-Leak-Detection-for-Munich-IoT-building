@@ -29,3 +29,6 @@ body {
     margin: 0;
     padding: 0;
 }
+series-a .ct-series-a .ct-area .ct-line {
+    stroke: rgb(24,41,53) !important;
+}
