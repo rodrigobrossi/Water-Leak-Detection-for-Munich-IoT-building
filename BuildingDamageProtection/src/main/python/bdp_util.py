@@ -40,6 +40,43 @@ def sendNotificationToUsers(endpoint, usergroups, action, userJSON):
 
     return False
 
+def sendEmails(emailList):
+    gmail_user = 'water.intrusion.munich@gmail.com'
+    gmail_password = 'watsoniot'
+    sent_from = gmail_user
+
+    server = None
+
+    try:  
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server.ehlo()
+        server.login(gmail_user, gmail_password)
+        for email in emailList:
+            message = _buildMessage(email, sent_from)
+            server.sendmail(sent_from, email.emailAddress, message.as_string())
+            print('Email sent!')
+
+    except Exception as e:
+        print(e)  
+        print('Something went wrong...')
+    finally:
+        if (server != None):
+            server.close()
+
+def _buildMessage(email, sent_from):
+    message = MIMEMultipart('alternative')
+    message['Subject'] = email.subject
+    message['From'] = sent_from
+    message['To'] = email.emailAddress
+
+    plain_text = MIMEText(email.textBody, 'plain')
+    html_text = MIMEText(email.htmlBody, 'html')
+
+    message.attach(plain_text)
+    message.attach(html_text)
+    return message
+
+
 def sendEmail(to, subject, plain_body, html_body):
     gmail_user = 'water.intrusion.munich@gmail.com'
     gmail_password = 'watsoniot'
@@ -56,17 +93,19 @@ def sendEmail(to, subject, plain_body, html_body):
     message.attach(plain_text)
     message.attach(html_text)
     
+    server = None
     try:  
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.ehlo()
         server.login(gmail_user, gmail_password)
         server.sendmail(sent_from, to, message.as_string())
-        server.close()
-    
         print('Email sent!')
     except Exception as e:
         print(e)  
         print('Something went wrong...')
+    finally:
+        if (server != None):
+            server.close()
         
 def sendSlack(to, msg):
     try:

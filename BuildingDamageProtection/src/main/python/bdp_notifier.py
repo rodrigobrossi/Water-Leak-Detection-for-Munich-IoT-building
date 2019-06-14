@@ -16,6 +16,7 @@ import ibm_db
 
 import bdp_dbutil, bdp_util
 from bdp_property import BDPProperty
+from bdp_email import BDPEmail
 
 
 class BDPNotifier():
@@ -23,6 +24,7 @@ class BDPNotifier():
     Class that handles notifications
     """
     def notify(notification, tenant):
+        print('NOTIFY START: ' + str(datetime.datetime.now()))
         """ 
         Notifies all user about an event
 
@@ -80,6 +82,8 @@ class BDPNotifier():
             bdp_dbutil.createNotificationRecord(notification["INCIDENT_ID"], 1, users)
             BDPNotifier._generateFixed(notification, users)
             return
+
+        print('NOTIFY END: ' + str(datetime.datetime.now()))
 
 
     def _timeToNotify(incident_record, tenant_record):
@@ -168,14 +172,22 @@ class BDPNotifier():
             bdp_util.sendSlack(user['USER_CONTACT_2'], body_plain)
     
     def _generateSnooze(notification, users):
+        print('GENERATE SNOOZE START: ' + str(datetime.datetime.now()))
         """
         Generate snooze alarm template and send it out
         """
         subject = 'Water Intrusion Notification Snoozed'
         
         print('[_generateSnoozeEmails] to {}'.format(users))
+        emailList = []
+        tenant = bdp_dbutil.getTenantByTenantID(notification['TENANT_ID'])
+        
+        current_dir = os.path.dirname(__file__)
+
+        template_plain = open(os.path.join(current_dir, 'templates/snooze_email.txt')).read()
+        template_html = open(os.path.join(current_dir, 'templates/snooze_email.html')).read()
+
         for user in users:
-            tenant = bdp_dbutil.getTenantByTenantID(notification['TENANT_ID'])
             params = {
                 'name': user['USER_NAME'], 
                 'handler': 'You have' if user['USER_NAME'] == notification["RESPONDER"] else notification["RESPONDER"],
@@ -183,16 +195,23 @@ class BDPNotifier():
                 'link': 'https://bdp.eu-de.mybluemix.net/respond?nid=' + user['NOTIFICATION_ID']
             }
             print('[BDPNotifier] generating template with params {}'.format(params))
-            current_dir = os.path.dirname(__file__)
-
-            template_plain = open(os.path.join(current_dir, 'templates/snooze_email.txt')).read()
-            template_html = open(os.path.join(current_dir, 'templates/snooze_email.html')).read()
             
             body_plain = pystache.render(template_plain, params)
             body_html = pystache.render(template_html, params)
-            
-            bdp_util.sendEmail(user['USER_CONTACT_1'], subject, body_plain, body_html)
+
+            email = BDPEmail()
+            email.emailAddress = user['USER_CONTACT_1']
+            email.subject = subject
+            email.htmlBody = body_html
+            email.plainBody = body_plain
+            emailList.append(email)
+
             bdp_util.sendSlack(user['USER_CONTACT_2'], body_plain)
+
+        bdp_util.sendEmails(emailList)
+        print('GENERATE SNOOZE END: ' + str(datetime.datetime.now()))    
+            # bdp_util.sendEmail(user['USER_CONTACT_1'], subject, body_plain, body_html)
+            # bdp_util.sendSlack(user['USER_CONTACT_2'], body_plain)
 
     def _generateFixed(notification, users):
         """

@@ -100,6 +100,7 @@ class BDPIncidentRespond(Resource):
         Receives POST requests with action type
         """
         print("[BDPIncidentRespond] post request received")
+        print('POST START: ' + str(datetime.datetime.now()))
         try:
             request_json = request.get_json(force=True)
             nid = str(request.referrer).split('?')[1][4:]
@@ -123,7 +124,7 @@ class BDPIncidentRespond(Resource):
             }
 
             BDPNotifier.notify(notification, user["TENANT_ID"])
-
+            print('POST END: ' + str(datetime.datetime.now()))
             return {"result":"OK"}, 200
         except Exception as e:
             print(e)
