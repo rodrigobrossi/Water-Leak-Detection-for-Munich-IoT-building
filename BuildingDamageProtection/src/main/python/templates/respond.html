@@ -44,7 +44,7 @@
                                 <tr id='table_timestamp'><td>Timestamp</td><td>{{timestamp}}</td></tr>
                                 <tr id='table_sensor_type'><td>Sensor Type</td><td>{{sensor_type}}</td></tr>
                                 <tr id='table_sensor_id'><td>Sensor ID</td><td>{{sensor_id}}</td></tr>
-                                <tr id='table_status'><td>Status</td><td>{{status}}</td></tr>
+                                <tr id='table_status'><td>Status</td><td id="table_status_value">{{status}}</td></tr>
                                 <tr id='table_handler'><td>Handler</td><td>{{handler}}</td></tr>
                                 <tr id='table_urgency'><td>Urgency</td>
                                 <td>
@@ -208,12 +208,15 @@ document.getElementById('snooze_button').addEventListener('click', function(even
     modal = new bootstrap.Modal(modal_id);
     request.onreadystatechange = function() {
       console.log(request.status)
-      if (request.status == 200){
-          modal.show()
-      }
-      else if(request.status == 208){
-          document.getElementById('responseModalBody').innerHTML = 'This incident is already snoozed';
-          modal.show()
+      if (request.readyState === 4 ) {
+        if (request.status === 200){
+            var responseJson = JSON.parse(request.responseText);
+            document.getElementById('table_status_value').innerHTML = responseJson['newStatus'];
+            modal.show()
+        } else if(request.status === 208){
+            document.getElementById('responseModalBody').innerHTML = 'This incident is already snoozed';
+            modal.show()
+        }
       }
     }
     request.open("POST","/respond",true);
