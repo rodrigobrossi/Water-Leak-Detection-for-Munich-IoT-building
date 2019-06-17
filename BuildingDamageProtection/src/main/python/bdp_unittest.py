@@ -242,5 +242,25 @@ class TestExistingIncidentWithDB(unittest.TestCase):
         
         self.assertFalse(response_2)
 
+    @mock.patch('bdp_dbutil.datetime.datetime', StubDate)
+    def test_unsnoozingIncident(self):
+        incidentDate = datetime.today() - timedelta(days=3)
+        notification = self.createIncident(str(incidentDate.strftime("%Y-%m-%d-%H.%M.%S")), 1)
+        incidentId = notification["NEW_INCIDENT_ID"]
+        users = bdp_dbutil.getUsersWithNIDs(2)
+        bdp_dbutil.createNotificationRecord(incidentId, 2, users)
+
+        lastSnoozedDate = datetime.today() - timedelta(days=2)
+        StubDate.now = classmethod(lambda cls: lastSnoozedDate)
+        bdp_dbutil.snoozeFlip(incidentId, True)
+
+        bdp_dbutil.snoozeFlip(incidentId, False)
+
+        details = bdp_dbutil.getNotificationDetailsById(users[0]["NOTIFICATION_ID"])
+
+        self.assertEquals(details['INCIDENT_STATUS_CODE'], 2)
+        
+
+
 if __name__ == '__main__':
     unittest.main()

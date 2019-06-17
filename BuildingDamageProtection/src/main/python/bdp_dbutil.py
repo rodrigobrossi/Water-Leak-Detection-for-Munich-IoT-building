@@ -137,13 +137,12 @@ def snoozeFlip(incident_id, state):
     :type state: bool
     """
     conn = BDPDBConnection.getInstance().getDBConnection()
-
     if state is True:
         updateIncidentStatus(incident_id, 3)
     else:
         #turn off snooze
         sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET SNOOZE_TIME = NULL, INCIDENT_STATUS_CODE=2 WHERE INCIDENT_ID = " + str(incident_id) + " OR INCIDENT_ID_ORIGINAL = " + str(incident_id)
-    stmt = ibm_db.exec_immediate(conn, sql_string)
+        stmt = ibm_db.exec_immediate(conn, sql_string)
 
 def updateIncidentNotifyTime(incidentid):
     conn = BDPDBConnection.getInstance().getDBConnection()
