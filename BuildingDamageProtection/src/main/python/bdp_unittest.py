@@ -2,6 +2,7 @@ import unittest
 from unittest import mock
 
 from datetime import datetime, timedelta
+import numpy as np
 
 import ibm_db
 
@@ -164,11 +165,12 @@ class TestRespondWithDB(unittest.TestCase):
         if old_incident:     
             bdp_dbutil.updateIncidentStatus(old_incident['INCIDENT_ID'], 'FIXED')
 
-    @mock.patch("bdp_dbutil.createPlot")
-    def test_buildContext(self, createPlot):
+    @mock.patch("bdp_dbutil.getPlottingData")
+    def test_buildContext(self, getPlottingData):
         incident_respond = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
         users = self.getUsersWithNotificationIDs(incident_respond["NEW_INCIDENT_ID"])
         context = BDPIncidentRespond.buildContext(users[0]["NOTIFICATION_ID"])
+        getPlottingData.return_value = [np.array([]), np.array([])]
         
         self.assertEqual(context['name'], users[0]["USER_NAME"])
         self.assertEqual(context['tenant'], 'IBM Test')

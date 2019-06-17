@@ -126,7 +126,7 @@ class BDPNotifier():
                 if diff > interval:
                     print("[BDPIncident] Snoozed, snoozed an hour ago: SEND!")
                     send = True
-                    bdp_dbutil.snoozeFlip(incident_record, False)
+                    bdp_dbutil.snoozeFlip(incident_record["INCIDENT_ID"], False)
                     
         if send is True:
             usergroups = bdp_dbutil.getUsersWithNIDs(tenant_record["TENANT_ID"])

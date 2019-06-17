@@ -127,15 +127,22 @@ def getUsersWithNIDs(tenant_id):
 
     return usergroups
 
-def snoozeFlip(incident_record, state):
+def snoozeFlip(incident_id, state):
+    """
+    Flips the snooze flag.
+
+    :param incident_id: Incident ID
+    :type incident_id: int
+    :param state: If true, the flag is set; otherwise removed
+    :type state: bool
+    """
     conn = BDPDBConnection.getInstance().getDBConnection()
 
     if state is True:
-        #set snooze
-        sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET SNOOZE_TIME = '" + str(datetime.datetime.now()) + "' WHERE INCIDENT_ID = " + str(incident_record["INCIDENT_ID"])
+        updateIncidentStatus(incident_id, 3)
     else:
-        #turn of snooze
-        sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET SNOOZE_TIME = null WHERE INCIDENT_ID = " + str(incident_record["INCIDENT_ID"])
+        #turn off snooze
+        sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET SNOOZE_TIME = NULL, INCIDENT_STATUS_CODE=2 WHERE INCIDENT_ID = " + str(incident_id) + " OR INCIDENT_ID_ORIGINAL = " + str(incident_id)
     stmt = ibm_db.exec_immediate(conn, sql_string)
 
 def updateIncidentNotifyTime(incidentid):
@@ -247,14 +254,10 @@ def updateIncidentStatus(incident_id, actionstr):
 
     now = str(datetime.datetime.now())
     if action == 1:
-        sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET INCIDENT_STATUS_CODE = '" + str(action) + "', FIX_TIME = '" + now + "' WHERE INCIDENT_ID = " + str(incident_id)
-        stmt = ibm_db.exec_immediate(conn, sql_string)
-        sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET INCIDENT_STATUS_CODE = '" + str(action) + "', FIX_TIME = '" + now + "' WHERE INCIDENT_ID_ORIGINAL = " + str(incident_id)
+        sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET INCIDENT_STATUS_CODE = '" + str(action) + "', FIX_TIME = '" + now + "' WHERE INCIDENT_ID = " + str(incident_id) + " OR INCIDENT_ID_ORIGINAL = " + str(incident_id)
         stmt = ibm_db.exec_immediate(conn, sql_string)
     else:
-        sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET INCIDENT_STATUS_CODE = '" + str(action) + "', SNOOZE_TIME = '" + now + "' WHERE INCIDENT_ID = " + str(incident_id)
-        stmt = ibm_db.exec_immediate(conn, sql_string)
-        sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET INCIDENT_STATUS_CODE = '" + str(action) + "', SNOOZE_TIME = '" + now + "' WHERE INCIDENT_ID_ORIGINAL = " + str(incident_id)
+        sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET INCIDENT_STATUS_CODE = '" + str(action) + "', SNOOZE_TIME = '" + now + "' WHERE INCIDENT_ID = " + str(incident_id) + " OR INCIDENT_ID_ORIGINAL = " + str(incident_id)
         stmt = ibm_db.exec_immediate(conn, sql_string)
     return True
 
@@ -355,6 +358,9 @@ def createHumidityTable(hardware_uid, datapoint_amount):
     table['HUMIDITY'] = None
     table['TIME_ONLY'] = None
 
+    # Change to descending order
+    table = table.iloc[::-1].reset_index(drop=True)
+
     for i in range(table.shape[0]):
         # Extract data from json
         hardware_json = json.loads(table.READING.iloc[i])
@@ -392,7 +398,6 @@ def getPlottingData(hardware_uid, datapoint_amount=480, plotpoint_amount=8, data
         column_means = table_slice.mean()
         # append an empty row
         tmp = tmp.append(pd.Series(), ignore_index=True)
-        print(tmp)
         for t in datapoint_types:
             # if one of the datapoint types is not numeric
             if not t in column_means.index:
@@ -402,8 +407,6 @@ def getPlottingData(hardware_uid, datapoint_amount=480, plotpoint_amount=8, data
             else:
                 # else take the mean
                 tmp[t].iat[-1] = round(column_means[t], 2)
-    print('jump_size {}'.format(jump_size))
-    print('small table shape {}'.format(tmp.shape))
     return [tmp[i].values for i in datapoint_types]
 
 def getNotificationDetailsById(notification_id):
