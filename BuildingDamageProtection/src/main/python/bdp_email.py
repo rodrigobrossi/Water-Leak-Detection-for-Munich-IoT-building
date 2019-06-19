@@ -1,7 +1,7 @@
 class BDPEmail:
 
-    def __init__(self):
-        self.emailAddress = ''
-        self.subject = ''
-        self.htmlBody = ''
-        self.textBody = ''
+    def __init__(self, emailAddress, subject, htmlBody, textBody):
+        self.emailAddress = emailAddress
+        self.subject = subject
+        self.htmlBody = htmlBody
+        self.textBody = textBody

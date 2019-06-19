@@ -359,14 +359,14 @@ def createHumidityTable(hardware_uid, datapoint_amount):
 
     # Change to descending order
     table = table.iloc[::-1].reset_index(drop=True)
-
+    
     for i in range(table.shape[0]):
         # Extract data from json
         hardware_json = json.loads(table.READING.iloc[i])
         # Save humidity in a seperate row
         table.at[i, 'HUMIDITY']  = hardware_json['humidity']
         # Extract time from datetime
-        table.at[i, 'TIME'] = table.loc[i, 'READING_TIME'].strftime('%H:%m:%-S')
+        table.at[i, 'TIME'] = table.loc[i, 'READING_TIME'].strftime('%H:%m:%S')
     return table
 
 def getPlottingData(hardware_uid, datapoint_amount=480, plotpoint_amount=8, datapoint_types=['TIME','HUMIDITY']):

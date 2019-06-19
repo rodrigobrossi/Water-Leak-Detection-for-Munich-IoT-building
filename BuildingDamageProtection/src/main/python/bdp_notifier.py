@@ -200,17 +200,12 @@ class BDPNotifier():
             body_plain = pystache.render(template_plain, params)
             body_html = pystache.render(template_html, params)
 
-            email = BDPEmail()
-            email.emailAddress = user['USER_CONTACT_1']
-            email.subject = subject
-            email.htmlBody = body_html
-            email.plainBody = body_plain
+            email = BDPEmail(user['USER_CONTACT_1'], subject, body_html, body_plain)
             emailList.append(email)
 
             bdp_util.sendSlack(user['USER_CONTACT_2'], body_plain)
 
-        emailThread = Thread(target = BDPNotifier._sendEmails, args = (emailList,))
-        emailThread.start()
+        BDPNotifier._startEmailThread(emailList)
 
 
     def _generateFixed(notification, users):
@@ -220,6 +215,14 @@ class BDPNotifier():
         subject = 'Water Intrusion Incident Resolved'
         
         print('[_generateFixedEmails] to {}'.format(users))
+
+        emailList = []
+
+        current_dir = os.path.dirname(__file__)
+
+        template_plain = open(os.path.join(current_dir, 'templates/fixed_email.txt')).read()
+        template_html = open(os.path.join(current_dir, 'templates/fixed_email.html')).read()
+        
         for user in users:
             params = {
                 'name': user['USER_NAME'], 
@@ -227,14 +230,18 @@ class BDPNotifier():
                 'link': 'https://bdp.eu-de.mybluemix.net/respond?nid=' + user['NOTIFICATION_ID']
             }
             print('[BDPNotifier] generating template with params {}'.format(params))
-            current_dir = os.path.dirname(__file__)
-
-            template_plain = open(os.path.join(current_dir, 'templates/fixed_email.txt')).read()
-            template_html = open(os.path.join(current_dir, 'templates/fixed_email.html')).read()
             
             body_plain = pystache.render(template_plain, params)
             body_html = pystache.render(template_html, params)
+
+            email = BDPEmail(user['USER_CONTACT_1'], subject, body_html, body_plain)
+            emailList.append(email)
             
-            bdp_util.sendEmail(user['USER_CONTACT_1'], subject, body_plain, body_html)
             bdp_util.sendSlack(user['USER_CONTACT_2'], body_plain)
+
+        BDPNotifier._startEmailThread(emailList)
+
+    def _startEmailThread(emailList):
+        emailThread = Thread(target = BDPNotifier._sendEmails, args = (emailList,))
+        emailThread.start()
         

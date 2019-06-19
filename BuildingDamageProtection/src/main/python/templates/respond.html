@@ -166,7 +166,7 @@ function disable_button(elem_id){
   button.disabled = true;
 }
 
-function toggle_button_availability(){
+function set_button_availability(){
   var status = document.getElementById('table_status').children[1].innerHTML;
   if(status == 'In progress')
   {
@@ -198,7 +198,7 @@ function plot_chart(){
 }
 
 document.addEventListener('DOMContentLoaded', function(event){
-  toggle_button_availability();
+  set_button_availability();
   plot_chart();
 })
 
@@ -210,32 +210,37 @@ document.getElementById('snooze_button').addEventListener('click', function(even
       console.log(request.status)
       if (request.readyState === 4 ) {
         if (request.status === 200){
-            var responseJson = JSON.parse(request.responseText);
-            document.getElementById('table_status_value').innerHTML = responseJson['newStatus'];
-            modal.show()
+          var responseJson = JSON.parse(request.responseText);
+          document.getElementById('table_status_value').innerHTML = responseJson['newStatus'];
+          set_button_availability();
+          modal.show();
         } else if(request.status === 208){
-            document.getElementById('responseModalBody').innerHTML = 'This incident is already snoozed';
-            modal.show()
+          document.getElementById('responseModalBody').innerHTML = 'This incident is already snoozed';
+          modal.show();
         }
       }
     }
     request.open("POST","/respond",true);
     request.setRequestHeader('Content-Type', 'application/json');
     request.send(JSON.stringify({'ACTION':'SNOOZE'}))
-})
-
-document.getElementById('fixed_button').addEventListener('click', function(event){
+  })
+  
+  document.getElementById('fixed_button').addEventListener('click', function(event){
     var request = new XMLHttpRequest();
     modal_id = document.getElementById('responseModal');
     modal = new bootstrap.Modal(modal_id);
     request.onreadystatechange = function() {
       console.log(request.status)
-      if (request.status == 200){
-          modal.show()
-      }
-      else {
-          document.getElementById('responseModalBody').innerHTML = 'Something went wrong';
-          modal.show()
+      if (request.readyState === 4 ) {
+        if (request.status == 200){
+            var responseJson = JSON.parse(request.responseText);
+            document.getElementById('table_status_value').innerHTML = responseJson['newStatus'];
+            set_button_availability();
+            modal.show();
+        } else {
+            document.getElementById('responseModalBody').innerHTML = 'Something went wrong';
+            modal.show();
+        }
       }
     }
     request.open("POST","/respond",true);
