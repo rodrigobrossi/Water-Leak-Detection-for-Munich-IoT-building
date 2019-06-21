@@ -24,6 +24,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="#" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Building Damage Prevetion System  documentation</a> &#187;</li> 
       </ul>
     </div>  
@@ -39,29 +42,43 @@
 <div class="genindex-jumpbox">
  <a href="#_"><strong>_</strong></a>
  | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#P"><strong>P</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#U"><strong>U</strong></a>
  
 </div>
 <h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#bdp_incident.BDPIncident._checkForIncident">_checkForIncident() (bdp_incident.BDPIncident method)</a>
+      <li><a href="model.html#bdp_incident.BDPIncident._checkForIncident">_checkForIncident() (bdp_incident.BDPIncident method)</a>
 </li>
-      <li><a href="index.html#bdp_notifier.BDPNotifier._generateAlarm">_generateAlarm() (bdp_notifier.BDPNotifier method)</a>
+      <li><a href="model.html#bdp_notifier.BDPNotifier._generateAlarm">_generateAlarm() (bdp_notifier.BDPNotifier method)</a>
 </li>
-      <li><a href="index.html#bdp_notifier.BDPNotifier._generateFixed">_generateFixed() (bdp_notifier.BDPNotifier method)</a>
+      <li><a href="model.html#bdp_notifier.BDPNotifier._generateFixed">_generateFixed() (bdp_notifier.BDPNotifier method)</a>
+</li>
+      <li><a href="model.html#bdp_notifier.BDPNotifier._generateSnooze">_generateSnooze() (bdp_notifier.BDPNotifier method)</a>
+</li>
+      <li><a href="model.html#bdp_respond.BDPIncidentRespond._getStatusForAction">_getStatusForAction() (bdp_respond.BDPIncidentRespond method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#bdp_notifier.BDPNotifier._generateSnooze">_generateSnooze() (bdp_notifier.BDPNotifier method)</a>
+      <li><a href="model.html#bdp_incident.BDPIncident._hardwareCallback">_hardwareCallback() (bdp_incident.BDPIncident method)</a>
 </li>
-      <li><a href="index.html#bdp_incident.BDPIncident._insertIncidentInDB">_insertIncidentInDB() (bdp_incident.BDPIncident method)</a>
+      <li><a href="model.html#bdp_incident.BDPIncident._insertIncidentInDB">_insertIncidentInDB() (bdp_incident.BDPIncident method)</a>
 </li>
-      <li><a href="index.html#bdp_notifier.BDPNotifier._timeToNotify">_timeToNotify() (bdp_notifier.BDPNotifier method)</a>
+      <li><a href="model.html#bdp_incident.BDPIncident._iotSubscribe">_iotSubscribe() (bdp_incident.BDPIncident method)</a>
+</li>
+      <li><a href="model.html#bdp_notifier.BDPNotifier._sendEmails">_sendEmails() (bdp_notifier.BDPNotifier method)</a>
+</li>
+      <li><a href="model.html#bdp_notifier.BDPNotifier._startEmailThread">_startEmailThread() (bdp_notifier.BDPNotifier method)</a>
+</li>
+      <li><a href="model.html#bdp_notifier.BDPNotifier._timeToNotify">_timeToNotify() (bdp_notifier.BDPNotifier method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -69,13 +86,35 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#bdp_incident.BDPIncident">BDPIncident (class in bdp_incident)</a>
+      <li><a href="utils.html#module-bdp_dbutil">bdp_dbutil (module)</a>
+</li>
+      <li><a href="utils.html#module-bdp_util">bdp_util (module)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.BDPDBConnection">BDPDBConnection (class in bdp_dbutil)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#bdp_respond.BDPIncidentRespond">BDPIncidentRespond (class in bdp_respond)</a>
+      <li><a href="model.html#bdp_incident.BDPIncident">BDPIncident (class in bdp_incident)</a>
 </li>
-      <li><a href="index.html#bdp_notifier.BDPNotifier">BDPNotifier (class in bdp_notifier)</a>
+      <li><a href="model.html#bdp_respond.BDPIncidentRespond">BDPIncidentRespond (class in bdp_respond)</a>
+</li>
+      <li><a href="model.html#bdp_notifier.BDPNotifier">BDPNotifier (class in bdp_notifier)</a>
+</li>
+      <li><a href="model.html#bdp_respond.BDPIncidentRespond.buildContext">buildContext() (bdp_respond.BDPIncidentRespond method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utils.html#bdp_dbutil.checkExcistingIncident">checkExcistingIncident() (in module bdp_dbutil)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utils.html#bdp_dbutil.createHumidityTable">createHumidityTable() (in module bdp_dbutil)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.createNotificationRecord">createNotificationRecord() (in module bdp_dbutil)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -83,7 +122,43 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#bdp_respond.BDPIncidentRespond.get">get() (bdp_respond.BDPIncidentRespond method)</a>
+      <li><a href="model.html#bdp_respond.BDPIncidentRespond.get">get() (bdp_respond.BDPIncidentRespond method)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.BDPDBConnection.getDBConnection">getDBConnection() (bdp_dbutil.BDPDBConnection method)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.getHardwareByDevice">getHardwareByDevice() (in module bdp_dbutil)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.getHardwareByHardwareUID">getHardwareByHardwareUID() (in module bdp_dbutil)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.getIncidentByIncidentID">getIncidentByIncidentID() (in module bdp_dbutil)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.getIncidentID">getIncidentID() (in module bdp_dbutil)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.BDPDBConnection.getInstance">getInstance() (bdp_dbutil.BDPDBConnection static method)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.getNotificationByNotificationID">getNotificationByNotificationID() (in module bdp_dbutil)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.getNotificationDetailsById">getNotificationDetailsById() (in module bdp_dbutil)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utils.html#bdp_dbutil.getNotificationsByIncidentID">getNotificationsByIncidentID() (in module bdp_dbutil)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.getPlottingData">getPlottingData() (in module bdp_dbutil)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.getRawEventsByHardwareUID">getRawEventsByHardwareUID() (in module bdp_dbutil)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.getTableName">getTableName() (in module bdp_dbutil)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.getTenantByName">getTenantByName() (in module bdp_dbutil)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.getTenantByTenantID">getTenantByTenantID() (in module bdp_dbutil)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.getUserByUserID">getUserByUserID() (in module bdp_dbutil)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.getUsersWithNIDs">getUsersWithNIDs() (in module bdp_dbutil)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.getUsersWithNIDsAtTimes">getUsersWithNIDsAtTimes() (in module bdp_dbutil)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -91,7 +166,19 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#bdp_incident.BDPIncident.handleRawEvents">handleRawEvents() (bdp_incident.BDPIncident method)</a>
+      <li><a href="model.html#bdp_incident.BDPIncident.handleRawEvents">handleRawEvents() (bdp_incident.BDPIncident method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utils.html#bdp_dbutil.insertIncident">insertIncident() (in module bdp_dbutil)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utils.html#bdp_dbutil.insertResponderToIncidentID">insertResponderToIncidentID() (in module bdp_dbutil)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -99,7 +186,7 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#bdp_respond.BDPIncidentRespond.methods">methods (bdp_respond.BDPIncidentRespond attribute)</a>
+      <li><a href="model.html#bdp_respond.BDPIncidentRespond.methods">methods (bdp_respond.BDPIncidentRespond attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -107,7 +194,7 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#bdp_notifier.BDPNotifier.notify">notify() (bdp_notifier.BDPNotifier method)</a>
+      <li><a href="model.html#bdp_notifier.BDPNotifier.notify">notify() (bdp_notifier.BDPNotifier method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -115,7 +202,49 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#bdp_respond.BDPIncidentRespond.post">post() (bdp_respond.BDPIncidentRespond method)</a>
+      <li><a href="model.html#bdp_respond.BDPIncidentRespond.post">post() (bdp_respond.BDPIncidentRespond method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utils.html#bdp_util.sendEmail">sendEmail() (in module bdp_util)</a>
+</li>
+      <li><a href="utils.html#bdp_util.sendEmails">sendEmails() (in module bdp_util)</a>
+</li>
+      <li><a href="utils.html#bdp_util.sendNotificationToUsers">sendNotificationToUsers() (in module bdp_util)</a>
+</li>
+      <li><a href="utils.html#bdp_util.sendSlack">sendSlack() (in module bdp_util)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.snoozeFlip">snoozeFlip() (in module bdp_dbutil)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="model.html#bdp_incident.BDPIncident.start">start() (bdp_incident.BDPIncident method)</a>
+</li>
+      <li><a href="model.html#bdp_respond.BDPIncidentRespond.status_code">status_code (bdp_respond.BDPIncidentRespond attribute)</a>
+</li>
+      <li><a href="model.html#bdp_respond.BDPIncidentRespond.status_fixed">status_fixed (bdp_respond.BDPIncidentRespond attribute)</a>
+</li>
+      <li><a href="model.html#bdp_respond.BDPIncidentRespond.status_new">status_new (bdp_respond.BDPIncidentRespond attribute)</a>
+</li>
+      <li><a href="model.html#bdp_respond.BDPIncidentRespond.status_snoozed">status_snoozed (bdp_respond.BDPIncidentRespond attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utils.html#bdp_dbutil.updateIncidentNotifyTime">updateIncidentNotifyTime() (in module bdp_dbutil)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utils.html#bdp_dbutil.updateIncidentStatus">updateIncidentStatus() (in module bdp_dbutil)</a>
+</li>
+      <li><a href="utils.html#bdp_dbutil.updateNotificationResponse">updateNotificationResponse() (in module bdp_dbutil)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -147,6 +276,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="#" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Building Damage Prevetion System  documentation</a> &#187;</li> 
       </ul>
     </div>
