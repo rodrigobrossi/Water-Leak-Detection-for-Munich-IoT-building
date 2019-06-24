@@ -1,0 +1,324 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Model &#8212; Building Damage Prevetion System  documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Util functions" href="utils.html" />
+    <link rel="prev" title="Architecture" href="architecture.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="utils.html" title="Util functions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="architecture.html" title="Architecture"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Building Damage Prevetion System  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="model">
+<h1>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="bdpincidentrespond">
+<h2>BDPIncidentRespond<a class="headerlink" href="#bdpincidentrespond" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="bdp_respond.BDPIncidentRespond">
+<em class="property">class </em><code class="descclassname">bdp_respond.</code><code class="descname">BDPIncidentRespond</code><a class="headerlink" href="#bdp_respond.BDPIncidentRespond" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">flask_restful.Resource</span></code></p>
+<dl class="method">
+<dt id="bdp_respond.BDPIncidentRespond._getStatusForAction">
+<code class="descname">_getStatusForAction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_respond.BDPIncidentRespond._getStatusForAction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bdp_respond.BDPIncidentRespond.buildContext">
+<code class="descname">buildContext</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_respond.BDPIncidentRespond.buildContext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds a context required for an UI tempate</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>nid</strong> (<em>int</em>) – notification ID</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>json of context</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdp_respond.BDPIncidentRespond.get">
+<code class="descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_respond.BDPIncidentRespond.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates UI web page based on notification id parameter</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bdp_respond.BDPIncidentRespond.methods">
+<code class="descname">methods</code><em class="property"> = ['GET', 'POST']</em><a class="headerlink" href="#bdp_respond.BDPIncidentRespond.methods" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bdp_respond.BDPIncidentRespond.post">
+<code class="descname">post</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_respond.BDPIncidentRespond.post" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receives POST requests with action type</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bdp_respond.BDPIncidentRespond.status_code">
+<code class="descname">status_code</code><em class="property"> = {1: 'Resolved', 2: 'New', 3: 'In progress'}</em><a class="headerlink" href="#bdp_respond.BDPIncidentRespond.status_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class that handles UI POST and GET requests</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bdp_respond.BDPIncidentRespond.status_fixed">
+<code class="descname">status_fixed</code><em class="property"> = 1</em><a class="headerlink" href="#bdp_respond.BDPIncidentRespond.status_fixed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bdp_respond.BDPIncidentRespond.status_new">
+<code class="descname">status_new</code><em class="property"> = 2</em><a class="headerlink" href="#bdp_respond.BDPIncidentRespond.status_new" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bdp_respond.BDPIncidentRespond.status_snoozed">
+<code class="descname">status_snoozed</code><em class="property"> = 3</em><a class="headerlink" href="#bdp_respond.BDPIncidentRespond.status_snoozed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="bdpincident">
+<h2>BDPIncident<a class="headerlink" href="#bdpincident" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="bdp_incident.BDPIncident">
+<em class="property">class </em><code class="descclassname">bdp_incident.</code><code class="descname">BDPIncident</code><a class="headerlink" href="#bdp_incident.BDPIncident" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class that checks for incident</p>
+<dl class="method">
+<dt id="bdp_incident.BDPIncident._checkForIncident">
+<code class="descname">_checkForIncident</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_incident.BDPIncident._checkForIncident" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if incident occured</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>hardware_uid</strong> (<em>int</em>) – Hardware ID</p>
+</dd>
+<dt class="field-even">Todo</dt>
+<dd class="field-even"><p>check rate of change and change urgency accordingly</p>
+</dd>
+<dt class="field-odd">Todo</dt>
+<dd class="field-odd"><p>make sure that anomaly persists before marking as incident</p>
+</dd>
+<dt class="field-even">Todo</dt>
+<dd class="field-even"><p>account for multiple sensors at once</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>response JSON to insert into DB</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdp_incident.BDPIncident._hardwareCallback">
+<code class="descname">_hardwareCallback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_incident.BDPIncident._hardwareCallback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bdp_incident.BDPIncident._insertIncidentInDB">
+<code class="descname">_insertIncidentInDB</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_incident.BDPIncident._insertIncidentInDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save incident info into DB</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>new_incident</strong> (<em>JSON</em>) – incident JSON to insert</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>notification</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdp_incident.BDPIncident._iotSubscribe">
+<code class="descname">_iotSubscribe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_incident.BDPIncident._iotSubscribe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bdp_incident.BDPIncident.handleRawEvents">
+<code class="descname">handleRawEvents</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_incident.BDPIncident.handleRawEvents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check incoming events from device</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>hardware_uid</strong> (<em>int</em>) – Hardware ID</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdp_incident.BDPIncident.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_incident.BDPIncident.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="bdpincidentnotifier">
+<h2>BDPIncidentNotifier<a class="headerlink" href="#bdpincidentnotifier" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="bdp_notifier.BDPNotifier">
+<em class="property">class </em><code class="descclassname">bdp_notifier.</code><code class="descname">BDPNotifier</code><a class="headerlink" href="#bdp_notifier.BDPNotifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class that handles notifications</p>
+<dl class="method">
+<dt id="bdp_notifier.BDPNotifier._generateAlarm">
+<code class="descname">_generateAlarm</code><span class="sig-paren">(</span><em>users</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_notifier.BDPNotifier._generateAlarm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate alarm template and send it out</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdp_notifier.BDPNotifier._generateFixed">
+<code class="descname">_generateFixed</code><span class="sig-paren">(</span><em>users</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_notifier.BDPNotifier._generateFixed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate fixed template and send it out</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdp_notifier.BDPNotifier._generateSnooze">
+<code class="descname">_generateSnooze</code><span class="sig-paren">(</span><em>users</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_notifier.BDPNotifier._generateSnooze" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate snooze alarm template and send it out</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdp_notifier.BDPNotifier._sendEmails">
+<code class="descname">_sendEmails</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_notifier.BDPNotifier._sendEmails" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bdp_notifier.BDPNotifier._startEmailThread">
+<code class="descname">_startEmailThread</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_notifier.BDPNotifier._startEmailThread" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bdp_notifier.BDPNotifier._timeToNotify">
+<code class="descname">_timeToNotify</code><span class="sig-paren">(</span><em>tenant_record</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_notifier.BDPNotifier._timeToNotify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if it is time to notify based on existing notification stamp and incident status</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>incident_record</strong> (<em>json</em>) – incident information</p></li>
+<li><p><strong>tenant_record</strong> (<em>json</em>) – tenant information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of users if it is time to notify else empty list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdp_notifier.BDPNotifier.notify">
+<code class="descname">notify</code><span class="sig-paren">(</span><em>tenant</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_notifier.BDPNotifier.notify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Notifies all user about an event</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>notification</strong> (<em>JSON</em>) – JSON constaining action type</p></li>
+<li><p><strong>tenant</strong> (<em>int</em>) – Tenant ID</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Model</a><ul>
+<li><a class="reference internal" href="#bdpincidentrespond">BDPIncidentRespond</a></li>
+<li><a class="reference internal" href="#bdpincident">BDPIncident</a></li>
+<li><a class="reference internal" href="#bdpincidentnotifier">BDPIncidentNotifier</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="architecture.html"
+                        title="previous chapter">Architecture</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="utils.html"
+                        title="next chapter">Util functions</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/model.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="utils.html" title="Util functions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="architecture.html" title="Architecture"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Building Damage Prevetion System  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Dep of WoW.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

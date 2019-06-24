@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Building Damage Prevention System’s documentation! &#8212; Building Damage Prevetion System  documentation</title>
+    <title>Water Damage Prevention System’s documentation! &#8212; Building Damage Prevetion System  documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -15,7 +15,8 @@
     <script type="text/javascript" src="_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Architecture" href="architecture.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -23,6 +24,12 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="architecture.html" title="Architecture"
+             accesskey="N">next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">Building Damage Prevetion System  documentation</a> &#187;</li> 
       </ul>
     </div>  
@@ -32,128 +39,25 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="building-damage-prevention-system-s-documentation">
-<h1>Building Damage Prevention System’s documentation!<a class="headerlink" href="#building-damage-prevention-system-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="water-damage-prevention-system-s-documentation">
+<h1>Water Damage Prevention System’s documentation!<a class="headerlink" href="#water-damage-prevention-system-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>This is a documentation of the Water Damage Prevention Notification System.</p>
+<a class="reference internal image-reference" href="_images/Screen.png"><img alt="Screenshot" class="align-center" src="_images/Screen.png" style="width: 600px;" /></a>
 <div class="toctree-wrapper compound">
-</div>
-<dl class="class">
-<dt id="bdp_respond.BDPIncidentRespond">
-<em class="property">class </em><code class="descclassname">bdp_respond.</code><code class="descname">BDPIncidentRespond</code><a class="headerlink" href="#bdp_respond.BDPIncidentRespond" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">flask_restful.Resource</span></code></p>
-<p>Class that handles UI POST and GET requests</p>
-<dl class="method">
-<dt id="bdp_respond.BDPIncidentRespond.get">
-<code class="descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_respond.BDPIncidentRespond.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates UI web page based on notification id parameter</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="bdp_respond.BDPIncidentRespond.methods">
-<code class="descname">methods</code><em class="property"> = ['GET', 'POST']</em><a class="headerlink" href="#bdp_respond.BDPIncidentRespond.methods" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bdp_respond.BDPIncidentRespond.post">
-<code class="descname">post</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_respond.BDPIncidentRespond.post" title="Permalink to this definition">¶</a></dt>
-<dd><p>Receives POST requests with action type</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="bdp_incident.BDPIncident">
-<em class="property">class </em><code class="descclassname">bdp_incident.</code><code class="descname">BDPIncident</code><a class="headerlink" href="#bdp_incident.BDPIncident" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class that checks for incident</p>
-<dl class="method">
-<dt id="bdp_incident.BDPIncident._checkForIncident">
-<code class="descname">_checkForIncident</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_incident.BDPIncident._checkForIncident" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check if incident occured</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>hardware_uid</strong> (<em>int</em>) – Hardware ID</p>
-</dd>
-<dt class="field-even">Todo</dt>
-<dd class="field-even"><p>check rate of change and change urgency accordingly</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>response JSON to insert into DB</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="bdp_incident.BDPIncident._insertIncidentInDB">
-<code class="descname">_insertIncidentInDB</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_incident.BDPIncident._insertIncidentInDB" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save incident info into DB</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>new_incident</strong> (<em>JSON</em>) – incident JSON to insert</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>notification, tenant_id</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="bdp_incident.BDPIncident.handleRawEvents">
-<code class="descname">handleRawEvents</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_incident.BDPIncident.handleRawEvents" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check incoming events from device</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>hardware_uid</strong> (<em>int</em>) – Hardware ID</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="bdp_notifier.BDPNotifier">
-<em class="property">class </em><code class="descclassname">bdp_notifier.</code><code class="descname">BDPNotifier</code><a class="headerlink" href="#bdp_notifier.BDPNotifier" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class that handles notifications</p>
-<dl class="method">
-<dt id="bdp_notifier.BDPNotifier._generateAlarm">
-<code class="descname">_generateAlarm</code><span class="sig-paren">(</span><em>users</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_notifier.BDPNotifier._generateAlarm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate alarm template and send it out</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="bdp_notifier.BDPNotifier._generateFixed">
-<code class="descname">_generateFixed</code><span class="sig-paren">(</span><em>users</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_notifier.BDPNotifier._generateFixed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate fixed template and send it out</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="bdp_notifier.BDPNotifier._generateSnooze">
-<code class="descname">_generateSnooze</code><span class="sig-paren">(</span><em>users</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_notifier.BDPNotifier._generateSnooze" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate snooze alarm template and send it out</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="bdp_notifier.BDPNotifier._timeToNotify">
-<code class="descname">_timeToNotify</code><span class="sig-paren">(</span><em>tenant_record</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_notifier.BDPNotifier._timeToNotify" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check if it is time to notify based on existing notification stamp and incident status</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="bdp_notifier.BDPNotifier.notify">
-<code class="descname">notify</code><span class="sig-paren">(</span><em>tenant</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_notifier.BDPNotifier.notify" title="Permalink to this definition">¶</a></dt>
-<dd><p>Notifies all user about an event</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>notification</strong> (<em>JSON</em>) – JSON constaining action type</p></li>
-<li><p><strong>tenant</strong> (<em>int</em>) – Tenant ID</p></li>
+<p class="caption"><span class="caption-text">Table of content:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model.html">Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model.html#bdpincidentrespond">BDPIncidentRespond</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#bdpincident">BDPIncident</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#bdpincidentnotifier">BDPIncidentNotifier</a></li>
 </ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Util functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#module-bdp_util">bdp_util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#module-bdp_dbutil">bdp_dbutil</a></li>
+</ul>
+</div>
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
@@ -172,10 +76,13 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Building Damage Prevention System’s documentation!</a></li>
+<li><a class="reference internal" href="#">Water Damage Prevention System’s documentation!</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 
+  <h4>Next topic</h4>
+  <p class="topless"><a href="architecture.html"
+                        title="next chapter">Architecture</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -203,6 +110,12 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="architecture.html" title="Architecture"
+             >next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">Building Damage Prevetion System  documentation</a> &#187;</li> 
       </ul>
     </div>

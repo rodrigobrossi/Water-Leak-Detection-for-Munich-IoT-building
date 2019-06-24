@@ -3,30 +3,23 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Building Damage Prevention System's documentation!
+Water Damage Prevention System's documentation!
 ==================================================
+
+This is a documentation of the Water Damage Prevention Notification System.
+
+.. image:: Screen.png
+   :width: 600px
+   :alt: Screenshot
+   :align: center
 
 .. toctree::
    :maxdepth: 3
-   :caption: Contents:
+   :caption: Table of content:
 
-.. autoclass:: bdp_respond.BDPIncidentRespond
-    :members:
-    :undoc-members:
-    :private-members:
-    :show-inheritance:
-
-.. autoclass:: bdp_incident.BDPIncident
-    :members:
-    :undoc-members:
-    :private-members:
-    :show-inheritance:
-
-.. autoclass:: bdp_notifier.BDPNotifier
-    :members:
-    :undoc-members:
-    :private-members:
-    :show-inheritance:
+   architecture
+   model
+   utils
 
 Indices and tables
 ==================

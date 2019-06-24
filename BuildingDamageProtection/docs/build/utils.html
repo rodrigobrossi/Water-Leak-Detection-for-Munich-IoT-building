@@ -1,0 +1,332 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Util functions &#8212; Building Damage Prevetion System  documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Model" href="model.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="model.html" title="Model"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Building Damage Prevetion System  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="util-functions">
+<h1>Util functions<a class="headerlink" href="#util-functions" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="module-bdp_util">
+<span id="bdp-util"></span><h1>bdp_util<a class="headerlink" href="#module-bdp_util" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="bdp_util.sendEmail">
+<code class="descclassname">bdp_util.</code><code class="descname">sendEmail</code><span class="sig-paren">(</span><em>to</em>, <em>subject</em>, <em>plain_body</em>, <em>html_body</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_util.sendEmail" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_util.sendEmails">
+<code class="descclassname">bdp_util.</code><code class="descname">sendEmails</code><span class="sig-paren">(</span><em>emailList</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_util.sendEmails" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_util.sendNotificationToUsers">
+<code class="descclassname">bdp_util.</code><code class="descname">sendNotificationToUsers</code><span class="sig-paren">(</span><em>endpoint</em>, <em>usergroups</em>, <em>action</em>, <em>userJSON</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_util.sendNotificationToUsers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_util.sendSlack">
+<code class="descclassname">bdp_util.</code><code class="descname">sendSlack</code><span class="sig-paren">(</span><em>to</em>, <em>msg</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_util.sendSlack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-bdp_dbutil">
+<span id="bdp-dbutil"></span><h1>bdp_dbutil<a class="headerlink" href="#module-bdp_dbutil" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="bdp_dbutil.BDPDBConnection">
+<em class="property">class </em><code class="descclassname">bdp_dbutil.</code><code class="descname">BDPDBConnection</code><a class="headerlink" href="#bdp_dbutil.BDPDBConnection" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="bdp_dbutil.BDPDBConnection.getDBConnection">
+<code class="descname">getDBConnection</code><span class="sig-paren">(</span><em>enforce=False</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.BDPDBConnection.getDBConnection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="bdp_dbutil.BDPDBConnection.getInstance">
+<em class="property">static </em><code class="descname">getInstance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.BDPDBConnection.getInstance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.checkExcistingIncident">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">checkExcistingIncident</code><span class="sig-paren">(</span><em>tenant_id</em>, <em>hardware_uid</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.checkExcistingIncident" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether an incident was already created</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tenant_id</strong> (<em>int</em>) – Tenant ID</p></li>
+<li><p><strong>hardware_uid</strong> (<em>int</em>) – Hardware unique ID</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary if found else False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.createHumidityTable">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">createHumidityTable</code><span class="sig-paren">(</span><em>hardware_uid</em>, <em>datapoint_amount</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.createHumidityTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a pandas table with humidity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hardware_uid</strong> (<em>int</em>) – Hardware unique ID</p></li>
+<li><p><strong>datapoint_amount</strong> (<em>int</em>) – Amount to datapoints to extract</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.createNotificationRecord">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">createNotificationRecord</code><span class="sig-paren">(</span><em>incidentid</em>, <em>type_code</em>, <em>usergroups</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.createNotificationRecord" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.getHardwareByDevice">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">getHardwareByDevice</code><span class="sig-paren">(</span><em>device</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.getHardwareByDevice" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.getHardwareByHardwareUID">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">getHardwareByHardwareUID</code><span class="sig-paren">(</span><em>hardware_uid</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.getHardwareByHardwareUID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.getIncidentByIncidentID">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">getIncidentByIncidentID</code><span class="sig-paren">(</span><em>incident_id</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.getIncidentByIncidentID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.getIncidentID">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">getIncidentID</code><span class="sig-paren">(</span><em>incident</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.getIncidentID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.getNotificationByNotificationID">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">getNotificationByNotificationID</code><span class="sig-paren">(</span><em>nid</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.getNotificationByNotificationID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.getNotificationDetailsById">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">getNotificationDetailsById</code><span class="sig-paren">(</span><em>notification_id</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.getNotificationDetailsById" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.getNotificationsByIncidentID">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">getNotificationsByIncidentID</code><span class="sig-paren">(</span><em>incidentid</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.getNotificationsByIncidentID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.getPlottingData">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">getPlottingData</code><span class="sig-paren">(</span><em>hardware_uid, datapoint_amount=480, plotpoint_amount=8, datapoint_types=['TIME', 'HUMIDITY']</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.getPlottingData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an overview points od the plotpoint_amount about the data points of datapoint_amount</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hardware_uid</strong> (<em>int</em>) – Hardware unique ID</p></li>
+<li><p><strong>datapoint_amount</strong> (<em>int</em>) – Amount to datapoints to extract</p></li>
+<li><p><strong>plotpoint_amount</strong> (<em>int</em>) – Amount to plotting points to extract (values are averaged out from datapoints)</p></li>
+<li><p><strong>datapoint_types</strong> (<em>list</em>) – List of datapoints types that should be extracted from the table</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list arrays that contain different datapoint types</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.getRawEventsByHardwareUID">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">getRawEventsByHardwareUID</code><span class="sig-paren">(</span><em>hardware_uid</em>, <em>datapoints_amount</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.getRawEventsByHardwareUID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.getTableName">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">getTableName</code><span class="sig-paren">(</span><em>tablename</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.getTableName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.getTenantByName">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">getTenantByName</code><span class="sig-paren">(</span><em>tenant</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.getTenantByName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.getTenantByTenantID">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">getTenantByTenantID</code><span class="sig-paren">(</span><em>tenant_id</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.getTenantByTenantID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.getUserByUserID">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">getUserByUserID</code><span class="sig-paren">(</span><em>user_id</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.getUserByUserID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.getUsersWithNIDs">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">getUsersWithNIDs</code><span class="sig-paren">(</span><em>tenant_id</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.getUsersWithNIDs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of users that are associated with current time and assigns a notification ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tenant_id</strong> (<em>int</em>) – length</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of users</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.getUsersWithNIDsAtTimes">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">getUsersWithNIDsAtTimes</code><span class="sig-paren">(</span><em>tenant_id</em>, <em>times</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.getUsersWithNIDsAtTimes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of users that are associated with certain times and assigns a notification ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tenant_id</strong> (<em>int</em>) – length</p></li>
+<li><p><strong>times</strong> (<em>enum</em>) – availability times</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of users</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.insertIncident">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">insertIncident</code><span class="sig-paren">(</span><em>existing_incident</em>, <em>new_incident</em>, <em>tenant_id</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.insertIncident" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.insertResponderToIncidentID">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">insertResponderToIncidentID</code><span class="sig-paren">(</span><em>incident_id</em>, <em>responder_id</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.insertResponderToIncidentID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.snoozeFlip">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">snoozeFlip</code><span class="sig-paren">(</span><em>incident_id</em>, <em>state</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.snoozeFlip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flips the snooze flag.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>incident_id</strong> (<em>int</em>) – Incident ID</p></li>
+<li><p><strong>state</strong> (<em>bool</em>) – If true, the flag is set; otherwise removed</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.updateIncidentNotifyTime">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">updateIncidentNotifyTime</code><span class="sig-paren">(</span><em>incidentid</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.updateIncidentNotifyTime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.updateIncidentStatus">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">updateIncidentStatus</code><span class="sig-paren">(</span><em>incident_id</em>, <em>actionstr</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.updateIncidentStatus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bdp_dbutil.updateNotificationResponse">
+<code class="descclassname">bdp_dbutil.</code><code class="descname">updateNotificationResponse</code><span class="sig-paren">(</span><em>nid</em>, <em>response</em><span class="sig-paren">)</span><a class="headerlink" href="#bdp_dbutil.updateNotificationResponse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Util functions</a></li>
+<li><a class="reference internal" href="#module-bdp_util">bdp_util</a></li>
+<li><a class="reference internal" href="#module-bdp_dbutil">bdp_dbutil</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="model.html"
+                        title="previous chapter">Model</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/utils.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="model.html" title="Model"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Building Damage Prevetion System  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Dep of WoW.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>
