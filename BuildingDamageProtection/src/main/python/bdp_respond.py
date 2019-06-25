@@ -64,32 +64,34 @@ class BDPIncidentRespond(Resource):
         :return: json of context
         """
 
-        details = bdp_dbutil.getNotificationDetailsById(nid)
+        notification_details = bdp_dbutil.getNotificationDetailsById(nid)
+        latest_incident_details = json.loads(bdp_dbutil.getLatestDetailForIncident(notification_details['INCIDENT_ID']))
 
-        users_group = bdp_dbutil.getUsersWithNIDs(details['TENANT_ID'])
+        users_group = bdp_dbutil.getUsersWithNIDs(notification_details['TENANT_ID'])
 
         users_names = []
         for user in users_group:
             users_names.append(user['USER_NAME'])
 
-        incident_status = BDPIncidentRespond.status_code[details['INCIDENT_STATUS_CODE']]
-        incident_detail = json.loads(details['INCIDENT_DETAIL'])
-        urgency = incident_detail['URGENCY']
+        incident_status = BDPIncidentRespond.status_code[notification_details['INCIDENT_STATUS_CODE']]
+        urgency = latest_incident_details['URGENCY']
+
+        orig_incident_details = json.loads(notification_details['INCIDENT_DETAIL'])
 
         handler = 'Not assigned'
-        if 'RESPONDER' in incident_detail.keys():
-            handler_id = incident_detail['RESPONDER']
+        if 'RESPONDER' in orig_incident_details.keys():
+            handler_id = orig_incident_details['RESPONDER']
             handler = bdp_dbutil.getUserByUserID(handler_id)['USER_NAME']
 
-        plot_points = bdp_dbutil.getPlottingData(details['HARDWARE_UID'])
+        plot_points = bdp_dbutil.getPlottingData(notification_details['HARDWARE_UID'])
 
-        return {'name': details['USER_NAME'],
-                'tenant' : details['TENANT_NAME'],
-                'sensor_id' : details['HARDWARE_ID'],
-                'sensor_type' : details['HARDWARE_TYPE'],
-                'hardware_uid' : details['HARDWARE_UID'],
-                'location' : details['HARDWARE_DETAIL'],
-                'timestamp' : details['INCIDENT_TIME'],
+        return {'name': notification_details['USER_NAME'],
+                'tenant' : notification_details['TENANT_NAME'],
+                'sensor_id' : notification_details['HARDWARE_ID'],
+                'sensor_type' : notification_details['HARDWARE_TYPE'],
+                'hardware_uid' : notification_details['HARDWARE_UID'],
+                'location' : notification_details['HARDWARE_DETAIL'],
+                'timestamp' : notification_details['INCIDENT_TIME'],
                 'status' : incident_status,
                 'handler' : handler,
                 'datapoints': [plot_points[1].tolist()],

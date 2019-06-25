@@ -341,6 +341,30 @@ def insertResponderToIncidentID(incident_id, responder_id):
     sql_string = "UPDATE " + getTableName("BDP_INCIDENT") + " SET INCIDENT_DETAIL = '" + json.dumps(incident_details) + "' WHERE INCIDENT_ID = " + str(incident_id)
     stmt = ibm_db.exec_immediate(conn, sql_string)
 
+def checkExpiredSnoozedInccidentFor(tenant_id, hardware_uid):
+    conn = BDPDBConnection.getInstance().getDBConnection()
+
+    tenant = getTenantByTenantID(tenant_id)
+    snooze_hour = tenant['SNOOZE_HR']
+
+    expired_snooze_date = datetime.datetime.now() - datetime.timedelta(hours=snooze_hour)
+
+    sql_string = """SELECT INCIDENT_ID
+    FROM """ + getTableName("BDP_INCIDENT") + """ 
+    WHERE INCIDENT_ID_ORIGINAL IS NULL
+    AND TENANT_ID = ?
+    AND CAUSE_HARDWARE = ?
+    AND INCIDENT_STATUS_CODE = ?
+    AND SNOOZE_TIME < ?"""
+
+    stmt = ibm_db.prepare(conn, sql_string)
+    ibm_db.bind_param(stmt, 1, str(tenant_id))
+    ibm_db.bind_param(stmt, 2, str(hardware_uid))
+    ibm_db.bind_param(stmt, 3, str(3))
+    ibm_db.bind_param(stmt, 4, str(3))
+    ibm_db.execute(stmt)
+    return ibm_db.fetch_assoc(stmt)
+
 def createHumidityTable(hardware_uid, datapoint_amount):
     """
     Creates a pandas table with humidity
@@ -407,6 +431,27 @@ def getPlottingData(hardware_uid, datapoint_amount=480, plotpoint_amount=8, data
                 # else take the mean
                 tmp[t].iat[-1] = round(column_means[t], 2)
     return [tmp[i].values for i in datapoint_types]
+
+def getLatestDetailForIncident(incident_id):
+
+    conn = BDPDBConnection.getInstance().getDBConnection()
+
+    sql = """SELECT INCIDENT_DETAIL 
+        FROM BDP_INCIDENT 
+        WHERE INCIDENT_ID = ? OR INCIDENT_ID_ORIGINAL = ?
+        ORDER BY INCIDENT_TIME DESC
+        FETCH FIRST 1 ROWS ONLY"""
+
+    stmt = ibm_db.prepare(conn, sql)
+    ibm_db.bind_param(stmt, 1, str(incident_id))
+    ibm_db.bind_param(stmt, 2, str(incident_id))
+    ibm_db.execute(stmt)
+    result = ibm_db.fetch_assoc(stmt)
+
+    if (result is False):
+        return '{}'
+    return result['INCIDENT_DETAIL']
+
 
 def getNotificationDetailsById(notification_id):
 

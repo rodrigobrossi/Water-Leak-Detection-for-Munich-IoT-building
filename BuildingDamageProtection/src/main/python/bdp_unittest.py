@@ -1,6 +1,8 @@
 import unittest
 from unittest import mock
 
+from flask import json
+
 from datetime import datetime, timedelta
 import numpy as np
 
@@ -137,11 +139,11 @@ class TestDBUtil(unittest.TestCase):
 
 class TestRespondWithDB(unittest.TestCase):
 
-    def createIncident(self, time, sensor):
+    def createIncident(self, time, sensor, urgency = 'moderate'):
         incident = {}
 
         incident['INCIDENT_DETAIL'] = {}
-        incident['INCIDENT_DETAIL']['URGENCY'] = 'moderate'
+        incident['INCIDENT_DETAIL']['URGENCY'] = urgency
         incident['INCIDENT_DETAIL']['HUMIDITY'] = 50
 
         incident['INCIDENT_TIME'] = time
@@ -178,6 +180,18 @@ class TestRespondWithDB(unittest.TestCase):
         self.assertEqual(context['hardware_uid'], 1)
         self.assertEqual(context['status'], 'New')
         self.assertEqual(context['handler'], 'Not assigned')
+
+    @mock.patch("bdp_dbutil.getPlottingData")
+    def test_correct_urgency(self, getPlottingData):
+        orig_time = datetime.today() - timedelta(hours=2)
+        incident_respond = self.createIncident(str(orig_time), 1, 'moderate')
+        incident_respond = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1, 'critical')
+        users = self.getUsersWithNotificationIDs(incident_respond["NEW_INCIDENT_ID"])
+        context = BDPIncidentRespond.buildContext(users[0]["NOTIFICATION_ID"])
+        
+        getPlottingData.return_value = [np.array([]), np.array([])]
+        
+        self.assertEqual(context['urgency_vis_3'], 'visible')
 
 class TestExistingIncidentWithDB(unittest.TestCase):
 
@@ -241,25 +255,6 @@ class TestExistingIncidentWithDB(unittest.TestCase):
         response_2 = ibm_db.fetch_assoc(ibm_db.exec_immediate(conn, sql_string))
         
         self.assertFalse(response_2)
-
-    @mock.patch('bdp_dbutil.datetime.datetime', StubDate)
-    def test_unsnoozingIncident(self):
-        incidentDate = datetime.today() - timedelta(days=3)
-        notification = self.createIncident(str(incidentDate.strftime("%Y-%m-%d-%H.%M.%S")), 1)
-        incidentId = notification["NEW_INCIDENT_ID"]
-        users = bdp_dbutil.getUsersWithNIDs(2)
-        bdp_dbutil.createNotificationRecord(incidentId, 2, users)
-
-        lastSnoozedDate = datetime.today() - timedelta(days=2)
-        StubDate.now = classmethod(lambda cls: lastSnoozedDate)
-        bdp_dbutil.snoozeFlip(incidentId, True)
-
-        bdp_dbutil.snoozeFlip(incidentId, False)
-
-        details = bdp_dbutil.getNotificationDetailsById(users[0]["NOTIFICATION_ID"])
-
-        self.assertEquals(details['INCIDENT_STATUS_CODE'], 2)
-        
 
 
 if __name__ == '__main__':
