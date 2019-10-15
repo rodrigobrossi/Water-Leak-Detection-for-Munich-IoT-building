@@ -1,8 +1,13 @@
-# Water-Leak-Detection-for-Munich-IoT-building
-UI can be found here: http://hkurtz-nodered-dev.mybluemix.net/ui/#/0
-Threshold set to: 50%
-Once Threshold is met an email is sent 
-
+# Notification system: BuildingDamageProtection
+To start the application locally:
+```
+pip install -r requiremets.txt
+gunicorn -w 3 --pythonpath src/main/python/ --log-level debug gateway:application 
+```
+To run the unittests:
+```
+python src/main/python/bdp_unittest.py
+```
 
 # Raspberry Pi setup
 ### Clone the Repo :
