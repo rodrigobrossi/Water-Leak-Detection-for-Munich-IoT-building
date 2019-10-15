@@ -8,6 +8,8 @@ To run the unittests:
 ```
 python src/main/python/bdp_unittest.py
 ```
+Documentations: docs/build/index.html
+
 
 # Raspberry Pi setup
 ### Clone the Repo :
