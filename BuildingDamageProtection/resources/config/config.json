@@ -13,5 +13,8 @@
    "server_type":"flask",
    "debug_mode":"true",
    "https_cert":"resources/https/cert.pem",
-   "https_key":"resources/https/key.pem"
+   "https_key":"resources/https/key.pem",
+   "tririga_user": "system",
+   "tririga_password": "smarter",
+   "tririga_api": "http://cap-sg-prd-5.securegateway.appdomain.cloud:18848/tririga/oslc/so/triWorkTaskCF"
 }

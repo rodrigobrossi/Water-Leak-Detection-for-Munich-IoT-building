@@ -255,6 +255,26 @@ class TestExistingIncidentWithDB(unittest.TestCase):
         response_2 = ibm_db.fetch_assoc(ibm_db.exec_immediate(conn, sql_string))
         
         self.assertFalse(response_2)
+    
+class TestTririgaWorkTaskCreation(unittest.TestCase):
+        
+    def createIncident(self, time, sensor):
+        incident = {}
+
+        incident['INCIDENT_DETAIL'] = {}
+        incident['INCIDENT_DETAIL']['URGENCY'] = 'moderate'
+        incident['INCIDENT_DETAIL']['HUMIDITY'] = 50
+
+        incident['INCIDENT_TIME'] = time
+        incident['TENANT_ID'] = 2
+        incident['CAUSE_HARDWARE'] = sensor
+
+        return BDPIncident._insertIncidentInDB(incident)
+
+    def test_tririga(self):
+        notification = self.createIncident(str(datetime.now().strftime("%Y-%m-%d-%H.%M.%S")), 1)
+        tririga_response = BDPNotifier._generateTririgaWorkTaks(notification["NEW_INCIDENT_ID"])
+        self.assertTrue(tririga_response)
 
 
 if __name__ == '__main__':
