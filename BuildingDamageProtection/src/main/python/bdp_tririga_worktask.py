@@ -3,6 +3,8 @@ import json
 class BDPWorktask:
 
     def __init__(self, urgency, sensor_id, location, humidity_level, link):
+
+        #TODO: update
         self = {}
         self['spi:action'] = 'Activate'
         self['spi:triTaskTypeCL'] = 'Corrective'

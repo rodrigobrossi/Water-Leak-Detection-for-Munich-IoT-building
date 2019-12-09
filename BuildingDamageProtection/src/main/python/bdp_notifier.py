@@ -259,12 +259,13 @@ class BDPNotifier():
 
         #tririgaPayload = BDPWorktask(urgency, hardware['HARDWARE_ID'], hardware['HARDWARE_DETAIL'], incident_detail['HUMIDITY'] , link)
         tririgaPayload = {}
-        tririgaPayload['spi:action'] = 'Activate'
-        tririgaPayload['spi:triTaskTypeCL'] = 'Corrective'
-        tririgaPayload['spi_wm:wopriority'] = 'Emergency'
-        tririgaPayload['spi:triCurrencyUO'] = 'Euro'        
-        tririgaPayload['dcterms:title'] = 'Water Intusion Detected!'
-        tririgaPayload['dcterms:description'] = 'Water has been detected! \n Urgency: ' + urgency + '\n Sensor ID: ' + str(hardware['HARDWARE_ID']) + '\n Location: ' + str(hardware['HARDWARE_DETAIL']) + '\n Humidity level: ' + str(incident_detail['HUMIDITY']) + '\n See the link for more information: ' + link
+        tririgaPayload['spi:action'] = 'Submit'
+        tririgaPayload['spi:triRequestClassCL'] = 'Humidity'
+        tririgaPayload['spi:triEmergencyBL'] = 'true' if urgency == 'Emergency' else 'false'  
+        tririgaPayload['spi:triDescriptionTX'] = 'Water has been detected! \n Urgency: ' + urgency + '\n Sensor ID: ' + str(hardware['HARDWARE_ID']) + '\n Location: ' + str(hardware['HARDWARE_DETAIL']) + '\n Humidity level: ' + str(incident_detail['HUMIDITY']) + '\n See the link for more information: ' + link
+        tririgaPayload['spi:triBuildingTX'] = 'Munich Watson IoT Center'
+        tririgaPayload['spi:triCustomerOrgTX'] = '\\Organizations\\IBM Watson IoT Center GmbH'
+        tririgaPayload['spi:triLocationRequestedTX'] = '\\Locations\\Offices\\Europe\\Munich Watson IoT Center'
         payload = json.dumps(tririgaPayload)
         
         return bdp_util.sendTririga(payload)

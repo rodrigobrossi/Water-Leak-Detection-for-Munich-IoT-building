@@ -10,6 +10,7 @@
 #############################################################
 import json, datetime
 import requests
+from requests.auth import HTTPBasicAuth
 
 import smtplib
 from email.mime.text import MIMEText
@@ -130,8 +131,13 @@ def sendSlack(to, msg):
 
 def sendTririga(work_task_payload):
     try:    
+        # print('-------------------------BDPProperty.getInstance().getValue()--------------------------')
+        # print(BDPProperty.getInstance().getValue('tririga_api'))
+        # print(BDPProperty.getInstance().getValue('tririga_user'))
+        # print(BDPProperty.getInstance().getValue('tririga_password'))
+        # print(work_task_payload)
         resp = requests.post(BDPProperty.getInstance().getValue('tririga_api'), 
-                            auth=(BDPProperty.getInstance().getValue('tririga_user'), BDPProperty.getInstance().getValue('tririga_password')), 
+                            auth=HTTPBasicAuth(BDPProperty.getInstance().getValue('tririga_user'), BDPProperty.getInstance().getValue('tririga_password')), 
                             data = work_task_payload)
 
         print(resp.status_code)

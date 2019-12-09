@@ -16,5 +16,5 @@
    "https_key":"resources/https/key.pem",
    "tririga_user": "system",
    "tririga_password": "smarter",
-   "tririga_api": "http://cap-sg-prd-5.securegateway.appdomain.cloud:18848/tririga/oslc/so/triWorkTaskCF"
+   "tririga_api": "http://cap-sg-prd-5.securegateway.appdomain.cloud:18848/tririga/oslc/so/triSensorCF"
 }
