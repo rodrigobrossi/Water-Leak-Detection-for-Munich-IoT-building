@@ -14,6 +14,13 @@ To run the unittests:
 ```
 python src/main/python/bdp_unittest.py
 ```
+
+To run the unittests with docker:
+```
+docker ps
+docker exec -it {{ container id }} /bin/sh
+python src/main/python/bdp_unittest.py
+```
 Documentations: docs/build/index.html
 
 
