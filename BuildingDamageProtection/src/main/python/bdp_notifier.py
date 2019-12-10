@@ -19,7 +19,7 @@ import ibm_db
 import bdp_dbutil, bdp_util
 from bdp_property import BDPProperty
 from bdp_email import BDPEmail
-
+from bdp_tririga_worktask import BDPWorktask
 
 class BDPNotifier():
     """ 
@@ -51,6 +51,8 @@ class BDPNotifier():
             bdp_dbutil.createNotificationRecord(notification["NEW_INCIDENT_ID"], 2, users)
 
             BDPNotifier._generateAlarm(notification["NEW_INCIDENT_ID"], users)
+            BDPNotifier._generateTririgaWorkTaks(notification["NEW_INCIDENT_ID"])
+
             return
 
         elif notification["ACTION"] == "SNOOZE":
@@ -244,4 +246,27 @@ class BDPNotifier():
     def _startEmailThread(emailList):
         emailThread = Thread(target = BDPNotifier._sendEmails, args = (emailList,))
         emailThread.start()
+
+    def _generateTririgaWorkTaks(incident_id):
+        print('_generateTririgaWorkTaks')
+        incident = bdp_dbutil.getIncidentByIncidentID(incident_id)
+        print(incident)
+        tenant = bdp_dbutil.getTenantByTenantID(incident['TENANT_ID'])['TENANT_NAME']
+        incident_detail = json.loads(incident['INCIDENT_DETAIL'])
+        urgency = 'Emergency' if incident_detail['URGENCY'] == 'critical' else 'High' 
+        hardware = bdp_dbutil.getHardwareByHardwareUID(incident['CAUSE_HARDWARE'])
+        link = 'https://bdp.eu-de.mybluemix.net/respond?nid='
+
+        #tririgaPayload = BDPWorktask(urgency, hardware['HARDWARE_ID'], hardware['HARDWARE_DETAIL'], incident_detail['HUMIDITY'] , link)
+        tririgaPayload = {}
+        tririgaPayload['spi:action'] = 'Submit'
+        tririgaPayload['spi:triRequestClassCL'] = 'Humidity'
+        tririgaPayload['spi:triEmergencyBL'] = 'true' if urgency == 'Emergency' else 'false'  
+        tririgaPayload['spi:triDescriptionTX'] = 'Water has been detected! \n Urgency: ' + urgency + '\n Sensor ID: ' + str(hardware['HARDWARE_ID']) + '\n Location: ' + str(hardware['HARDWARE_DETAIL']) + '\n Humidity level: ' + str(incident_detail['HUMIDITY']) + '\n See the link for more information: ' + link
+        tririgaPayload['spi:triBuildingTX'] = 'Munich Watson IoT Center'
+        tririgaPayload['spi:triCustomerOrgTX'] = '\\Organizations\\IBM Watson IoT Center GmbH'
+        tririgaPayload['spi:triLocationRequestedTX'] = '\\Locations\\Offices\\Europe\\Munich Watson IoT Center'
+        payload = json.dumps(tririgaPayload)
+        
+        return bdp_util.sendTririga(payload)
         

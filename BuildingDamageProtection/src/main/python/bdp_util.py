@@ -10,10 +10,12 @@
 #############################################################
 import json, datetime
 import requests
+from requests.auth import HTTPBasicAuth
 
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from bdp_property import BDPProperty
 
 import ibm_db
 import ibmiotf.application
@@ -123,6 +125,23 @@ def sendSlack(to, msg):
                             data = json.dumps(body))
 
         if resp.status_code == 200:
+            return True
+    except Exception as e:
+        print(e)
+
+def sendTririga(work_task_payload):
+    try:    
+        # print('-------------------------BDPProperty.getInstance().getValue()--------------------------')
+        # print(BDPProperty.getInstance().getValue('tririga_api'))
+        # print(BDPProperty.getInstance().getValue('tririga_user'))
+        # print(BDPProperty.getInstance().getValue('tririga_password'))
+        # print(work_task_payload)
+        resp = requests.post(BDPProperty.getInstance().getValue('tririga_api'), 
+                            auth=HTTPBasicAuth(BDPProperty.getInstance().getValue('tririga_user'), BDPProperty.getInstance().getValue('tririga_password')), 
+                            data = work_task_payload)
+
+        print(resp.status_code)
+        if resp.status_code == 201:
             return True
     except Exception as e:
         print(e)
