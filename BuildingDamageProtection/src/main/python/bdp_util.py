@@ -48,20 +48,28 @@ def sendNotificationToUsers(endpoint, usergroups, action, userJSON):
 
     return False
 
-def _buildEmailBody(email, sent_from):
+def _buildEmailBody(to, subject, plain_body, html_body, sent_from):
     """ 
     Parses email body object
+
+    :param to: Recipient email address
+    :param subject: Email subject string
+    :param plain_body: Message body without CSS styling
+    :param html_body: Message body with CSS styling
+
+    :return: Message object
     """
     message = MIMEMultipart('alternative')
-    message['Subject'] = email.subject
+    message['Subject'] = subject
     message['From'] = sent_from
-    message['To'] = email.emailAddress
+    message['To'] = to
 
-    plain_text = MIMEText(email.textBody, 'plain')
-    html_text = MIMEText(email.htmlBody, 'html')
+    plain_text = MIMEText(plain_body, 'plain')
+    html_text = MIMEText(html_body, 'html')
 
     message.attach(plain_text)
     message.attach(html_text)
+
     return message
 
 def sendEmails(emailList):
@@ -79,11 +87,17 @@ def sendEmails(emailList):
         server.ehlo()
         server.login(gmail_user, gmail_password)
         for email in emailList:
-            message = _buildEmailBody(email, gmail_user)
+            message = _buildEmailBody( 
+                email.emailAddress, 
+                email.subject,
+                email.textBody, 
+                email.htmlBody, 
+                gmail_user
+            )
             server.sendmail(gmail_user, email.emailAddress, message.as_string())
-        print('[STATUS][bdp_util.sendEmails] Email notification was sent out')
+        print('[STATUS][bdp_util.sendEmails] Email notification was sent')
     except Exception as e:
-        print('[ERROR][bdp_util.sendEmails] Email notification was not sent out! Reason: {}'.format(e))
+        print('[ERROR][bdp_util.sendEmails] Email notification was not sent! Reason: {}'.format(e))
     finally:
         if (server != None):
             server.close()
@@ -100,27 +114,24 @@ def sendEmail(to, subject, plain_body, html_body):
     gmail_user = BDPProperty.getInstance().getValue('gmail_user')
     gmail_password = BDPProperty.getInstance().getValue('gmail_password')
     
-    message = MIMEMultipart('alternative')
-    message['Subject'] = subject
-    message['From'] = gmail_user
-    message['To'] = to
-
-    plain_text = MIMEText(plain_body, 'plain')
-    html_text = MIMEText(html_body, 'html')
-
-    message.attach(plain_text)
-    message.attach(html_text)
-    
     server = None
     try:  
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.ehlo()
         server.login(gmail_user, gmail_password)
+
+        message = _buildEmailBody(
+            to, 
+            subject, 
+            plain_body, 
+            html_body, 
+            gmail_user
+        )
         server.sendmail(gmail_user, to, message.as_string())
-        print('[STATUS][bdp_util.sendEmail] Email notification was sent out')
+        print('[STATUS][bdp_util.sendEmail] Email notification was sent')
 
     except Exception as e:
-        print('[ERROR][bdp_util.sendEmail] Email notification was not sent out! Reason: {}'.format(e))
+        print('[ERROR][bdp_util.sendEmail] Email notification was not sent! Reason: {}'.format(e))
 
     finally:
         if (server != None):
@@ -158,6 +169,13 @@ def sendSlack(to, msg):
         print('[ERROR][bdp_util.sendSlack] Error occured: {}'.format(e))
 
 def sendTririga(work_task_payload):
+    """
+    Creates Tririga work order
+
+    :param work_task_payload: Tririga work task object
+
+    :return: True is successful
+    """
     try:    
         resp = requests.post(
             BDPProperty.getInstance().getValue('tririga_api'), 
