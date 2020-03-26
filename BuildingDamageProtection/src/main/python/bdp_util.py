@@ -21,51 +21,37 @@ import ibm_db
 import ibmiotf.application
 
 def sendNotificationToUsers(endpoint, usergroups, action, userJSON):
-    print("sendNotificationToUsers: " + action)
-    print(userJSON)
-    print(usergroups)
+    """ 
+    Methods that notifies users of a specific action
+    """
     try:
-        url = endpoint + 'confirm'
-            
-        print(url)
-        requestbody = {"action": "CONFIRM", "responder_action": action, "group": usergroups, "responder_info": userJSON["USER_CONTACT_1"]}
-        print(requestbody)
-        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        resp = requests.post(url, headers=headers, data = json.dumps(requestbody))
-    
-        print(resp.status_code)
-        print(resp.text)
+        resp = requests.post(
+            endpoint + 'confirm', 
+            headers = {
+                'Content-type': 'application/json', 
+                'Accept': 'text/plain'
+                }, 
+            data = json.dumps({
+                "action": "CONFIRM", 
+                "responder_action": action, 
+                "group": usergroups, 
+                "responder_info": userJSON["USER_CONTACT_1"]
+            })
+        )
         if resp.status_code == 200:
+            print("[STATUS][bdp_util.sendNotificationToUsers] Action notification was sent: {}".format(action))
             return True
+        else:
+            print("[ERROR][bdp_util.sendNotificationToUsers] Notification was not sent. Status code: {}".format(resp.status_code))
     except Exception as e:
-        print(e)
+        print("[ERROR][bdp_util.sendNotificationToUsers] Something went wrong: {}".format(e))
 
     return False
 
-def sendEmails(emailList):
-    gmail_user = 'water.intrusion.munich@gmail.com'
-    gmail_password = 'watsoniot'
-    sent_from = gmail_user
-
-    server = None
-
-    try:  
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        server.ehlo()
-        server.login(gmail_user, gmail_password)
-        for email in emailList:
-            message = _buildMessage(email, sent_from)
-            server.sendmail(sent_from, email.emailAddress, message.as_string())
-            print('Email sent!')
-
-    except Exception as e:
-        print(e)  
-        print('Something went wrong...')
-    finally:
-        if (server != None):
-            server.close()
-
-def _buildMessage(email, sent_from):
+def _buildEmailBody(email, sent_from):
+    """ 
+    Parses email body object
+    """
     message = MIMEMultipart('alternative')
     message['Subject'] = email.subject
     message['From'] = sent_from
@@ -78,15 +64,45 @@ def _buildMessage(email, sent_from):
     message.attach(html_text)
     return message
 
+def sendEmails(emailList):
+    """
+    Sends multiple emails out to the emailing list
+
+    :param emailList: List of email objects that containts email addresses and email message bodies
+    """
+    gmail_user = BDPProperty.getInstance().getValue('gmail_user')
+    gmail_password = BDPProperty.getInstance().getValue('gmail_password')
+    
+    server = None
+    try:  
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server.ehlo()
+        server.login(gmail_user, gmail_password)
+        for email in emailList:
+            message = _buildEmailBody(email, gmail_user)
+            server.sendmail(gmail_user, email.emailAddress, message.as_string())
+        print('[STATUS][bdp_util.sendEmails] Email notification was sent out')
+    except Exception as e:
+        print('[ERROR][bdp_util.sendEmails] Email notification was not sent out! Reason: {}'.format(e))
+    finally:
+        if (server != None):
+            server.close()
 
 def sendEmail(to, subject, plain_body, html_body):
-    gmail_user = 'water.intrusion.munich@gmail.com'
-    gmail_password = 'watsoniot'
-    sent_from = gmail_user  
+    """
+    Sends a single email out
+
+    :param to: Recipient email address
+    :param subject: Email subject string
+    :param plain_body: Message body without CSS styling
+    :param html_body: Message body with CSS styling
+    """
+    gmail_user = BDPProperty.getInstance().getValue('gmail_user')
+    gmail_password = BDPProperty.getInstance().getValue('gmail_password')
     
     message = MIMEMultipart('alternative')
     message['Subject'] = subject
-    message['From'] = sent_from
+    message['From'] = gmail_user
     message['To'] = to
 
     plain_text = MIMEText(plain_body, 'plain')
@@ -100,48 +116,63 @@ def sendEmail(to, subject, plain_body, html_body):
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.ehlo()
         server.login(gmail_user, gmail_password)
-        server.sendmail(sent_from, to, message.as_string())
-        print('Email sent!')
+        server.sendmail(gmail_user, to, message.as_string())
+        print('[STATUS][bdp_util.sendEmail] Email notification was sent out')
+
     except Exception as e:
-        print(e)  
-        print('Something went wrong...')
+        print('[ERROR][bdp_util.sendEmail] Email notification was not sent out! Reason: {}'.format(e))
+
     finally:
         if (server != None):
             server.close()
         
 def sendSlack(to, msg):
+    """
+    Sends a single Slack message out
+
+    :param to: Recipient Slack ID
+    :param msg: Message body
+
+    :return: True is successful
+    """
     try:
-        headers = {
-            'Content-type': 'application/json', 
-            'Accept': 'text/plain',
-            'Authorization': 'Bearer xoxb-83959766341-650053210930-Nf6jYeLVuACXwYKeRLPQMO57'
-        }
-        
-        body = {}
-        body['text'] = msg
-        body['channel'] = to
-        resp = requests.post('https://slack.com/api/chat.postMessage', 
-                            headers=headers, 
-                            data = json.dumps(body))
+        resp = requests.post(
+            'https://slack.com/api/chat.postMessage',
+            headers = {
+                'Content-type': 'application/json', 
+                'Accept': 'text/plain',
+                'Authorization': BDPProperty.getInstance().getValue('slack_auth')
+                },
+            data = json.dumps({
+                'channel': to,
+                'text': msg
+                })
+            )
 
         if resp.status_code == 200:
+            print('[STATUS][bdp_util.sendSlack] Slack notification was sent')
             return True
+        else:
+            print('[ERROR][bdp_util.sendSlack] Response status code: {}'.format(resp.status_code))
     except Exception as e:
-        print(e)
+        print('[ERROR][bdp_util.sendSlack] Error occured: {}'.format(e))
 
 def sendTririga(work_task_payload):
     try:    
-        # print('-------------------------BDPProperty.getInstance().getValue()--------------------------')
-        # print(BDPProperty.getInstance().getValue('tririga_api'))
-        # print(BDPProperty.getInstance().getValue('tririga_user'))
-        # print(BDPProperty.getInstance().getValue('tririga_password'))
-        # print(work_task_payload)
-        resp = requests.post(BDPProperty.getInstance().getValue('tririga_api'), 
-                            auth=HTTPBasicAuth(BDPProperty.getInstance().getValue('tririga_user'), BDPProperty.getInstance().getValue('tririga_password')), 
-                            data = work_task_payload)
+        resp = requests.post(
+            BDPProperty.getInstance().getValue('tririga_api'), 
+            auth=HTTPBasicAuth(
+                BDPProperty.getInstance().getValue('tririga_user'), 
+                BDPProperty.getInstance().getValue('tririga_password')
+                ), 
+            data = work_task_payload
+            )
 
-        print(resp.status_code)
         if resp.status_code == 201:
+            print("[STATUS][bdp_util.sendTririga] Tritiga work order was created")
             return True
+        else:
+            print("[ERROR][bdp_util.sendTririga] Response status code: {}".format(resp.status_code))
+
     except Exception as e:
-        print(e)
+        print('[ERROR][bdp_util.sendTririga] Error occured: {}'.format(e))
