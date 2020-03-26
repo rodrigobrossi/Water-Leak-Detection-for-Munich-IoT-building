@@ -13,6 +13,8 @@ import datetime, json
 import ibm_db, ibmiotf
 
 import bdp_dbutil, bdp_util
+
+from bdp_property import BDPProperty
 from bdp_notifier import BDPNotifier
 
 class BDPIncident():
@@ -26,9 +28,7 @@ class BDPIncident():
         :param hardware_uid: Hardware ID
         :type hardware_uid: int
 
-        :todo: check rate of change and change urgency accordingly
-        :todo: make sure that anomaly persists before marking as incident
-        :todo: account for multiple sensors at once
+        :todo: particle swarm analytics
 
         :return: response JSON to insert into DB
         """
@@ -38,8 +38,6 @@ class BDPIncident():
         if value_of_interest < 50:
             return None
 
-        # TODO: check the slope
-        # TODO: make sure that anomaly persists
         response = {}
 
         response['INCIDENT_DETAIL'] = {}
@@ -79,11 +77,11 @@ class BDPIncident():
         :return: notification
         """
         try:
-            print('[BDPIncident] Incident received!')
+            print('[STATUS][BDPIncident] Incident identified')
 
             tenant = bdp_dbutil.getTenantByTenantID(new_incident['TENANT_ID'])
             if not tenant:
-                print('[BDPIncident] Tenant {} is not found!'.format(new_incident['TENANT_ID']))
+                print('[ERROR][BDPIncident] Tenant {} is not found!'.format(new_incident['TENANT_ID']))
                 return
             tenant_id = tenant['TENANT_ID']
 
@@ -110,7 +108,7 @@ class BDPIncident():
 
             hardware = bdp_dbutil.getHardwareByDevice(event.device)
             if not hardware:
-                print("[hardwareCallback] Device {} not found.".format(event.device))
+                print("[ERROR][BDPIncident.hardwareCallback] Device {} not found.".format(event.device))
                 return
             hardware_uid = hardware["HARDWARE_UID"]
 
@@ -121,7 +119,7 @@ class BDPIncident():
             # Save to DB
             stmt = ibm_db.exec_immediate(conn, sql_string)
             if ibm_db.num_rows(stmt) == 0:
-                print("[hardwareCallback] Could not add the event to DB!")
+                print("[ERROR][BDPIncident.hardwareCallback] Could not add the event to DB!")
                 return
 
             # Remove old points
@@ -136,23 +134,23 @@ class BDPIncident():
             print(e)
 
     def start():
+        """
+        Starts the application
+        """
         BDPIncident._iotSubscribe()
 
     def _iotSubscribe():
+        """
+        Subscribe to deviced from IBM IoT Platform 
+        """
         try:
-            myDeviceType="waterLeakDetector"
-            options = {
-                "org": "h9eyui",
-                "id": "orgfx53ykk",
-                "auth-method": "apikey",
-                "auth-key": "a-h9eyui-orgfx53ykk",
-                "auth-token": "rGXJy+2xk1FbSzCR&-",
-                "type": "shared",
-                "clean-session": True
-            }
-            client = ibmiotf.application.Client(options)
+            client = ibmiotf.application.Client(BDPProperty.getInstance().getValue('iotplatform_options'))
+            
             client.connect()
             client.deviceEventCallback = BDPIncident._hardwareCallback
-            client.subscribeToDeviceEvents(deviceType=myDeviceType)
+            
+            #TODO: get from DB
+            client.subscribeToDeviceEvents(deviceType="waterLeakDetector")
+            client.subscribeToDeviceEvents(deviceType="waterSensorsDemo")
         except ibmiotf.ConnectionException  as e:
             print(e)

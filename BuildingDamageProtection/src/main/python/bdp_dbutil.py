@@ -277,8 +277,6 @@ def getHardwareByDevice(device):
 
 def getHardwareByHardwareUID(hardware_uid):
     conn = BDPDBConnection.getInstance().getDBConnection()
-
-    print("[getHardwareByHardwareUID]: hardware_uid = " + str(hardware_uid))
     
     sql_string = "SELECT * FROM " + getTableName("BDP_HARDWARE") 
     sql_string += " WHERE HARDWARE_UID = '"+ str(hardware_uid) + "'"
@@ -313,11 +311,11 @@ def insertIncident(existing_incident, new_incident, tenant_id):
         
         stmt = ibm_db.exec_immediate(conn, sql_string)
         incident_id = getIncidentID(new_incident)
-        print('[insertIncident] New incident_id = {}'.format(new_incident))
+        print('[STATUS][insertIncident] New incident_id = {}'.format(new_incident))
     else: 
         #existing incident
         incident_id = str(existing_incident["INCIDENT_ID"])
-        print('[insertIncident] Existing incident_id = {}'.format(incident_id))
+        print('[STATUS][insertIncident] Existing incident_id = {}'.format(incident_id))
 
         sql_string = "INSERT INTO " + getTableName("BDP_INCIDENT") 
         sql_string += " (INCIDENT_DETAIL, INCIDENT_TIME, INCIDENT_STATUS_CODE, TENANT_ID, CAUSE_HARDWARE, INCIDENT_ID_ORIGINAL) " 
@@ -327,7 +325,7 @@ def insertIncident(existing_incident, new_incident, tenant_id):
         stmt = ibm_db.exec_immediate(conn, sql_string)
     
     if ibm_db.num_rows(stmt) == 0:
-        print("[insertIncident] Could not add the incident to DB!")
+        print("[ERROR][insertIncident] Could not add the incident to DB!")
         return 
     
     return incident_id

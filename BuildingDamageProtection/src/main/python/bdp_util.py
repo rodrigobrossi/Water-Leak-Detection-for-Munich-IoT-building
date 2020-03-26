@@ -15,6 +15,7 @@ from requests.auth import HTTPBasicAuth
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+
 from bdp_property import BDPProperty
 
 import ibm_db
