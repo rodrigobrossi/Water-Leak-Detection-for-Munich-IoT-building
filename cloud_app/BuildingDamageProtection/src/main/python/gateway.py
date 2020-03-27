@@ -8,7 +8,7 @@
 # divested of its trade secrets, irrespective of what has
 # been deposited with the U.S. Copyright Office.
 #############################################################
-#design doc: https://ibm.ent.box.com/file/293956264729
+
 from threading import Thread
 from time import sleep
 
