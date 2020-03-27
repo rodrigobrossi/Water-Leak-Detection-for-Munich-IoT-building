@@ -5,4 +5,6 @@
 *.log
 
 # Generated web content
-BuildingDamageProtection/src/main/python/static/img/*
+cloud_app/BuildingDamageProtection/src/main/python/static/img/*
+
+.vscode
