@@ -46,7 +46,7 @@ class BDPNotifier():
             if len(users) == 0:
                 print('[STATUS][BDPNotifier] No notification will be send out.')
                 return
-            print(users)
+
             bdp_dbutil.updateIncidentNotifyTime(notification["NEW_INCIDENT_ID"])
             bdp_dbutil.createNotificationRecord(notification["NEW_INCIDENT_ID"], 2, users)
 
@@ -102,33 +102,40 @@ class BDPNotifier():
         send = False
 
         if incident_record == False: 
-            #no previous incident, send immediately
-            print("[STATUS][BDPNotifier]: No previous incident, send immediately")
+            #No previous incident, send immediately
+            print("[STATUS][BDPNotifier]: No previous incident -> sending alarm")
             send = True
         else:
-            #is it snoozed? if so, past the snoozed period yet? if past, needs to reset and send. otherwise, hibernate. 
-            #if not snoozed, what was the last time sent out? past period yet?
             if incident_record["SNOOZE_TIME"] is None:
+                # Incident was never snoozed
                 lastsent = incident_record["NOTIFY_TIME"]
                 if lastsent is None:
+                    # Alarm was never sent before
                     print("[STATUS][BDPNotifier] No snooze, never sent before -> sending alarm")
                     send = True
                 else:
+                    # Alarm was sent before
                     interval = tenant_record["ALARM_INTERVAL_HR"] * 60
                     now = datetime.datetime.now()
                     diff = (now - lastsent).total_seconds() / 60
+
                     if diff > interval:
-                        print("[STATUS][BDPNotifier] No snooze -> sending alarm")
+                        print("[STATUS][BDPNotifier] Hibernation time expired -> sending alarm")
                         send = True
+                    else:
+                        print("[STATUS][BDPNotifier] Hibernation time is still active -> no alarm")
             else:
+                # Incedent was snoozed before
                 lastsnooze = incident_record["SNOOZE_TIME"]
                 interval = tenant_record["SNOOZE_HR"] * 60
                 now = datetime.datetime.now()
                 diff = (now - lastsnooze).total_seconds() / 60
                 if diff > interval:
-                    print("[STATUS][BDPIncident] No snooze -> sending alarm")
+                    print("[STATUS][BDPIncident] Snooze time expired -> sending alarm")
                     send = True
                     bdp_dbutil.snoozeFlip(incident_record["INCIDENT_ID"], False)
+                else:
+                    print("[STATUS][BDPIncident] Snooze time is still active -> no alarm")
                     
         if send is True:
             usergroups = bdp_dbutil.getUsersWithNIDs(tenant_record["TENANT_ID"])
