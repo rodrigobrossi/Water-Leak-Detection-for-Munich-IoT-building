@@ -184,10 +184,12 @@ def sendTririga(work_task_payload):
                 BDPProperty.getInstance().getValue('tririga_user'), 
                 BDPProperty.getInstance().getValue('tririga_password')
                 ), 
-            data = work_task_payload
+            headers = {'Content-type': 'application/json'},
+            data=json.dumps(work_task_payload),
+            # json=json.dumps(work_task_payload)
             )
 
-        if resp.status_code == 201:
+        if resp.status_code == 200:
             print("[STATUS][bdp_util.sendTririga] Tritiga work order was created")
             return True
         else:

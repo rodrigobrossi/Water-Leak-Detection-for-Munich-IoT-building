@@ -265,7 +265,7 @@ class BDPNotifier():
         tririgaPayload['spi:triBuildingTX'] = 'Munich Watson Center'
         tririgaPayload['spi:triCustomerOrgTX'] = '\\Organizations\\IBM Watson IoT Center GmbH'
         tririgaPayload['spi:triLocationRequestedTX'] = '\\Locations\\Offices\\Europe\\Munich Watson Center'
-        payload = json.dumps(tririgaPayload)
+        payload = tririgaPayload
         
         return bdp_util.sendTririga(payload)
         
