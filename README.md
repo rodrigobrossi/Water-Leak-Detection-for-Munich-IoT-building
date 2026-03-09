@@ -10,40 +10,40 @@ Real-time water leak detection and damage prevention system for the **IBM Munich
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                          SENSOR LAYER                            │
-│                                                                   │
-│  Raspberry Pi (humidity.py)          ESP8266 (dhttemp.ino)       │
-│  DHT/AM2302 sensor on GPIO pin 4     DHT22 sensor on pin D4      │
-│  Publishes every 60 seconds          Publishes every 5 seconds   │
-│                 │                                │                │
-│                 └──────────────┬─────────────────┘                │
-└────────────────────────────────┼─────────────────────────────────┘
+│                          SENSOR LAYER                           │
+│                                                                 │
+│  Raspberry Pi (humidity.py)          ESP8266 (dhttemp.ino)      │
+│  DHT/AM2302 sensor on GPIO pin 4     DHT22 sensor on pin D4     │
+│  Publishes every 60 seconds          Publishes every 5 seconds  │
+│                 │                                │              │
+│                 └──────────────┬─────────────────┘              │
+└────────────────────────────────┼────────────────────────────────┘
                                  │ MQTT (port 1883)
                                  ▼
                    IBM Watson IoT Platform
                    Topic: iot-2/evt/status/fmt/json
                                  │
                                  ▼
-┌────────────────────────────────────────────────────────────────┐
-│                  CLOUD BACKEND (Flask + Gevent)                  │
-│                                                                  │
-│  BDPIncident ──► Incident detection by humidity level           │
-│       │          < 50% → OK | 50-75% → MODERATE | >75% → CRITICAL│
-│       ▼                                                          │
-│  BDPNotifier ──► Email (Gmail SMTP)                             │
-│                ──► Slack (Webhook)                              │
-│                ──► Tririga (FM Service Request)                 │
-│                                                                  │
-│  BDPRespond  ──► Web UI: /respond?nid=<id>                     │
-│                    ├── SNOOZE (defer alert)                     │
-│                    └── FIXED (mark as resolved)                 │
-│                                                                  │
-│  REST APIs                                                       │
-│  ├── POST /tenant    ──► Register organization                  │
-│  ├── POST /user      ──► Register users                         │
-│  └── POST /hardware  ──► Register sensors                       │
-│                                                                  │
-└────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────---───┐
+│                  CLOUD BACKEND (Flask + Gevent)                   │
+│                                                                   │
+│  BDPIncident ──► Incident detection by humidity level             │
+│       │          < 50% → OK | 50-75% → MODERATE | >75% → CRITICAL │
+│       ▼                                                           │
+│  BDPNotifier ──► Email (Gmail SMTP)                               │
+│                ──► Slack (Webhook)                                │
+│                ──► Tririga (FM Service Request)                   │
+│                                                                   │
+│  BDPRespond  ──► Web UI: /respond?nid=<id>                        │
+│                    ├── SNOOZE (defer alert)                       │
+│                    └── FIXED (mark as resolved)                   │
+│                                                                   │
+│  REST APIs                                                        │
+│  ├── POST /tenant    ──► Register organization                    │
+│  ├── POST /user      ──► Register users                           │
+│  └── POST /hardware  ──► Register sensors                         │
+│                                                                   │
+└───────────────────────────────────────────────────────────────---─┘
                                  │
                                  ▼
                          IBM Db2 Database

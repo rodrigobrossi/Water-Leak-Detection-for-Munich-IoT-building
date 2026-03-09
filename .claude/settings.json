@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout -b feature/modernize-dependencies-and-security)",
+      "Read(//Users/rbrossi/.ssh/**)",
+      "Bash(ssh -T git@github.ibm.com)",
+      "Bash(ssh -T git@github.com)",
+      "Bash(git remote set-url origin git@github.com:rodrigobrossi/Water-Leak-Detection-for-Munich-IoT-building.git)",
+      "Bash(git push -u origin feature/modernize-dependencies-and-security)",
+      "Bash(gh repo create rodrigobrossi/Water-Leak-Detection-for-Munich-IoT-building --public --description \"Water leak detection and damage prevention system for IBM Munich IoT Center\")",
+      "Bash(gh pr:*)",
+      "Bash(git push origin master)",
+      "Bash(git checkout master)",
+      "Bash(git branch -d feature/modernize-dependencies-and-security)",
+      "Bash(git push origin --delete feature/modernize-dependencies-and-security)",
+      "Bash(gh api repos/rodrigobrossi/Water-Leak-Detection-for-Munich-IoT-building --method PATCH -f default_branch=master)"
+    ]
+  }
+}
