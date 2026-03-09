@@ -1,47 +1,47 @@
 # Water Damage Prevention System
 
-Sistema de detecção e prevenção de danos por água para o **Munich IoT Center (IBM)**. Monitora umidade em tempo real via sensores IoT, detecta vazamentos automaticamente e dispara notificações multi-canal com fluxo de resposta a incidentes via web.
+Real-time water leak detection and damage prevention system for the **IBM Munich Watson IoT Center**. Monitors humidity via IoT sensors, automatically detects leaks, and triggers multi-channel notifications with a web-based incident response workflow.
 
 <img src="/img/sensor.png" width="200"/> <img src="/img/UI.png" width="400"/>
 
 ---
 
-## Arquitetura Geral
+## Architecture Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        CAMADA DE SENSORES                        │
+│                          SENSOR LAYER                            │
 │                                                                   │
 │  Raspberry Pi (humidity.py)          ESP8266 (dhttemp.ino)       │
-│  Sensor DHT / AM2302 no GPIO 4       Sensor DHT22 no pino D4     │
-│  Publica a cada 60 segundos          Publica a cada 5 segundos   │
+│  DHT/AM2302 sensor on GPIO pin 4     DHT22 sensor on pin D4      │
+│  Publishes every 60 seconds          Publishes every 5 seconds   │
 │                 │                                │                │
 │                 └──────────────┬─────────────────┘                │
-└────────────────────────────────┼────────────────────────────────-─┘
-                                 │ MQTT (porta 1883)
+└────────────────────────────────┼─────────────────────────────────┘
+                                 │ MQTT (port 1883)
                                  ▼
                    IBM Watson IoT Platform
-                   Tópico: iot-2/evt/status/fmt/json
+                   Topic: iot-2/evt/status/fmt/json
                                  │
                                  ▼
 ┌────────────────────────────────────────────────────────────────┐
-│                    CLOUD BACKEND (Flask + Gevent)               │
+│                  CLOUD BACKEND (Flask + Gevent)                  │
 │                                                                  │
-│  BDPIncident ──► Detecção de incidentes por nível de umidade    │
-│       │          < 50% → OK | 50-75% → MODERADO | >75% → CRÍTICO│
+│  BDPIncident ──► Incident detection by humidity level           │
+│       │          < 50% → OK | 50-75% → MODERATE | >75% → CRITICAL│
 │       ▼                                                          │
 │  BDPNotifier ──► Email (Gmail SMTP)                             │
 │                ──► Slack (Webhook)                              │
-│                ──► Tririga (Service Request FM)                 │
+│                ──► Tririga (FM Service Request)                 │
 │                                                                  │
 │  BDPRespond  ──► Web UI: /respond?nid=<id>                     │
-│                    ├── SNOOZE (adiar alarme)                    │
-│                    └── FIXED (marcar como resolvido)            │
+│                    ├── SNOOZE (defer alert)                     │
+│                    └── FIXED (mark as resolved)                 │
 │                                                                  │
 │  REST APIs                                                       │
-│  ├── POST /tenant    ──► Cadastrar organização                  │
-│  ├── POST /user      ──► Cadastrar usuários                     │
-│  └── POST /hardware  ──► Registrar sensores                     │
+│  ├── POST /tenant    ──► Register organization                  │
+│  ├── POST /user      ──► Register users                         │
+│  └── POST /hardware  ──► Register sensors                       │
 │                                                                  │
 └────────────────────────────────────────────────────────────────┘
                                  │
@@ -53,173 +53,173 @@ Sistema de detecção e prevenção de danos por água para o **Munich IoT Cente
 
 ---
 
-## Estrutura do Repositório
+## Repository Structure
 
 ```
 .
 ├── sensors/
-│   ├── pi/                   # Implementação para Raspberry Pi
-│   │   ├── humidity.py       # Coleta de dados do sensor DHT, publica via MQTT e Blynk
-│   │   ├── MarkovModel.py    # Modelo preditivo de transições de estado (seco/molhado)
-│   │   └── humidity.service  # Serviço systemd para execução automática
-│   └── dhttemp/              # Implementação para ESP8266 (Arduino)
-│       └── dhttemp.ino       # Firmware: MQTT + Blynk + display OLED SSD1306
+│   ├── pi/                   # Raspberry Pi implementation
+│   │   ├── humidity.py       # DHT sensor data collection, publishes via MQTT and Blynk
+│   │   ├── MarkovModel.py    # Predictive Markov chain model for state transitions (dry/wet)
+│   │   └── humidity.service  # systemd service file for auto-start on boot
+│   └── dhttemp/              # ESP8266 implementation (Arduino)
+│       └── dhttemp.ino       # Firmware: MQTT + Blynk + OLED SSD1306 display
 │
 └── cloud_app/BuildingDamageProtection/
     ├── Dockerfile
-    ├── Procfile              # Deploy no IBM Cloud (Cloud Foundry)
-    ├── requirements.txt      # Dependências Python
-    ├── runtime.txt           # Python 3.6
+    ├── Procfile              # IBM Cloud Foundry deployment config
+    ├── requirements.txt      # Python dependencies
+    ├── runtime.txt           # Python 3.11
     └── src/main/python/
-        ├── gateway.py              # Ponto de entrada Flask: define rotas e inicia threads
-        ├── bdp_incident.py         # Listener de eventos IoT + lógica de detecção
-        ├── bdp_notifier.py         # Orquestração de notificações (email/Slack/Tririga)
-        ├── bdp_respond.py          # Handler do fluxo de resposta a incidentes (web UI)
-        ├── bdp_hardware.py         # REST API para gerenciamento de sensores
-        ├── bdp_tenant.py           # REST API para multi-tenancy
-        ├── bdp_user.py             # REST API para usuários
-        ├── bdp_auth.py             # Autenticação HTTP Basic Auth
-        ├── bdp_property.py         # Singleton de carregamento do config.json
-        ├── bdp_dbutil.py           # Queries Db2 + pool de conexões
-        ├── bdp_util.py             # Integrações: Gmail, Slack, Tririga
-        ├── bdp_sysinit.py          # Inicialização e migração do schema do banco
-        ├── bdp_servicecheck.py     # Health check periódico da conexão com DB
-        ├── bdp_email.py            # Modelo de dados de email
-        ├── bdp_tririga_worktask.py # Integração com sistema FM Tririga
-        ├── bdp_unittest.py         # Testes unitários
-        ├── templates/              # Templates HTML/texto para emails e UI
-        └── static/                 # CSS e imagens da interface web
+        ├── gateway.py              # Flask entry point: defines routes and starts threads
+        ├── bdp_incident.py         # IoT event listener + incident detection logic
+        ├── bdp_notifier.py         # Notification orchestration (email/Slack/Tririga)
+        ├── bdp_respond.py          # Incident response web UI handler
+        ├── bdp_hardware.py         # REST API for sensor management
+        ├── bdp_tenant.py           # REST API for multi-tenancy
+        ├── bdp_user.py             # REST API for user management
+        ├── bdp_auth.py             # HTTP Basic Auth
+        ├── bdp_property.py         # config.json singleton loader
+        ├── bdp_dbutil.py           # Db2 queries + connection pooling
+        ├── bdp_util.py             # Gmail, Slack, and Tririga integrations
+        ├── bdp_sysinit.py          # Database schema initialization and migrations
+        ├── bdp_servicecheck.py     # Periodic DB connection health check
+        ├── bdp_email.py            # Email data model
+        ├── bdp_tririga_worktask.py # Tririga FM system integration
+        ├── bdp_unittest.py         # Unit tests
+        ├── templates/              # HTML/text templates for emails and web UI
+        └── static/                 # CSS and images for the web interface
 ```
 
 ---
 
-## Componentes em Detalhe
+## Components in Detail
 
-### 1. Sensores (`sensors/`)
+### 1. Sensors (`sensors/`)
 
 #### Raspberry Pi — `humidity.py`
-- Lê temperatura e umidade do sensor **DHT/AM2302** no pino GPIO 4
-- Publica dados a cada **60 segundos** via MQTT para o IBM Watson IoT Platform
-- Expõe dados também para o app mobile **Blynk** (pinos virtuais V5=umidade, V6=fahrenheit, V7=celsius)
-- Pode ser executado como serviço systemd (arquivo `humidity.service` incluído)
+- Reads temperature and humidity from a **DHT/AM2302** sensor on GPIO pin 4
+- Publishes readings every **60 seconds** via MQTT to IBM Watson IoT Platform
+- Exposes data to the **Blynk** mobile app (virtual pins V5=humidity, V6=fahrenheit, V7=celsius)
+- Can run as a systemd service (`humidity.service` included)
 
 #### ESP8266 — `dhttemp.ino`
-- Lê temperatura e umidade do sensor **DHT22** no pino D4
-- Exibe dados em display **OLED SSD1306** (I2C)
-- Publica via MQTT para o IBM Watson IoT Platform a cada **5 segundos**
-- Integração com **Blynk** nos mesmos pinos virtuais
+- Reads temperature and humidity from a **DHT22** sensor on pin D4
+- Displays readings on an **OLED SSD1306** display (I2C)
+- Publishes via MQTT to IBM Watson IoT Platform every **5 seconds**
+- Integrates with **Blynk** on the same virtual pins
 
-#### Modelo Preditivo — `MarkovModel.py`
-- Implementa **Cadeia de Markov** para prever transições de estado (seco → molhado)
-- Usa estimação de máxima verossimilhança para parametrização
-
----
-
-### 2. Backend Cloud (`cloud_app/`)
-
-#### `gateway.py` — Ponto de Entrada
-- Inicializa o app Flask com Gevent WSGI para handling assíncrono
-- Registra todas as rotas REST
-- Inicia thread de background para health checks periódicos
-- Conecta ao IBM Watson IoT Platform para escutar eventos dos sensores
-- Modos de servidor: `flask` (dev), `cli` (sem servidor HTTP), ou WSGI com SSL
-
-#### `bdp_incident.py` — Detecção de Incidentes
-- Escuta eventos MQTT dos device types: `waterLeakDetector` e `waterSensorsDemo`
-- Armazena leituras brutas em `BDP_RAW_EVENTS` (retenção de 7 dias)
-- **Lógica de detecção:**
-  - Umidade < 50% → Sem incidente
-  - Umidade 50–75% → Incidente **MODERADO**
-  - Umidade > 75% → Incidente **CRÍTICO**
-- Evita duplicação de incidentes ativos por tenant + sensor
-
-#### `bdp_notifier.py` — Orquestração de Notificações
-- Determina quais usuários notificar conforme **horário** (horário comercial vs. fora de expediente)
-- Gerencia ciclo de vida das notificações: **ALARM → SNOOZE → FIXED**
-- Renderiza templates Mustache para emails e mensagens Slack
-- Cria service requests no **Tririga** (sistema de facilities management)
-
-#### `bdp_respond.py` — Interface de Resposta
-- Rota `GET /respond?nid=<notification_id>`: renderiza UI com detalhes do incidente
-- Exibe gráfico histórico de umidade, urgência e status atual
-- Permite ao usuário:
-  - **SNOOZE**: Adiar alarme por N horas (configurável)
-  - **FIXED**: Marcar incidente como resolvido
-
-#### `bdp_dbutil.py` — Camada de Dados
-Gerencia conexão singleton com **IBM Db2**. Tabelas principais:
-
-| Tabela | Descrição |
-|--------|-----------|
-| `BDP_TENANT` | Organizações/clientes do sistema |
-| `BDP_USER` | Usuários com info de contato e disponibilidade |
-| `BDP_HARDWARE` | Sensores com localização física |
-| `BDP_INCIDENT` | Incidentes de água detectados |
-| `BDP_NOTIFICATION` | Notificações individuais por usuário |
-| `BDP_RAW_EVENTS` | Leituras brutas dos sensores (7 dias) |
-| `BDP_DBCHANGELOG` | Versionamento do schema |
+#### Predictive Model — `MarkovModel.py`
+- Implements a **Markov Chain** to predict state transitions (dry → wet)
+- Uses maximum likelihood estimation for parameter fitting
 
 ---
 
-## Pré-requisitos
+### 2. Cloud Backend (`cloud_app/`)
 
-### Para o Backend Cloud
-- Python 3.6
-- IBM Db2 (local ou IBM Cloud)
-- IBM Watson IoT Platform (conta IBM Cloud)
-- Conta Gmail com "Acesso a app menos seguro" habilitado (ou App Password)
-- Slack Webhook URL (opcional)
-- Tririga API (opcional)
+#### `gateway.py` — Entry Point
+- Initializes the Flask app with Gevent WSGI for async request handling
+- Registers all REST routes
+- Starts a background thread for periodic health checks
+- Connects to IBM Watson IoT Platform to listen for sensor events
+- Server modes: `flask` (dev), `cli` (no HTTP server), or WSGI with SSL
 
-### Para o Sensor Raspberry Pi
-- Raspberry Pi (qualquer modelo com GPIO)
-- Sensor DHT11, DHT22 ou AM2302
+#### `bdp_incident.py` — Incident Detection
+- Listens for MQTT events from device types: `waterLeakDetector` and `waterSensorsDemo`
+- Stores raw readings in `BDP_RAW_EVENTS` (7-day retention)
+- **Detection logic:**
+  - Humidity < 50% → No incident
+  - Humidity 50–75% → **MODERATE** incident
+  - Humidity > 75% → **CRITICAL** incident
+- Prevents duplicate active incidents per tenant + sensor
+
+#### `bdp_notifier.py` — Notification Orchestration
+- Determines which users to notify based on **time of day** (business hours vs. off-hours)
+- Manages notification lifecycle: **ALARM → SNOOZE → FIXED**
+- Renders Mustache templates for emails and Slack messages
+- Creates service requests in **Tririga** (facilities management system)
+
+#### `bdp_respond.py` — Response Interface
+- Route `GET /respond?nid=<notification_id>`: renders UI with incident details
+- Displays humidity history chart, urgency level, and current status
+- Allows the user to:
+  - **SNOOZE**: Defer the alert for N hours (configurable)
+  - **FIXED**: Mark the incident as resolved
+
+#### `bdp_dbutil.py` — Data Layer
+Manages a singleton connection to **IBM Db2**. Main tables:
+
+| Table                | Description                                     |
+|----------------------|-------------------------------------------------|
+| `BDP_TENANT`         | Organizations / system clients                  |
+| `BDP_USER`           | Users with contact info and availability hours  |
+| `BDP_HARDWARE`       | Sensors with physical location details          |
+| `BDP_INCIDENT`       | Detected water incidents                        |
+| `BDP_NOTIFICATION`   | Individual per-user notifications               |
+| `BDP_RAW_EVENTS`     | Raw sensor readings (7-day rolling retention)   |
+| `BDP_DBCHANGELOG`    | Database schema version tracking               |
+
+---
+
+## Prerequisites
+
+### Cloud Backend
+- Python 3.11
+- IBM Db2 (local or IBM Cloud)
+- IBM Watson IoT Platform (IBM Cloud account)
+- Gmail account with App Password enabled
+- Slack Bot Token (optional)
+- Tririga API credentials (optional)
+
+### Raspberry Pi Sensor
+- Raspberry Pi (any model with GPIO)
+- DHT11, DHT22, or AM2302 sensor
 - Python 3.x
 
-### Para o Sensor ESP8266
-- Placa ESP8266 (NodeMCU, Wemos D1 Mini, etc.)
-- Sensor DHT22
-- Display OLED SSD1306 (opcional)
+### ESP8266 Sensor
+- ESP8266 board (NodeMCU, Wemos D1 Mini, etc.)
+- DHT22 sensor
+- OLED SSD1306 display (optional)
 - Arduino IDE 1.8+
 
 ---
 
-## Setup Local — Backend
+## Local Setup — Backend
 
-### 1. Configuração
+### 1. Configuration
 
-Crie o arquivo de configuração a partir do exemplo:
+Copy the example config and fill in your credentials:
 
 ```bash
 cp cloud_app/BuildingDamageProtection/resources/config/config.example.json \
    cloud_app/BuildingDamageProtection/resources/config/config.json
 ```
 
-Edite `config.json` com suas credenciais (veja detalhes na seção [Configuração](#configuração)).
+Edit `config.json` with your credentials (see the [Configuration](#configuration) section for details).
 
-### 2. Instalação das Dependências
+### 2. Install Dependencies
 
 ```bash
 cd cloud_app/BuildingDamageProtection
 pip install -r requirements.txt
 ```
 
-> **Nota:** A dependência `ibm_db==3.0.1` requer o IBM Db2 Client instalado no sistema.
-> Veja: [ibm-db no PyPI](https://pypi.org/project/ibm-db/)
+> **Note:** The `ibm_db` package requires the IBM Db2 Client to be installed on the system.
+> See: [ibm-db on PyPI](https://pypi.org/project/ibm-db/)
 
-### 3. Executar
+### 3. Run
 
 ```bash
-# Modo desenvolvimento (Flask)
+# Development mode (Flask)
 cd cloud_app/BuildingDamageProtection/src/main/python
 python gateway.py
 
-# Modo produção (Gunicorn)
+# Production mode (Gunicorn)
 cd cloud_app/BuildingDamageProtection
 gunicorn -w 3 --pythonpath src/main/python --log-level debug gateway:application
 ```
 
-### 4. Via Docker
+### 4. Docker
 
 ```bash
 cd cloud_app/BuildingDamageProtection
@@ -227,7 +227,7 @@ docker build -t building-damage-protection .
 docker run -p 5000:5000 building-damage-protection
 ```
 
-### 5. Testes
+### 5. Tests
 
 ```bash
 python src/main/python/bdp_unittest.py
@@ -235,26 +235,28 @@ python src/main/python/bdp_unittest.py
 
 ---
 
-## Setup Local — Sensor Raspberry Pi
+## Local Setup — Raspberry Pi Sensor
 
 ```bash
-# 1. Instalar biblioteca do sensor DHT
+# 1. Install the DHT sensor library
 git clone https://github.com/adafruit/Adafruit_Python_DHT.git
 cd Adafruit_Python_DHT
 sudo python setup.py install
 
-# 2. Instalar dependências IoT e Blynk
-pip install ibmiotf
+# 2. Install IoT and Blynk dependencies
+pip install paho-mqtt
 pip install blynk-library-python
 
-# 3. Configurar credenciais em sensors/pi/humidity.py
-# Edite: organization, deviceType, deviceId, authToken, blynkToken
+# 3. Set credentials via environment variables
+cp sensors/pi/.env.example sensors/pi/.env
+# Edit .env with your IOT_ORG, IOT_DEVICE_ID, IOT_TOKEN, BLYNK_TOKEN
 
-# 4. Executar
+# 4. Run
+source sensors/pi/.env
 cd sensors/pi
 python humidity.py
 
-# 5. (Opcional) Instalar como serviço systemd
+# 5. (Optional) Install as a systemd service
 sudo cp humidity.service /etc/systemd/system/
 sudo systemctl enable humidity.service
 sudo systemctl daemon-reload
@@ -263,31 +265,28 @@ sudo systemctl start humidity.service
 
 ---
 
-## Setup — Sensor ESP8266
+## Setup — ESP8266 Sensor
 
-1. Abra `sensors/dhttemp/dhttemp.ino` no **Arduino IDE**
-2. Instale as bibliotecas pelo Library Manager:
+1. Open `sensors/dhttemp/dhttemp.ino` in the **Arduino IDE**
+2. Install required libraries via Library Manager:
    - `PubSubClient` (MQTT)
    - `ESP8266WiFi`
    - `Blynk`
    - `Adafruit GFX Library`
    - `Adafruit SSD1306`
    - `DHT sensor library` (Adafruit)
-3. Edite as credenciais no sketch:
-   ```cpp
-   char auth[] = "SEU_BLYNK_TOKEN";
-   char ssid[] = "SUA_REDE_WIFI";
-   char pass[] = "SUA_SENHA_WIFI";
-   #define ORG "SEU_ORG_ID"
-   #define TOKEN "SEU_AUTH_TOKEN"
+3. Copy the credentials template and fill in your values:
+   ```bash
+   cp sensors/dhttemp/credentials.h.example sensors/dhttemp/credentials.h
+   # Edit credentials.h with your WiFi, Blynk, and IoT credentials
    ```
-4. Selecione a placa correta (ex: `NodeMCU 1.0`) e faça o upload
+4. Select the correct board (e.g. `NodeMCU 1.0`) and upload the sketch
 
 ---
 
-## Configuração
+## Configuration
 
-O arquivo `config.json` deve estar em:
+The config file must be placed at:
 `cloud_app/BuildingDamageProtection/resources/config/config.json`
 
 ```json
@@ -298,131 +297,126 @@ O arquivo `config.json` deve estar em:
   "https_key": "",
   "https_cert": "",
   "gateway_user": "admin",
-  "gateway_password": "senha_segura",
+  "gateway_password": "change_me",
   "db_dbname": "BLUDB",
   "db_dbhost": "localhost",
   "db_dbport": "50000",
   "db_admin_user": "db2admin",
-  "db_admin_password": "senha_db",
+  "db_admin_password": "change_me",
   "iotplatform_options": {
-    "org": "SEU_ORG_ID",
+    "org": "YOUR_ORG_ID",
     "id": "cloud-app",
     "auth-method": "apikey",
-    "auth-key": "SUA_API_KEY",
-    "auth-token": "SEU_AUTH_TOKEN"
+    "auth-key": "YOUR_API_KEY",
+    "auth-token": "YOUR_AUTH_TOKEN"
   },
-  "gmail_user": "seu@gmail.com",
-  "gmail_password": "sua_app_password",
-  "slack_auth": "xoxb-seu-token-slack",
-  "tririga_api": "https://sua-instancia.tririga.com/api/",
-  "tririga_user": "usuario_tririga",
-  "tririga_password": "senha_tririga",
+  "gmail_user": "your@gmail.com",
+  "gmail_password": "your_app_password",
+  "slack_auth": "xoxb-your-slack-bot-token",
+  "tririga_api": "https://your-instance.tririga.com/api/",
+  "tririga_user": "tririga_username",
+  "tririga_password": "change_me",
   "alarm_interval_hr": "1",
   "snooze_hr": "2",
   "check_status_interval": "24"
 }
 ```
 
-### Parâmetros de Configuração
+### Configuration Parameters
 
-| Parâmetro | Descrição |
-|-----------|-----------|
-| `server_type` | `flask` (dev), `cli` (sem HTTP), ou qualquer outro valor (WSGI/SSL) |
-| `server_port` | Porta do servidor HTTP |
-| `gateway_user/password` | Credenciais para autenticação HTTP Basic nas APIs REST |
-| `db_*` | Credenciais do IBM Db2 |
-| `iotplatform_options` | Credenciais IBM Watson IoT Platform (Application credentials) |
-| `gmail_user/password` | Conta Gmail para envio de alertas |
-| `slack_auth` | Token de bot Slack para envio de mensagens |
-| `tririga_*` | Credenciais da API do sistema Tririga (FM) |
-| `alarm_interval_hr` | Intervalo mínimo entre alarmes repetidos (horas) |
-| `snooze_hr` | Duração do snooze de notificações (horas) |
-| `check_status_interval` | Frequência do health check de conexão com o DB (horas) |
+| Parameter              | Description                                                          |
+|------------------------|----------------------------------------------------------------------|
+| `server_type`          | `flask` (dev), `cli` (no HTTP server), or any other value (WSGI/SSL) |
+| `server_port`          | HTTP server port                                                     |
+| `gateway_user/password`| HTTP Basic Auth credentials for REST API endpoints                   |
+| `db_*`                 | IBM Db2 connection credentials                                       |
+| `iotplatform_options`  | IBM Watson IoT Platform application credentials                      |
+| `gmail_user/password`  | Gmail account used to send alert emails                              |
+| `slack_auth`           | Slack bot token for message delivery                                 |
+| `tririga_*`            | Tririga FM system API credentials                                    |
+| `alarm_interval_hr`    | Minimum interval between repeated alarms (hours)                     |
+| `snooze_hr`            | Duration of a notification snooze (hours)                            |
+| `check_status_interval`| Frequency of DB connection health checks (hours)                     |
 
 ---
 
-## Fluxo de Funcionamento
+## How It Works
 
 ```
-1. Sensor detecta umidade acima do limite
+1. Sensor detects humidity above threshold
         ↓
-2. Publica leitura via MQTT para IBM Watson IoT Platform
+2. Publishes reading via MQTT to IBM Watson IoT Platform
         ↓
-3. BDPIncident recebe o evento, verifica nível de urgência
+3. BDPIncident receives the event and evaluates urgency level
         ↓
-4. Cria registro de incidente no banco (BDP_INCIDENT)
+4. Creates an incident record in the database (BDP_INCIDENT)
         ↓
-5. BDPNotifier identifica usuários responsáveis
-   (horário comercial vs. fora de expediente)
+5. BDPNotifier identifies responsible users
+   (business hours vs. off-hours groups)
         ↓
-6. Envia notificações: Email + Slack + Tririga (Service Request)
-   O email inclui link: /respond?nid=<id>
+6. Sends notifications: Email + Slack + Tririga (Service Request)
+   The email contains a response link: /respond?nid=<id>
         ↓
-7. Usuário acessa link → vê detalhes + histórico + gráfico
+7. User opens the link → views incident details, history, and chart
         ↓
-8. Usuário escolhe:
-   ├── SNOOZE: silencia alarme por N horas
-   └── FIXED: marca incidente como resolvido
+8. User takes action:
+   ├── SNOOZE: silence the alert for N hours
+   └── FIXED: mark the incident as resolved
 ```
 
 ---
 
-## Endpoints REST
+## REST Endpoints
 
-Todos os endpoints requerem **HTTP Basic Auth** (credenciais `gateway_user/gateway_password`).
+All endpoints require **HTTP Basic Auth** (`gateway_user` / `gateway_password`).
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| `GET` | `/` | Health check — retorna versão e status |
-| `GET/POST` | `/respond` | UI de resposta a incidentes |
-| `POST` | `/tenant` | Cadastrar tenant/organização |
-| `POST` | `/user` | Cadastrar usuário com disponibilidade |
-| `POST` | `/hardware` | Registrar sensor/detector |
+| Method     | Endpoint    | Description                              |
+|------------|-------------|------------------------------------------|
+| `GET`      | `/`         | Health check — returns version and status |
+| `GET/POST` | `/respond`  | Incident response web UI                 |
+| `POST`     | `/tenant`   | Register a tenant / organization         |
+| `POST`     | `/user`     | Register a user with availability hours  |
+| `POST`     | `/hardware` | Register a sensor / detector             |
 
 ---
 
-## Aviso de Segurança
+## Security Notice
 
-> **IMPORTANTE:** O código dos sensores contém credenciais hardcoded (tokens IoT, tokens Blynk, credenciais WiFi). Antes de fazer fork ou deploy em produção:
+> **IMPORTANT:** Sensor source files previously contained hardcoded credentials (IoT tokens, Blynk tokens, WiFi passwords). These have been moved to environment variables and a gitignored `credentials.h` file. Before deploying:
 >
-> - Gere novos tokens no IBM Watson IoT Platform
-> - Gere novo token no Blynk
-> - Mova todas as credenciais para variáveis de ambiente ou arquivo de configuração externo
-> - **Nunca commite** `config.json` com credenciais reais
+> - Generate new tokens on IBM Watson IoT Platform
+> - Generate a new Blynk token
+> - Never commit `config.json` or `credentials.h` with real credentials
 
 ---
 
-## Sugestões de Melhorias
+## Suggested Improvements
 
-- [ ] Substituir credenciais hardcoded nos sensores por variáveis de ambiente ou arquivo `.env`
-- [ ] Adicionar arquivo `config.example.json` como template (sem credenciais reais)
-- [ ] Criar `docker-compose.yml` com Db2 + App para facilitar setup local completo
-- [ ] Atualizar dependências (Flask 1.0.2 → 3.x, Python 3.6 → 3.11+)
-- [ ] Adicionar suporte a múltiplos tipos de sensor e protocolos além do IBM Watson IoT
-- [ ] Implementar dashboard web para visualização em tempo real dos dados de umidade
-- [ ] Adicionar autenticação JWT nos endpoints REST
-- [ ] Substituir `ibmiotf` (deprecated) por `ibm-watson-iot` ou MQTT client direto (`paho-mqtt`)
+- [ ] Create a `docker-compose.yml` with Db2 + App for a one-command local setup
+- [ ] Add support for multiple sensor types and protocols beyond IBM Watson IoT
+- [ ] Build a real-time web dashboard for live humidity visualization
+- [ ] Replace HTTP Basic Auth with JWT on REST endpoints
 
 ---
 
-## Tecnologias
+## Tech Stack
 
-| Camada | Tecnologia |
-|--------|-----------|
-| Sensor (Pi) | Python, Adafruit DHT, ibmiotf, BlynkLib |
-| Sensor (ESP) | C++/Arduino, PubSubClient, ESP8266WiFi, Blynk |
-| Backend | Python 3.6, Flask 1.0.2, Gevent, Flask-RESTful |
-| Banco de Dados | IBM Db2 |
-| IoT Platform | IBM Watson IoT Platform (MQTT) |
-| Notificações | Gmail SMTP, Slack API, IBM Tririga |
-| Deploy | IBM Cloud Foundry, Docker |
+| Layer        | Technology                                              |
+|--------------|---------------------------------------------------------|
+| Sensor (Pi)  | Python, Adafruit DHT, paho-mqtt, BlynkLib               |
+| Sensor (ESP) | C++/Arduino, PubSubClient, ESP8266WiFi, Blynk           |
+| Backend      | Python 3.11, Flask 3.0, Gevent, Flask-RESTful           |
+| Database     | IBM Db2                                                 |
+| IoT Platform | IBM Watson IoT Platform (MQTT)                          |
+| Notifications| Gmail SMTP, Slack API, IBM Tririga                      |
+| Deployment   | IBM Cloud Foundry, Docker                               |
 
 ---
 
-## Autores
+## Authors
 
 - Rodrigo Brossi — IBM
 - Angelo Danducci — IBM
 - Hari Hara Prasad Viswanathan — IBM
 
-Desenvolvido para o **Munich Watson IoT Center** — IBM, 2018/2019.
+Developed for the **IBM Munich Watson IoT Center** — 2018/2019.
