@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<changelog>
+    <include file="resources/db/db2/001_create_tables.sql"/>
+</changelog>
