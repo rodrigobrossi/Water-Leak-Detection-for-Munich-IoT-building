@@ -417,8 +417,8 @@ def getPlottingData(hardware_uid, datapoint_amount=480, plotpoint_amount=8, data
         table_slice = table[i:i + jump_size + 1]
         # calculate means of numeric columns
         column_means = table_slice.mean()
-        # append an empty row
-        tmp = tmp.append(pd.Series(), ignore_index=True)
+        # append an empty row (pd.DataFrame.append removed in pandas 2.x)
+        tmp = pd.concat([tmp, pd.DataFrame([pd.Series()])], ignore_index=True)
         for t in datapoint_types:
             # if one of the datapoint types is not numeric
             if not t in column_means.index:

@@ -1,7 +1,10 @@
-//Written by: John D Vasquez, IBM
+//Written by: Rodrigo Brossi, IBM
 //Date: 24/10/18
 //Water detection Monitor Munich IoT Center
-// WiFi manager code in place 
+
+// Credentials are stored in credentials.h (gitignored).
+// Copy credentials.h.example to credentials.h and fill in your values.
+#include "credentials.h"
 
 #define BLYNK_PRINT Serial
 
@@ -17,33 +20,21 @@
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 
-
-// WiFi-Manager
-//#include <DNSServer.h>        // Local DNS Server used for redirecting all requests to the configuration portal
-//#include <ESP8266WebServer.h> // Local WebServer used to serve the configuration portal
-//#include <WiFiManager.h>      // https://github.com/tzapu/WiFiManager WiFi Configuration Magic
-
 // #include "definitions.h"
 #define OLED_RESET 0  // GPIO0
 Adafruit_SSD1306 display(OLED_RESET);
 
-// You should get Auth Token in the Blynk App.
-// Go to the Project Settings (nut icon).
-char auth[] = "bb1475ed813446248525d5e9374d32c8";
+char auth[] = BLYNK_TOKEN;
+char ssid[] = WIFI_SSID;
+char pass[] = WIFI_PASS;
 
-// Your WiFi credentials.
-// Set password to "" for open networks.
-
-char ssid[] = "IOTDEMOS";
-char pass[] = "dem04IoT";
- 
 #define DHTPIN D4
-#define DHTTYPE DHT22  
+#define DHTTYPE DHT22
 DHT dht(DHTPIN, DHTTYPE);
-#define ORG "h9eyui"
-#define DEVICE_TYPE "waterLeakDetector"
-#define DEVICE_ID "20WestSensor1"
-#define TOKEN "watsoniot"
+#define ORG         IOT_ORG
+#define DEVICE_TYPE IOT_DEVICE_TYPE
+#define DEVICE_ID   IOT_DEVICE_ID
+#define TOKEN       IOT_TOKEN
 
 char server[] = ORG ".messaging.internetofthings.ibmcloud.com";
 char topic[] = "iot-2/evt/status/fmt/json";

@@ -19,7 +19,6 @@ from email.mime.multipart import MIMEMultipart
 from bdp_property import BDPProperty
 
 import ibm_db
-import ibmiotf.application
 
 def sendNotificationToUsers(endpoint, usergroups, action, userJSON):
     """ 

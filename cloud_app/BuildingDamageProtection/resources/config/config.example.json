@@ -1,0 +1,30 @@
+{
+  "ver": "1.0",
+  "server_type": "flask",
+  "server_port": "5000",
+  "https_key": "",
+  "https_cert": "",
+  "gateway_user": "admin",
+  "gateway_password": "change_me",
+  "db_dbname": "BLUDB",
+  "db_dbhost": "localhost",
+  "db_dbport": "50000",
+  "db_admin_user": "db2admin",
+  "db_admin_password": "change_me",
+  "iotplatform_options": {
+    "org": "YOUR_IOT_ORG_ID",
+    "id": "cloud-app",
+    "auth-method": "apikey",
+    "auth-key": "YOUR_API_KEY",
+    "auth-token": "YOUR_AUTH_TOKEN"
+  },
+  "gmail_user": "your.email@gmail.com",
+  "gmail_password": "your_app_password",
+  "slack_auth": "xoxb-your-slack-bot-token",
+  "tririga_api": "https://your-tririga-instance.com/api/",
+  "tririga_user": "tririga_username",
+  "tririga_password": "change_me",
+  "alarm_interval_hr": "1",
+  "snooze_hr": "2",
+  "check_status_interval": "24"
+}

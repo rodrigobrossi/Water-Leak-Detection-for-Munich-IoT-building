@@ -7,4 +7,10 @@
 # Generated web content
 cloud_app/BuildingDamageProtection/src/main/python/static/img/*
 
+# Credentials — never commit the real config
+resources/config/config.json
+sensors/dhttemp/credentials.h
+sensors/pi/.env
+
 .vscode
+.DS_Store

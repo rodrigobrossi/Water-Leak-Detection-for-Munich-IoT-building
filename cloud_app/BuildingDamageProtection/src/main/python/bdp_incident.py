@@ -10,12 +10,21 @@
 #############################################################
 import datetime, json
 
-import ibm_db, ibmiotf
+import ibm_db
+import paho.mqtt.client as mqtt
 
 import bdp_dbutil, bdp_util
 
 from bdp_property import BDPProperty
 from bdp_notifier import BDPNotifier
+
+
+class _IoTEvent:
+    """Adapter that maps a raw paho MQTT message to the event structure used by _hardwareCallback."""
+    def __init__(self, device_type, device_id, data):
+        self.device = "{}:{}".format(device_type, device_id)
+        self.data = data
+
 
 class BDPIncident():
     """
@@ -141,16 +150,45 @@ class BDPIncident():
 
     def _iotSubscribe():
         """
-        Subscribe to deviced from IBM IoT Platform 
+        Subscribe to devices from IBM Watson IoT Platform via paho-mqtt.
+        Topic format: iot-2/type/{deviceType}/id/{deviceId}/evt/{eventType}/fmt/{format}
         """
         try:
-            client = ibmiotf.application.Client(BDPProperty.getInstance().getValue('iotplatform_options'))
-            
-            client.connect()
-            client.deviceEventCallback = BDPIncident._hardwareCallback
-            
-            #TODO: get from DB
-            client.subscribeToDeviceEvents(deviceType="waterLeakDetector")
-            client.subscribeToDeviceEvents(deviceType="waterSensorsDemo")
-        except ibmiotf.ConnectionException  as e:
-            print(e)
+            props      = BDPProperty.getInstance().getValue('iotplatform_options')
+            org        = props['org']
+            app_id     = props.get('id', 'cloud-app')
+            auth_key   = props['auth-key']
+            auth_token = props['auth-token']
+
+            broker    = "{}.messaging.internetofthings.ibmcloud.com".format(org)
+            client_id = "a:{}:{}".format(org, app_id)
+
+            def on_connect(client, userdata, flags, rc):
+                if rc == 0:
+                    client.subscribe("iot-2/type/waterLeakDetector/id/+/evt/+/fmt/json")
+                    client.subscribe("iot-2/type/waterSensorsDemo/id/+/evt/+/fmt/json")
+                    print("[STATUS][BDPIncident] Connected to IoT Platform and subscribed.")
+                else:
+                    print("[ERROR][BDPIncident] MQTT connection failed with code {}".format(rc))
+
+            def on_message(client, userdata, msg):
+                try:
+                    # iot-2/type/{deviceType}/id/{deviceId}/evt/{eventType}/fmt/{format}
+                    parts = msg.topic.split('/')
+                    device_type = parts[2]
+                    device_id   = parts[4]
+                    data = json.loads(msg.payload.decode('utf-8'))
+                    event = _IoTEvent(device_type, device_id, data)
+                    BDPIncident._hardwareCallback(event)
+                except Exception as e:
+                    print("[ERROR][BDPIncident.on_message] {}".format(e))
+
+            client = mqtt.Client(client_id=client_id, protocol=mqtt.MQTTv311)
+            client.username_pw_set(auth_key, auth_token)
+            client.on_connect = on_connect
+            client.on_message = on_message
+            client.connect(broker, 1883, keepalive=60)
+            client.loop_start()
+
+        except Exception as e:
+            print("[ERROR][BDPIncident._iotSubscribe] {}".format(e))
