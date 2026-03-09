@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Building Damage Protection — Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --border: #2a2d3a;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --ok: #22c55e;
+      --moderate: #f59e0b;
+      --critical: #ef4444;
+      --accent: #3b82f6;
+    }
+
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2rem; border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    header h1 { font-size: 1.1rem; font-weight: 600; letter-spacing: .02em; }
+    header h1 span { color: var(--accent); }
+
+    #status-badge {
+      display: flex; align-items: center; gap: .5rem;
+      font-size: .8rem; color: var(--muted);
+    }
+    #status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+    #status-dot.ok { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+
+    #refresh-info { font-size: .75rem; color: var(--muted); }
+
+    main { padding: 1.5rem 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    /* ── Auth modal ── */
+    #auth-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.75);
+      display: flex; align-items: center; justify-content: center; z-index: 999;
+    }
+    #auth-modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 2rem; width: 340px;
+    }
+    #auth-modal h2 { font-size: 1rem; margin-bottom: 1.25rem; }
+    #auth-modal input {
+      width: 100%; padding: .6rem .75rem; margin-bottom: .75rem;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font-size: .875rem; outline: none;
+    }
+    #auth-modal input:focus { border-color: var(--accent); }
+    #auth-modal button {
+      width: 100%; padding: .65rem; background: var(--accent); border: none;
+      border-radius: 8px; color: #fff; font-size: .9rem; cursor: pointer; font-weight: 600;
+    }
+    #auth-error { color: var(--critical); font-size: .8rem; margin-top: .5rem; display: none; }
+
+    /* ── Section headers ── */
+    .section-title {
+      font-size: .7rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 1rem;
+    }
+
+    /* ── Sensor cards ── */
+    #sensors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    .sensor-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem; cursor: pointer;
+      transition: border-color .2s, transform .15s;
+      position: relative; overflow: hidden;
+    }
+    .sensor-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .sensor-card.selected { border-color: var(--accent); }
+    .sensor-card .status-bar {
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .sensor-card .status-bar.ok { background: var(--ok); }
+    .sensor-card .status-bar.moderate { background: var(--moderate); }
+    .sensor-card .status-bar.critical { background: var(--critical); }
+    .sensor-card .status-bar.unknown { background: var(--muted); }
+
+    .sensor-name { font-size: .8rem; color: var(--muted); margin-bottom: .25rem; }
+    .sensor-id { font-size: .95rem; font-weight: 600; margin-bottom: .75rem; word-break: break-all; }
+    .sensor-readings { display: flex; gap: 1.5rem; }
+    .reading-block .label { font-size: .7rem; color: var(--muted); }
+    .reading-block .value { font-size: 1.5rem; font-weight: 700; }
+    .reading-block .value.ok { color: var(--ok); }
+    .reading-block .value.moderate { color: var(--moderate); }
+    .reading-block .value.critical { color: var(--critical); }
+    .sensor-location { font-size: .75rem; color: var(--muted); margin-top: .75rem; }
+    .sensor-time { font-size: .7rem; color: var(--muted); margin-top: .25rem; }
+
+    /* ── Chart panel ── */
+    #chart-panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.5rem;
+      display: none;
+    }
+    #chart-panel.visible { display: block; }
+    #chart-title { font-size: .9rem; font-weight: 600; margin-bottom: 1rem; }
+    #chart-container { position: relative; height: 220px; }
+
+    /* ── Incidents table ── */
+    #incidents-section { }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    th {
+      text-align: left; padding: .6rem 1rem;
+      font-size: .7rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    td { padding: .65rem 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,.02); }
+
+    .badge {
+      display: inline-block; padding: .2rem .55rem;
+      border-radius: 999px; font-size: .7rem; font-weight: 700; letter-spacing: .04em;
+    }
+    .badge.active   { background: rgba(239,68,68,.15);  color: var(--critical); }
+    .badge.snoozed  { background: rgba(245,158,11,.15); color: var(--moderate); }
+    .badge.fixed    { background: rgba(34,197,94,.15);  color: var(--ok); }
+    .badge.unknown  { background: rgba(100,116,139,.15); color: var(--muted); }
+
+    #no-incidents { color: var(--muted); font-size: .85rem; padding: 1rem 0; }
+    #no-sensors   { color: var(--muted); font-size: .85rem; }
+
+    /* ── Stats strip ── */
+    #stats-strip {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+    }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: .85rem 1.25rem; flex: 1; min-width: 120px;
+    }
+    .stat-card .stat-label { font-size: .7rem; color: var(--muted); margin-bottom: .3rem; }
+    .stat-card .stat-value { font-size: 1.6rem; font-weight: 700; }
+
+    .loader { color: var(--muted); font-size: .85rem; }
+  </style>
+</head>
+<body>
+
+<!-- Auth modal -->
+<div id="auth-overlay">
+  <div id="auth-modal">
+    <h2>Sign in to Dashboard</h2>
+    <input type="text" id="input-user" placeholder="Username" value="admin" />
+    <input type="password" id="input-pass" placeholder="Password" />
+    <button onclick="login()">Continue</button>
+    <div id="auth-error">Invalid credentials — please try again.</div>
+  </div>
+</div>
+
+<header>
+  <h1>Building Damage <span>Protection</span></h1>
+  <div id="status-badge">
+    <div id="status-dot"></div>
+    <span id="status-text">Connecting…</span>
+  </div>
+  <span id="refresh-info">Auto-refresh in <span id="countdown">30</span>s &nbsp;|&nbsp; <a href="/map3d" style="color:var(--accent);text-decoration:none;font-size:.75rem;">3D Map →</a></span>
+</header>
+
+<main>
+  <!-- Stats -->
+  <div id="stats-strip">
+    <div class="stat-card">
+      <div class="stat-label">Sensors</div>
+      <div class="stat-value" id="stat-sensors">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Active Incidents</div>
+      <div class="stat-value" id="stat-active" style="color:var(--critical)">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Snoozed</div>
+      <div class="stat-value" id="stat-snoozed" style="color:var(--moderate)">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Resolved</div>
+      <div class="stat-value" id="stat-fixed" style="color:var(--ok)">—</div>
+    </div>
+  </div>
+
+  <!-- Sensors -->
+  <section>
+    <div class="section-title">Sensors</div>
+    <div id="sensors-grid"><span class="loader">Loading sensors…</span></div>
+  </section>
+
+  <!-- Chart -->
+  <div id="chart-panel">
+    <div id="chart-title">Humidity history</div>
+    <div id="chart-container"><canvas id="humidity-chart"></canvas></div>
+  </div>
+
+  <!-- Incidents -->
+  <section id="incidents-section">
+    <div class="section-title">Recent Incidents</div>
+    <div class="table-wrap">
+      <table id="incidents-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Sensor</th>
+            <th>Location</th>
+            <th>Time</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="incidents-body">
+          <tr><td colspan="5" class="loader">Loading incidents…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script>
+  let AUTH = '';
+  let selectedHardwareUid = null;
+  let chart = null;
+  let refreshTimer = null;
+  let countdownTimer = null;
+  let countdownVal = 30;
+
+  function b64(u, p) { return btoa(u + ':' + p); }
+
+  function apiFetch(path) {
+    return fetch(path, { headers: { 'Authorization': 'Basic ' + AUTH } });
+  }
+
+  async function login() {
+    const u = document.getElementById('input-user').value.trim();
+    const p = document.getElementById('input-pass').value;
+    AUTH = b64(u, p);
+    const r = await fetch('/api/tenants', { headers: { 'Authorization': 'Basic ' + AUTH } });
+    if (r.status === 401) {
+      document.getElementById('auth-error').style.display = 'block';
+      return;
+    }
+    document.getElementById('auth-overlay').style.display = 'none';
+    startDashboard();
+  }
+
+  document.getElementById('input-pass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') login();
+  });
+
+  function startDashboard() {
+    loadAll();
+    scheduleRefresh();
+  }
+
+  function scheduleRefresh() {
+    clearInterval(refreshTimer);
+    clearInterval(countdownTimer);
+    countdownVal = 30;
+    document.getElementById('countdown').textContent = countdownVal;
+    countdownTimer = setInterval(() => {
+      countdownVal--;
+      document.getElementById('countdown').textContent = countdownVal;
+      if (countdownVal <= 0) { loadAll(); countdownVal = 30; }
+    }, 1000);
+  }
+
+  async function loadAll() {
+    await checkStatus();
+    await Promise.all([loadHardware(), loadIncidents()]);
+    if (selectedHardwareUid !== null) loadChart(selectedHardwareUid);
+  }
+
+  async function checkStatus() {
+    try {
+      const r = await fetch('/');
+      if (r.ok) {
+        document.getElementById('status-dot').className = 'ok';
+        document.getElementById('status-text').textContent = 'API healthy';
+      }
+    } catch { document.getElementById('status-text').textContent = 'API unreachable'; }
+  }
+
+  function humidityClass(h) {
+    if (h === null) return 'unknown';
+    if (h < 50)  return 'ok';
+    if (h < 75)  return 'moderate';
+    return 'critical';
+  }
+
+  async function loadHardware() {
+    const r = await apiFetch('/api/hardware');
+    const sensors = await r.json();
+    document.getElementById('stat-sensors').textContent = sensors.length;
+    const grid = document.getElementById('sensors-grid');
+    if (!sensors.length) { grid.innerHTML = '<span id="no-sensors">No sensors registered.</span>'; return; }
+
+    grid.innerHTML = sensors.map(s => {
+      let humidity = null, temp = null;
+      try {
+        const reading = s.LAST_READING ? JSON.parse(s.LAST_READING) : null;
+        if (reading) { humidity = reading.humidity ?? reading.HUMIDITY ?? null; temp = reading.temperature ?? reading.TEMPERATURE ?? null; }
+      } catch {}
+      const cls = humidityClass(humidity);
+      const hDisplay = humidity !== null ? humidity.toFixed(1) + '%' : '—';
+      const tDisplay = temp !== null ? temp.toFixed(1) + '°C' : '—';
+      const lastTime = s.LAST_READING_TIME ? new Date(s.LAST_READING_TIME).toLocaleString() : 'No data';
+      return `<div class="sensor-card${selectedHardwareUid == s.HARDWARE_UID ? ' selected' : ''}"
+                   onclick="selectSensor(${s.HARDWARE_UID})">
+        <div class="status-bar ${cls}"></div>
+        <div class="sensor-name">${s.HARDWARE_TYPE}</div>
+        <div class="sensor-id">${s.HARDWARE_ID}</div>
+        <div class="sensor-readings">
+          <div class="reading-block">
+            <div class="label">Humidity</div>
+            <div class="value ${cls}">${hDisplay}</div>
+          </div>
+          ${temp !== null ? `<div class="reading-block"><div class="label">Temp</div><div class="value">${tDisplay}</div></div>` : ''}
+        </div>
+        ${s.HARDWARE_DETAIL ? `<div class="sensor-location">${s.HARDWARE_DETAIL}</div>` : ''}
+        <div class="sensor-time">${lastTime}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function selectSensor(uid) {
+    selectedHardwareUid = uid;
+    document.querySelectorAll('.sensor-card').forEach(c => c.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    loadChart(uid);
+  }
+
+  async function loadChart(uid) {
+    const r = await apiFetch('/api/events/' + uid);
+    const events = await r.json();
+    if (!events.length) { document.getElementById('chart-panel').classList.remove('visible'); return; }
+
+    const points = events.slice().reverse().map(e => {
+      let h = null;
+      try { const d = JSON.parse(e.READING); h = d.humidity ?? d.HUMIDITY ?? null; } catch {}
+      return { x: e.READING_TIME, y: h };
+    }).filter(p => p.y !== null);
+
+    const labels = points.map(p => {
+      const d = new Date(p.x);
+      return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+    });
+    const data = points.map(p => p.y);
+
+    document.getElementById('chart-panel').classList.add('visible');
+
+    if (chart) chart.destroy();
+    chart = new Chart(document.getElementById('humidity-chart'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Humidity (%)',
+          data,
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59,130,246,.1)',
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0.3,
+          fill: true,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          x: { grid: { color: '#2a2d3a' }, ticks: { color: '#64748b', maxTicksLimit: 10, maxRotation: 0 } },
+          y: {
+            grid: { color: '#2a2d3a' }, ticks: { color: '#64748b' },
+            min: 0, max: 100,
+            title: { display: true, text: '%', color: '#64748b' }
+          }
+        },
+        annotation: { annotations: [
+          { type: 'line', yMin: 50, yMax: 50, borderColor: 'rgba(245,158,11,.6)', borderWidth: 1, borderDash: [4,4] },
+          { type: 'line', yMin: 75, yMax: 75, borderColor: 'rgba(239,68,68,.6)', borderWidth: 1, borderDash: [4,4] },
+        ]}
+      }
+    });
+  }
+
+  const STATUS_MAP = { 1: ['fixed','Resolved'], 2: ['active','Active'], 3: ['snoozed','Snoozed'] };
+
+  async function loadIncidents() {
+    const r = await apiFetch('/api/incidents');
+    const incidents = await r.json();
+    const counts = { 2: 0, 3: 0, 1: 0 };
+    incidents.forEach(i => { if (counts[i.INCIDENT_STATUS_CODE] !== undefined) counts[i.INCIDENT_STATUS_CODE]++; });
+    document.getElementById('stat-active').textContent  = counts[2];
+    document.getElementById('stat-snoozed').textContent = counts[3];
+    document.getElementById('stat-fixed').textContent   = counts[1];
+
+    const tbody = document.getElementById('incidents-body');
+    if (!incidents.length) {
+      tbody.innerHTML = '<tr><td colspan="5" id="no-incidents">No incidents recorded.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = incidents.map(i => {
+      const [cls, label] = STATUS_MAP[i.INCIDENT_STATUS_CODE] || ['unknown','Unknown'];
+      const t = i.INCIDENT_TIME ? new Date(i.INCIDENT_TIME).toLocaleString() : '—';
+      return `<tr>
+        <td>${i.INCIDENT_ID}</td>
+        <td>${i.HARDWARE_ID || '—'}</td>
+        <td>${i.HARDWARE_DETAIL || '—'}</td>
+        <td>${t}</td>
+        <td><span class="badge ${cls}">${label}</span></td>
+      </tr>`;
+    }).join('');
+  }
+</script>
+</body>
+</html>

@@ -20,6 +20,7 @@ from flask_httpauth import HTTPBasicAuth
 from flask import request
 from flask import json
 import ibm_db
+import bdp_dbutil
 from bdp_dbutil import *
 
 from bdp_auth import BDPAuth

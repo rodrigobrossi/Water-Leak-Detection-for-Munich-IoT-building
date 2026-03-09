@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BDP — 3D Building Map</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=IBM+Plex+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #080b12;
+      --surface:  #0e1422;
+      --border:   #1c2438;
+      --text:     #c0d4f0;
+      --muted:    #3d5272;
+      --ok:       #1dcc6e;
+      --mod:      #f5a623;
+      --crit:     #ff2d55;
+      --accent:   #3d9eff;
+    }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
+    body { font-family: 'IBM Plex Mono', monospace; color: var(--text); }
+
+    /* ── canvas ── */
+    #canvas-wrap { position: fixed; inset: 0; }
+    #canvas-wrap canvas { display: block; width: 100% !important; height: 100% !important; }
+    #label-wrap  { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+
+    /* ── scanlines ── */
+    #scanlines {
+      position: fixed; inset: 0; z-index: 5; pointer-events: none;
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,.025) 3px, rgba(0,0,0,.025) 4px);
+    }
+
+    /* ── header ── */
+    #hud {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+      padding: .85rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(8,11,18,.96) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    #hud > * { pointer-events: all; }
+    .hud-title {
+      font-family: 'Syne', sans-serif; font-size: .9rem; font-weight: 800;
+      letter-spacing: .18em; text-transform: uppercase; color: var(--accent);
+    }
+    .hud-title span { color: rgba(192,212,240,.5); }
+    #live-badge {
+      display: flex; align-items: center; gap: .45rem;
+      font-size: .6rem; letter-spacing: .1em; color: var(--muted);
+    }
+    #live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--muted); transition: background .4s;
+    }
+    #live-dot.on { background: var(--ok); box-shadow: 0 0 7px rgba(29,204,110,.7); animation: blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
+    .back-btn {
+      font-size: .65rem; letter-spacing: .1em; color: var(--muted);
+      text-decoration: none; padding: .35rem .8rem;
+      border: 1px solid var(--border); border-radius: 4px;
+      transition: color .2s, border-color .2s, box-shadow .2s;
+    }
+    .back-btn:hover { color: var(--accent); border-color: var(--accent); box-shadow: 0 0 10px rgba(61,158,255,.25); }
+
+    /* ── legend ── */
+    #legend {
+      position: fixed; bottom: 1.5rem; left: 1.5rem; z-index: 20;
+      display: flex; flex-direction: column; gap: .45rem;
+    }
+    .leg { display: flex; align-items: center; gap: .5rem; font-size: .62rem; letter-spacing: .05em; color: var(--muted); }
+    .leg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── controls hint ── */
+    #hint {
+      position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 20;
+      font-size: .6rem; letter-spacing: .06em; color: var(--muted); text-align: right; line-height: 2;
+    }
+
+    /* ── CSS2D labels ── */
+    .floor-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+      color: rgba(61,158,255,.45); white-space: nowrap; pointer-events: none; user-select: none;
+    }
+    .sensor-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: .05em;
+      color: rgba(192,212,240,.9);
+      background: rgba(8,11,18,.8); border: 1px solid rgba(61,158,255,.22);
+      padding: 2px 7px; border-radius: 3px;
+      white-space: nowrap; pointer-events: none; user-select: none;
+      transform: translateY(-30px);
+    }
+
+    /* ── popup ── */
+    #popup {
+      position: fixed; z-index: 30; display: none;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.1rem 1.4rem; min-width: 210px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.7);
+    }
+    #popup.show { display: block; }
+    #popup-close {
+      position: absolute; top: .55rem; right: .8rem;
+      cursor: pointer; color: var(--muted); font-size: .85rem; line-height: 1;
+    }
+    #popup-close:hover { color: var(--text); }
+    #popup-bar { height: 2px; border-radius: 1px; margin-bottom: .75rem; background: var(--muted); }
+    #popup-bar.ok   { background: var(--ok);   box-shadow: 0 0 6px rgba(29,204,110,.5); }
+    #popup-bar.mod  { background: var(--mod);  box-shadow: 0 0 6px rgba(245,166,35,.5); }
+    #popup-bar.crit { background: var(--crit); box-shadow: 0 0 6px rgba(255,45,85,.5); }
+    #popup-name {
+      font-family: 'Syne', sans-serif; font-size: .75rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: .6rem;
+    }
+    .prow { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .35rem; font-size: .68rem; }
+    .pk { color: var(--muted); letter-spacing: .06em; }
+    .pv { font-weight: 600; letter-spacing: .04em; }
+
+    /* ── auth ── */
+    #auth {
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(8,11,18,.96);
+      display: flex; align-items: center; justify-content: center;
+    }
+    #auth-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 2.25rem 2rem; width: 300px;
+    }
+    #auth-box h2 {
+      font-family: 'Syne', sans-serif; font-size: .95rem; font-weight: 800;
+      letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin-bottom: .2rem;
+    }
+    #auth-box p { font-size: .65rem; color: var(--muted); margin-bottom: 1.4rem; letter-spacing: .04em; }
+    #auth-box input {
+      width: 100%; padding: .6rem .8rem; margin-bottom: .65rem;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+      color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: .78rem; outline: none;
+    }
+    #auth-box input:focus { border-color: var(--accent); }
+    #auth-btn {
+      width: 100%; padding: .65rem;
+      background: var(--accent); border: none; border-radius: 6px;
+      color: #fff; font-family: 'Syne', sans-serif; font-size: .8rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase; cursor: pointer;
+      transition: opacity .2s, box-shadow .2s;
+    }
+    #auth-btn:hover { opacity: .9; box-shadow: 0 0 18px rgba(61,158,255,.3); }
+    #auth-err { color: var(--crit); font-size: .68rem; margin-top: .5rem; display: none; }
+
+    /* ── loader ── */
+    #loader {
+      position: fixed; inset: 0; z-index: 90;
+      background: var(--bg); display: none; align-items: center; justify-content: center;
+      flex-direction: column; gap: .85rem; transition: opacity .5s;
+    }
+    #loader.show { display: flex; }
+    #loader.gone { opacity: 0; pointer-events: none; }
+    #loader-err  { color: var(--crit); font-size: .65rem; letter-spacing: .08em; display: none; margin-top: .5rem; }
+    .spin {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 2px solid var(--border); border-top-color: var(--accent);
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loader p { font-size: .65rem; letter-spacing: .12em; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<!-- Auth -->
+<div id="auth">
+  <div id="auth-box">
+    <h2>BDP / Control</h2>
+    <p>3D Sensor Map — authenticate to enter</p>
+    <input type="text"     id="au" placeholder="Username" value="admin" />
+    <input type="password" id="ap" placeholder="Password" />
+    <button id="auth-btn" onclick="doLogin()">Access Map</button>
+    <div id="auth-err">Authentication failed.</div>
+  </div>
+</div>
+
+<!-- Loader -->
+<div id="loader"><div class="spin"></div><p id="loader-msg">Initialising sensor array…</p><p id="loader-err"></p></div>
+
+<!-- Scanlines -->
+<div id="scanlines"></div>
+
+<!-- 3D Canvas -->
+<div id="canvas-wrap"><canvas id="c"></canvas></div>
+<div id="label-wrap"></div>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="hud-title">BDP <span>/ 3D MAP</span></div>
+  <div id="live-badge"><div id="live-dot"></div><span id="live-txt">—</span></div>
+  <a href="/dashboard" class="back-btn">← Dashboard</a>
+</div>
+
+<!-- Legend -->
+<div id="legend">
+  <div class="leg"><div class="leg-dot" style="background:var(--ok);box-shadow:0 0 5px rgba(29,204,110,.5)"></div>Normal &lt;50 %</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--mod);box-shadow:0 0 5px rgba(245,166,35,.5)"></div>Moderate 50–75 %</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--crit);box-shadow:0 0 5px rgba(255,45,85,.5)"></div>Critical &gt;75 %</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--muted)"></div>No data</div>
+</div>
+
+<div id="hint">Drag · rotate<br>Scroll · zoom<br>Click sensor</div>
+
+<!-- Popup -->
+<div id="popup">
+  <span id="popup-close" onclick="closePopup()">✕</span>
+  <div id="popup-bar"></div>
+  <div id="popup-name">—</div>
+  <div class="prow"><span class="pk">LOCATION</span>   <span class="pv" id="pp-loc">—</span></div>
+  <div class="prow"><span class="pk">TYPE</span>        <span class="pv" id="pp-type">—</span></div>
+  <div class="prow"><span class="pk">HUMIDITY</span>    <span class="pv" id="pp-hum">—</span></div>
+  <div class="prow"><span class="pk">TEMPERATURE</span> <span class="pv" id="pp-temp">—</span></div>
+  <div class="prow"><span class="pk">STATUS</span>      <span class="pv" id="pp-status">—</span></div>
+  <div class="prow" style="margin-top:.4rem"><span class="pk">LAST SEEN</span><span class="pv" id="pp-time" style="font-size:.6rem">—</span></div>
+</div>
+
+<script type="module">
+import * as THREE            from 'three';
+import { OrbitControls }     from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer,
+         CSS2DObject }       from 'three/addons/renderers/CSS2DRenderer.js';
+
+/* ── constants ──────────────────────── */
+const BW = 18, BD = 12, FH = 3.5;
+const BASEMENT_Y = -FH;
+const ROOF_Y     = FH * 3;   // 10.5
+
+const FLOORS = [
+  { y: BASEMENT_Y, label: 'BASEMENT' },
+  { y: 0,          label: 'GROUND'   },
+  { y: FH,         label: 'FLOOR 2'  },
+  { y: FH * 2,     label: 'FLOOR 3'  },
+];
+
+// Sensor home positions inside the building
+const SENSOR_POS = {
+  'sensor-01': new THREE.Vector3(-3,  FH + 1.75,  -1),    // Server Room B2
+  'sensor-02': new THREE.Vector3( 3, -FH + 1.75,   1),    // Basement
+  'sensor-03': new THREE.Vector3( 0,  ROOF_Y + .9,  0),   // Rooftop HVAC
+};
+
+const C = {
+  ok:      0x1dcc6e,
+  mod:     0xf5a623,
+  crit:    0xff2d55,
+  unknown: 0x3d5272,
+};
+
+/* ── state ──────────────────────────── */
+let AUTH = '';
+let scene, camera, renderer, labelRenderer, controls, clock, raycaster, mouse;
+let sensorObjs = [];   // { group, core, halo, pl, baseY, data }
+let rings = [];        // { mesh, basePos, phase }
+
+/* ── auth ───────────────────────────── */
+window.doLogin = async () => {
+  const errEl = document.getElementById('auth-err');
+  errEl.style.display = 'none';
+  AUTH = btoa(document.getElementById('au').value.trim() + ':' + document.getElementById('ap').value);
+  try {
+    const r = await fetch('/api/hardware', { headers: { Authorization: 'Basic ' + AUTH } });
+    if (r.status === 401) { errEl.style.display = 'block'; return; }
+    const sensors = await r.json();
+    document.getElementById('auth').style.display = 'none';
+    const loader = document.getElementById('loader');
+    loader.classList.add('show');
+    document.getElementById('loader-msg').textContent = 'Building 3D scene…';
+    await new Promise(res => setTimeout(res, 50)); // let browser paint loader
+    try {
+      initScene();
+    } catch (e) {
+      document.getElementById('loader-err').textContent = 'Scene error: ' + e.message;
+      document.getElementById('loader-err').style.display = 'block';
+      document.getElementById('loader-msg').style.display = 'none';
+      document.querySelector('#loader .spin').style.display = 'none';
+      console.error(e); return;
+    }
+    placeSensors(sensors);
+    loader.classList.add('gone');
+    document.getElementById('live-dot').classList.add('on');
+    document.getElementById('live-txt').textContent = 'LIVE';
+    autoRefresh();
+  } catch (e) {
+    errEl.textContent = 'Network error: ' + e.message;
+    errEl.style.display = 'block';
+  }
+};
+document.getElementById('ap').addEventListener('keydown', e => e.key === 'Enter' && window.doLogin());
+
+/* ── scene ──────────────────────────── */
+function initScene() {
+  clock = new THREE.Clock();
+
+  renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = .85;
+
+  labelRenderer = new CSS2DRenderer({ element: document.getElementById('label-wrap') });
+  labelRenderer.setSize(innerWidth, innerHeight);
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x080b12);
+  scene.fog = new THREE.FogExp2(0x080b12, .016);
+
+  camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, .1, 300);
+  camera.position.set(32, 20, 32);
+
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = .06;
+  controls.minDistance = 8;
+  controls.maxDistance = 80;
+  controls.maxPolarAngle = Math.PI * .47;
+  controls.target.set(0, FH, 0);
+  controls.update();
+
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2();
+
+  /* lights */
+  scene.add(new THREE.AmbientLight(0x0d1520, 3.5));
+  const sun = new THREE.DirectionalLight(0x6090d0, 1.8);
+  sun.position.set(20, 35, 20); sun.castShadow = true;
+  scene.add(sun);
+  const fill = new THREE.DirectionalLight(0x203040, 1);
+  fill.position.set(-12, 8, -18);
+  scene.add(fill);
+  scene.add(new THREE.HemisphereLight(0x203560, 0x060912, 1.4));
+
+  buildBuilding();
+  buildGround();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+    labelRenderer.setSize(innerWidth, innerHeight);
+  });
+  renderer.domElement.addEventListener('click', onCanvasClick);
+  animate();
+}
+
+/* ── building ───────────────────────── */
+function buildBuilding() {
+  const matSlab = new THREE.MeshStandardMaterial({ color: 0x0f1c2e, roughness: .9, metalness: .1 });
+  const matGlass = new THREE.MeshStandardMaterial({
+    color: 0x204880, roughness: .1, metalness: .25,
+    transparent: true, opacity: .09, side: THREE.DoubleSide, depthWrite: false,
+  });
+  const matCol = new THREE.MeshStandardMaterial({
+    color: 0x182d50, roughness: .7, metalness: .4, emissive: 0x0a1830, emissiveIntensity: .6,
+  });
+  const eFloor  = new THREE.LineBasicMaterial({ color: 0x3c6aaa });
+  const eWall   = new THREE.LineBasicMaterial({ color: 0x1e3558 });
+
+  const totalH = ROOF_Y - BASEMENT_Y;  // 14
+
+  /* floor slabs */
+  FLOORS.forEach(f => {
+    addBox(0, f.y, 0, BW, .18, BD, matSlab, eFloor);
+    addGrid(f.y + .1);
+
+    const d = document.createElement('div');
+    d.className = 'floor-lbl'; d.textContent = f.label;
+    const o = new CSS2DObject(d);
+    o.position.set(-BW / 2 - 1.8, f.y + .3, 0);
+    scene.add(o);
+  });
+
+  /* roof */
+  addBox(0, ROOF_Y,     0, BW,     .22, BD, matSlab, eFloor);
+  addBox(0, ROOF_Y + .4, 0, BW + .3, .55, BD + .3, matCol, eFloor);
+
+  /* walls — back (z+), left (x-), right (x+), front partial (z-) */
+  const wy = BASEMENT_Y + totalH / 2;
+  addBox(0,        wy, BD / 2,  BW,  totalH, .14, matGlass, eWall);  // back
+  addBox(-BW / 2,  wy, 0,       .14, totalH,  BD, matGlass, eWall);  // left
+  addBox( BW / 2,  wy, 0,       .14, totalH,  BD, matGlass, eWall);  // right
+  addBox(-BW / 4,  wy, -BD / 2, BW / 2 - .1, totalH, .14, matGlass, eWall); // front (cut-away right half)
+
+  /* columns */
+  const colH = totalH + .5;
+  const colGeo = new THREE.BoxGeometry(.4, colH, .4);
+  [[-BW/2,-BD/2], [-BW/2,BD/2], [BW/2,-BD/2], [BW/2,BD/2],
+   [-BW/4,-BD/2], [0,-BD/2], [BW/4,-BD/2],
+   [-BW/4,BD/2],  [0,BD/2],  [BW/4,BD/2]].forEach(([x, z]) => {
+    const m = new THREE.Mesh(colGeo, matCol);
+    m.position.set(x, BASEMENT_Y + colH / 2, z);
+    m.castShadow = true;
+    scene.add(m);
+  });
+
+  /* windows */
+  const wMat = new THREE.MeshStandardMaterial({
+    color: 0x4facff, emissive: 0x1a4a88, emissiveIntensity: .7,
+    transparent: true, opacity: .3, side: THREE.DoubleSide,
+  });
+  const wG = new THREE.PlaneGeometry(1.5, 1.3);
+  FLOORS.forEach(f => {
+    [-5,-3,-1,1,3,5].forEach(xi => {
+      const w = new THREE.Mesh(wG, wMat);
+      w.position.set(xi * 1.3, f.y + FH / 2, BD / 2 - .05);
+      scene.add(w);
+    });
+    [-3,-1,1,3].forEach(zi => {
+      [BW/2, -BW/2].forEach((x, side) => {
+        const w = new THREE.Mesh(wG, wMat);
+        w.rotation.y = Math.PI / 2;
+        w.position.set(x + (side ? .06 : -.06), f.y + FH / 2, zi);
+        scene.add(w);
+      });
+    });
+  });
+
+  /* interior outlines */
+  interiorOutline(-3, FH,      -1, 7, FH,    5, 0x1a3f60); // Server Room F2
+  interiorOutline( 3, BASEMENT_Y, 1, 8, FH,  6, 0x142840); // Basement Storage
+  interiorOutline( 3, FH * 2,   0, 5, FH,    4, 0x1a2d40); // F3 room
+}
+
+function addBox(x, y, z, w, h, d, mat, edgeMat) {
+  const geo = new THREE.BoxGeometry(w, h, d);
+  const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true;
+  scene.add(m);
+  const el = new THREE.LineSegments(new THREE.EdgesGeometry(geo), edgeMat);
+  el.position.set(x, y, z); scene.add(el);
+}
+
+function addGrid(y) {
+  const g = new THREE.GridHelper(Math.max(BW, BD), 6, 0x0c1a2c, 0x0c1a2c);
+  g.position.set(0, y, 0); scene.add(g);
+}
+
+function interiorOutline(x, yBase, z, w, h, d, color) {
+  const geo = new THREE.BoxGeometry(w, h, d);
+  const mat = new THREE.LineBasicMaterial({ color });
+  const ls = new THREE.LineSegments(new THREE.EdgesGeometry(geo), mat);
+  ls.position.set(x, yBase + h / 2, z); scene.add(ls);
+}
+
+function buildGround() {
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(140, 140),
+    new THREE.MeshStandardMaterial({ color: 0x05080f, roughness: 1 })
+  );
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = BASEMENT_Y - .1;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  const grid = new THREE.GridHelper(120, 48, 0x0c1522, 0x0c1522);
+  grid.position.y = BASEMENT_Y - .09; scene.add(grid);
+
+  // Glow ring around building footprint
+  const rg = new THREE.RingGeometry(12, 16, 64);
+  const rm = new THREE.MeshBasicMaterial({ color: 0x1a3a6e, transparent: true, opacity: .1, side: THREE.DoubleSide, depthWrite: false });
+  const ring = new THREE.Mesh(rg, rm);
+  ring.rotation.x = -Math.PI / 2; ring.position.y = BASEMENT_Y - .06; scene.add(ring);
+}
+
+/* ── sensors ────────────────────────── */
+function statusOf(h) {
+  if (h === null) return 'unknown';
+  return h < 50 ? 'ok' : h < 75 ? 'mod' : 'crit';
+}
+
+function placeSensors(sensors) {
+  sensorObjs.forEach(o => scene.remove(o.group));
+  rings.forEach(r => scene.remove(r.mesh));
+  sensorObjs = []; rings = [];
+
+  sensors.forEach((sensor, idx) => {
+    const basePos = SENSOR_POS[sensor.HARDWARE_ID]
+      || new THREE.Vector3((idx - 1) * 4, FH * 1.5, 0);
+
+    let hum = null, temp = null;
+    try {
+      const rd = sensor.LAST_READING ? JSON.parse(sensor.LAST_READING) : null;
+      if (rd) { hum = rd.humidity ?? rd.HUMIDITY ?? null; temp = rd.temperature ?? rd.TEMPERATURE ?? null; }
+    } catch {}
+    const st = statusOf(hum);
+    const col = C[st];
+
+    const group = new THREE.Group();
+    group.position.copy(basePos);
+
+    /* halo */
+    const halo = new THREE.Mesh(
+      new THREE.SphereGeometry(.55, 16, 16),
+      new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: .07, depthWrite: false })
+    );
+    group.add(halo);
+
+    /* core */
+    const core = new THREE.Mesh(
+      new THREE.SphereGeometry(.27, 20, 20),
+      new THREE.MeshStandardMaterial({
+        color: col, emissive: new THREE.Color(col), emissiveIntensity: 1.3,
+        roughness: .2, metalness: .6,
+      })
+    );
+    core.castShadow = true;
+    group.add(core);
+
+    /* point light */
+    const pl = new THREE.PointLight(col, 3.5, 6, 2);
+    group.add(pl);
+
+    /* drop line to floor */
+    const nearFloor = [...FLOORS].reverse().find(f => f.y + .1 <= basePos.y)?.y ?? BASEMENT_Y;
+    const floorRef  = basePos.y > ROOF_Y ? ROOF_Y + .14 : nearFloor + .12;
+    const dropGeo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, floorRef - basePos.y, 0),
+    ]);
+    group.add(new THREE.Line(dropGeo,
+      new THREE.LineBasicMaterial({ color: col, transparent: true, opacity: .25 })));
+
+    /* CSS2D label */
+    const ld = document.createElement('div');
+    ld.className = 'sensor-lbl'; ld.textContent = sensor.HARDWARE_ID;
+    const lo = new CSS2DObject(ld);
+    lo.position.set(0, .52, 0); group.add(lo);
+
+    scene.add(group);
+
+    /* store for raycasting and animation */
+    group.userData = { sensor, hum, temp, st, core };
+    sensorObjs.push({ group, core, halo, pl, baseY: basePos.y, data: { sensor, hum, temp, st } });
+
+    /* 3 staggered pulse rings */
+    for (let i = 0; i < 3; i++) addRing(basePos.clone(), col, i * 0.75);
+  });
+}
+
+function addRing(pos, color, phase) {
+  const geo = new THREE.RingGeometry(.05, .15, 40);
+  const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .7, side: THREE.DoubleSide, depthWrite: false });
+  const m = new THREE.Mesh(geo, mat);
+  m.rotation.x = -Math.PI / 2;
+  m.position.copy(pos);
+  scene.add(m);
+  rings.push({ mesh: m, basePos: pos.clone(), phase });
+}
+
+/* ── animate ────────────────────────── */
+function animate() {
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+  controls.update();
+
+  sensorObjs.forEach(({ group, core, halo, pl, baseY }, i) => {
+    const bob = Math.sin(t * 1.1 + i * 2.3) * .065;
+    group.position.y = baseY + bob;
+
+    const p = .85 + Math.sin(t * 2.8 + i * 1.9) * .15;
+    core.material.emissiveIntensity = 1.1 * p;
+    pl.intensity = 3.2 * p;
+    halo.material.opacity = .04 + .055 * p;
+  });
+
+  rings.forEach(r => {
+    const phase = ((t * .55 + r.phase) % 1);
+    const s = .4 + phase * 5;
+    r.mesh.scale.set(s, s, s);
+    r.mesh.material.opacity = (1 - phase) * .45;
+    // Sync Y with parent sensor bob
+    const parent = sensorObjs.find(o => o.baseY === r.basePos.y);
+    r.mesh.position.y = parent ? parent.group.position.y : r.basePos.y;
+  });
+
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+}
+
+/* ── interaction ────────────────────── */
+function onCanvasClick(e) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1;
+  mouse.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(sensorObjs.map(o => o.core));
+  if (hits.length) {
+    const s = sensorObjs.find(o => o.core === hits[0].object);
+    if (s) openPopup(s, e.clientX, e.clientY);
+  } else {
+    closePopup();
+  }
+}
+
+function openPopup({ data: { sensor, hum, temp, st } }, cx, cy) {
+  const ST_LABEL = { ok: 'NORMAL', mod: 'MODERATE', crit: 'CRITICAL', unknown: 'NO DATA' };
+  const ST_COLOR = { ok: 'var(--ok)', mod: 'var(--mod)', crit: 'var(--crit)', unknown: 'var(--muted)' };
+  document.getElementById('popup-name').textContent    = sensor.HARDWARE_ID;
+  document.getElementById('pp-loc').textContent        = sensor.HARDWARE_DETAIL || '—';
+  document.getElementById('pp-type').textContent       = sensor.HARDWARE_TYPE   || '—';
+  document.getElementById('pp-hum').textContent        = hum  !== null ? hum.toFixed(1)  + ' %'  : '— %';
+  document.getElementById('pp-temp').textContent       = temp !== null ? temp.toFixed(1) + ' °C' : '— °C';
+  document.getElementById('pp-status').textContent     = ST_LABEL[st];
+  document.getElementById('pp-status').style.color     = ST_COLOR[st];
+  document.getElementById('pp-time').textContent       = sensor.LAST_READING_TIME ? new Date(sensor.LAST_READING_TIME).toLocaleString() : 'No data';
+  const bar = document.getElementById('popup-bar');
+  bar.className = 'popup-bar ' + (st === 'mod' ? 'mod' : st);  // mod → mod class
+
+  const pw = 240, ph = 210;
+  let px = cx + 18, py = cy - ph / 2;
+  if (px + pw > innerWidth  - 12) px = cx - pw - 18;
+  if (py < 12) py = 12;
+  if (py + ph > innerHeight - 12) py = innerHeight - ph - 12;
+  document.getElementById('popup').style.cssText += `left:${px}px;top:${py}px`;
+  document.getElementById('popup').classList.add('show');
+}
+window.closePopup = () => document.getElementById('popup').classList.remove('show');
+
+/* ── auto-refresh ───────────────────── */
+function autoRefresh() {
+  let cd = 30;
+  setInterval(async () => {
+    if (--cd <= 0) {
+      cd = 30;
+      try {
+        const r = await fetch('/api/hardware', { headers: { Authorization: 'Basic ' + AUTH } });
+        if (r.ok) placeSensors(await r.json());
+      } catch {}
+    }
+  }, 1000);
+}
+</script>
+</body>
+</html>

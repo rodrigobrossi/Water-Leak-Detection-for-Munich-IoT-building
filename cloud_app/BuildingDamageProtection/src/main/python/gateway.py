@@ -23,7 +23,7 @@ gevent.monkey.patch_all()
 from bdp_auth import BDPAuth
 from bdp_sysinit import BDPSysInit
 
-from flask import Flask
+from flask import Flask, render_template
 from flask_restful import Resource, Api
 from flask_httpauth import HTTPBasicAuth
 
@@ -34,6 +34,7 @@ from bdp_user import BDPUser
 from bdp_respond import BDPIncidentRespond
 from bdp_servicecheck import BDPServiceCheck
 from bdp_hardware import BDPHardware
+from bdp_dashboard import BDPDashboardTenants, BDPDashboardHardware, BDPDashboardIncidents, BDPDashboardEvents
 
 import bdp_util, bdp_dbutil
 
@@ -60,8 +61,20 @@ api.add_resource(BDPIncidentRespond, '/respond')
 api.add_resource(BDPTenant, '/tenant')
 api.add_resource(BDPUser, '/user')
 api.add_resource(BDPHardware, '/hardware')
+api.add_resource(BDPDashboardTenants, '/api/tenants')
+api.add_resource(BDPDashboardHardware, '/api/hardware')
+api.add_resource(BDPDashboardIncidents, '/api/incidents')
+api.add_resource(BDPDashboardEvents, '/api/events/<int:hardware_uid>')
 
 BDPIncident.start()
+
+@application.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
+
+@application.route('/map3d')
+def map3d():
+    return render_template('map3d.html')
 
 if __name__ == "__main__":
     server_type = BDPProperty.getInstance().getValue('server_type')
